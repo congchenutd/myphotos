@@ -1,0 +1,7 @@
+Import photos
+- Click "Import"
+- Select photos
+- Option: "Create event" or "Add to event"
+	- if create event, give an edit: date, event name, location
+	- if add to event, give a selection of events
+- Click "Done"
