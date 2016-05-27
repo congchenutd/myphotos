@@ -6,5 +6,6 @@
         <file>Images/Quit.png</file>
         <file>Images/Settings.png</file>
         <file>Images/Add.png</file>
+        <file>Images/Scan.png</file>
     </qresource>
 </RCC>

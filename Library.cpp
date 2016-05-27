@@ -1,62 +1,103 @@
 #include "Event.h"
 #include "Library.h"
+#include "People.h"
 #include "Photo.h"
+#include "Settings.h"
+#include "LibraryDAO.h"
+#include "Tag.h"
 
 #include <QSqlQuery>
-
-Library::Library()
-{
-    createTables();
-}
-
-void Library::createTables()
-{
-    QSqlQuery query;
-    query.exec("PRAGMA foreign_keys = ON");
-    query.exec("create table People ( \
-                   ID int primary key, \
-                   Name varchar \
-               )");
-    query.exec("create table Photos ( \
-                   ID int primary key, \
-                   Name varchar \
-               )");
-}
+#include <QDir>
+#include <QDebug>
 
 Library* Library::getInstance()
 {
-    if (_instance == 0)
-        _instance = new Library;
-    return _instance;
+    static Library instance;
+    return &instance;
 }
 
-QList<Event*> Library::getEvents() const {
-//    return _events.values();
+QStringList Library::getMonitoredFolders() const {
+    return Settings::getInstance()->getMonitoredFolders();
 }
 
-QList<Photo*> Library::getAllPhotos() const
+void Library::setMonitoredFolders(const QStringList& list) {
+    Settings::getInstance()->setMonitoredFolders(list);
+}
+
+void Library::scan()
 {
-    QList<Photo*> result;
-//    foreach(Event* event, _events)
-//        result.append(event->getPhotos());
-    return result;
+    QStringList folders = Settings::getInstance()->getMonitoredFolders();
+    for (const QString& folder: folders)
+    {
+        QDir dir(folder);
+        dir.setFilter(QDir::Files | QDir::NoSymLinks);
+        dir.setSorting(QDir::Size | QDir::Reversed);
+        dir.setNameFilters(Settings::getInstance()->getMonitoredFileTypes().split(";"));
+        for (const QFileInfo& info: dir.entryInfoList())
+        {
+            qDebug() << info.filePath();
+        }
+    }
 }
 
-void Library::setPath(const QString& path) {
-    _path = path;
+void Library::save() {
+    _dao->save(this);
 }
 
-void Library::addPhoto(Photo* photo)
-{
+QMap<int, People*> Library::getAllPeople() const {
+    return _people;
+}
 
+QMap<int, Tag*> Library::getAllTags() const {
+    return _tags;
+}
+
+QMap<int, Event*> Library::getAllEvents() const {
+    return _events;
+}
+
+QMap<int, Photo*> Library::getAllPhotos() const {
+    return _photos;
+}
+
+People* Library::getPeople(int id) {
+    return _people.find(id).value();
+}
+
+Tag* Library::getTag(int id) {
+    return _tags.find(id).value();
+}
+
+Event* Library::getEvent(int id) {
+    return _events.find(id).value();
+}
+
+Photo* Library::getPhoto(int id) {
+    return _photos.find(id).value();
+}
+
+void Library::addPhoto(Photo* photo) {
+    if (photo != 0)
+        _photos.insert(photo->getID(), photo);
 }
 
 void Library::addEvent(Event* event) {
+    if (event != 0)
+        _events.insert(event->getID(), event);
 }
 
-void Library::addPeople(People *people)
+Library::Library()
 {
-
+    _dao = LibraryDAO::getInstance();
+    _dao->load(this);
 }
 
-Library* Library::_instance = 0;
+void Library::addPeople(People* people) {
+    if (people != 0)
+        _people.insert(people->getID(), people);
+}
+
+void Library::addTag(Tag* tag) {
+    if (tag != 0)
+        _tags.insert(tag->getID(), tag);
+}

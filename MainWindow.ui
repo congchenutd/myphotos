@@ -38,7 +38,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionImport"/>
+   <addaction name="actionScan"/>
    <addaction name="actionSettings"/>
    <addaction name="actionQuit"/>
   </widget>
@@ -54,13 +54,22 @@
     <bool>false</bool>
    </attribute>
   </widget>
-  <action name="actionImport">
+  <action name="actionQuit">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/Images/Add.png</normaloff>:/Images/Add.png</iconset>
+     <normaloff>:/Images/Quit.png</normaloff>:/Images/Quit.png</iconset>
    </property>
    <property name="text">
-    <string>Import</string>
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionScan">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Scan.png</normaloff>:/Images/Scan.png</iconset>
+   </property>
+   <property name="text">
+    <string>Scan</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -70,15 +79,6 @@
    </property>
    <property name="text">
     <string>Settings</string>
-   </property>
-  </action>
-  <action name="actionQuit">
-   <property name="icon">
-    <iconset resource="Resources.qrc">
-     <normaloff>:/Images/Quit.png</normaloff>:/Images/Quit.png</iconset>
-   </property>
-   <property name="text">
-    <string>Quit</string>
    </property>
   </action>
  </widget>

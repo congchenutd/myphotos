@@ -11,7 +11,7 @@ public:
     explicit MainWindow(QWidget* parent = 0);
 
 private slots:
-    void onImport();
+    void onScan();
     void onSettings();
 
 private:

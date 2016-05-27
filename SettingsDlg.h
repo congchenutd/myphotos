@@ -9,6 +9,7 @@ class SettingsDlg : public QDialog
 
 public:
     explicit SettingsDlg(QWidget* parent = 0);
+    void accept();
 
 private slots:
     void onMonitoredFolders();

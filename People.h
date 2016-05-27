@@ -2,11 +2,17 @@
 #define PEOPLE_H
 
 #include <QString>
+#include "Persistable.h"
 
-class People
+class PeopleDAO;
+
+class People: public Persistable
 {
 public:
-    People(const QString& name);
+    People(int id, const QString& name);
+
+    QString getName() const;
+    void setName(const QString& name);
 
 private:
     QString _name;

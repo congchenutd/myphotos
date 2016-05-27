@@ -15,6 +15,17 @@ void Settings::setMonitoredFolders(const QStringList& list) {
     setValue("MonitoredFolders", list);
 }
 
+QString Settings::getMonitoredFileTypes() const {
+    return value("MonitoredFileTypes").toString();
+}
+
+void Settings::setMonitoredFileTypes(const QString& list)
+{
+    QStringList unsorted = list.split(";");
+    unsorted.sort();
+    setValue("MonitoredFileTypes", unsorted.join(";"));
+}
+
 Settings::Settings(const QString& fileName)
     : QSettings(fileName, QSettings::IniFormat) {}
 

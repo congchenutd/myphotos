@@ -4,16 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui sql testlib widgets
 
 TARGET = MyPhotos
 TEMPLATE = app
 
-
-SOURCES +=\
-        MainWindow.cpp \
+SOURCES += \
+	MainWindow.cpp \
     Main.cpp \
     Library.cpp \
     Photo.cpp \
@@ -21,18 +18,37 @@ SOURCES +=\
     People.cpp \
     SettingsDlg.cpp \
     MonitoredFoldersDlg.cpp \
-    Settings.cpp
+    Settings.cpp \
+    LibraryDAO.cpp \
+    PeopleDAO.cpp \
+    EventDAO.cpp \
+    PhotoDAO.cpp \
+    ModelTest.cpp \
+    Persistable.cpp \
+    DAO.cpp \
+    Tag.cpp \
+    TagDAO.cpp
 
-HEADERS  += MainWindow.h \
+HEADERS += \
+	MainWindow.h \
     Library.h \
     Photo.h \
     Event.h \
     People.h \
     SettingsDlg.h \
     MonitoredFoldersDlg.h \
-    Settings.h
+    Settings.h \
+    LibraryDAO.h \
+    PeopleDAO.h \
+    EventDAO.h \
+    Persistable.h \
+    DAO.h \
+    PhotoDAO.h \
+    Tag.h \
+    TagDAO.h
 
-FORMS    += MainWindow.ui \
+FORMS += \
+	MainWindow.ui \
     SettingsDlg.ui \
     MonitoredFoldersDlg.ui
 

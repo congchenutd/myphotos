@@ -1,19 +1,25 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "Persistable.h"
+
 #include <QDate>
 #include <QString>
 
 class Photo;
 
-class Event
+class Event: public Persistable
 {
 public:
-    Event(const QString& name, const QDate& date);
+    Event(int id, const QString& name, const QDate& date);
 
     QString         getName()   const;
     QDate           getDate()   const;
     QList<Photo*>   getPhotos() const;
+
+    void setName(const QString& name);
+    void setDate(const QDate& date);
+    void addPhoto(Photo* photo);
 
 private:
     QString         _name;
