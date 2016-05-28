@@ -11,6 +11,7 @@ class People;
 class Event;
 class Tag;
 class PhotoDAO;
+class Thumbnail;
 
 class Photo: public Persistable
 {
@@ -23,13 +24,15 @@ public:
     QList<Tag *>    getTags()       const;
     QList<People*>  getPeople()     const;
     Event*          getEvent()      const;
+    Thumbnail*      getThumbnail()  const;
 
     void setTitle       (const QString& title);
     void setFilePath    (const QString& filePath);
     void setTimeTaken   (const QDateTime& time);
-    void addTag     (Tag*       tag);
-    void addPeople  (People*    people);
-    void setEvent   (Event*     event);
+    void addTag         (Tag*       tag);
+    void addPeople      (People*    people);
+    void setEvent       (Event*     event);
+    void setThumbnail   (Thumbnail* thumbnail);
 
 private:
     QString         _title;
@@ -38,6 +41,7 @@ private:
     QList<Tag*>     _tags;
     QList<People*>  _people;
     Event*          _event;
+    Thumbnail*      _thumbnail;
 };
 
 #endif // PHOTO_H

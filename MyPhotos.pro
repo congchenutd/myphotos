@@ -27,7 +27,11 @@ SOURCES += \
     Persistable.cpp \
     DAO.cpp \
     Tag.cpp \
-    TagDAO.cpp
+    TagDAO.cpp \
+    PhotoView.cpp \
+    FlowLayout.cpp \
+    Thumbnail.cpp \
+    ThumbnailDAO.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -45,12 +49,17 @@ HEADERS += \
     DAO.h \
     PhotoDAO.h \
     Tag.h \
-    TagDAO.h
+    TagDAO.h \
+    PhotoView.h \
+    FlowLayout.h \
+    Thumbnail.h \
+    ThumbnailDAO.h
 
 FORMS += \
 	MainWindow.ui \
     SettingsDlg.ui \
-    MonitoredFoldersDlg.ui
+    MonitoredFoldersDlg.ui \
+    PhotoView.ui
 
 RESOURCES += \
     Resources.qrc

@@ -17,6 +17,7 @@ public:
     void remove(Persistable* persistable);
 
     QString getTableName() const;
+    int getNextID() const;
 
     virtual Persistable* load(int id) const = 0;
 
@@ -27,7 +28,6 @@ protected:
     virtual void removeRelationships(Persistable* ) { }
     virtual void insertRelationships(Persistable* ) { }
 
-    int getNextID() const;
 
 private:
     QString _tableName;

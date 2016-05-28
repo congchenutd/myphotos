@@ -14,6 +14,12 @@ public:
     QString getMonitoredFileTypes() const;
     void setMonitoredFileTypes(const QString& list);
 
+    QSize getThumbnailSize() const;
+    void setThumbnailSize(const QSize& size);
+
+    QString getThumbnailCacheLocation() const;
+    void setThumbnailCacheLocation(const QString& path);
+
 private:
     Settings(const QString& fileName);
 

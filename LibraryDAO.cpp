@@ -7,6 +7,7 @@
 #include "People.h"
 #include "Library.h"
 #include "TagDAO.h"
+#include "ThumbnailDAO.h"
 
 #include <QSqlQuery>
 #include <QVariant>
@@ -19,59 +20,83 @@ LibraryDAO* LibraryDAO::getInstance()
 
 void LibraryDAO::load(Library* library)
 {
+    // objects
     QSqlQuery query;
-    query.exec("select ID from Photos Order By Time");
+    query.exec("select ID from Photos Order By ID");
     while (query.next())
         library->addPhoto(PhotoDAO::getInstance()->load(query.value(0).toInt()));
 
-    query.exec("select ID from People Order By Name");
+    query.exec("select ID from People Order By ID");
     while (query.next())
         library->addPeople(PeopleDAO::getInstance()->load(query.value(0).toInt()));
 
-    query.exec("select ID from Tags Order By Name");
+    query.exec("select ID from Tags Order By ID");
     while (query.next())
         library->addTag(TagDAO::getInstance()->load(query.value(0).toInt()));
 
-    query.exec("select ID from Events Order By Name");
+    query.exec("select ID from Events Order By ID");
     while (query.next())
         library->addEvent(EventDAO::getInstance()->load(query.value(0).toInt()));
 
+    query.exec("select ID from Thumbnails Order By ID");
+    while (query.next())
+        library->addThumbnail(ThumbnailDAO::getInstance()->load(query.value(0).toInt()));
 
-    query.exec(tr("select PhotoID, PeopleID from PhotoPeople"));
+    // relationships
+    query.exec(tr("select FilePath, People.Name from Photos, Peple, PhotoPeople \
+                   where Photos.ID = PhotoID and Peole.ID = PeopleID"));
     while (query.next())
     {
-        int photoID  = query.value(0).toInt();
-        int peopleID = query.value(1).toInt();
-        library->getPhoto(photoID)->addPeople(library->getPeople(peopleID));
+        QString filePath    = query.value(0).toString();
+        QString peopleName  = query.value(1).toString();
+        library->getPhoto(filePath)->addPeople(library->getPeople(peopleName));
     }
 
-    query.exec(tr("select PhotoID, TagID from PhotoTag"));
+    query.exec(tr("select FilePath, Tags.Name from Photos, Tags, PhotoTag \
+                   where Photos.ID = PhotoID and Tags.ID = TagID"));
     while (query.next())
     {
-        int photoID = query.value(0).toInt();
-        int tagID   = query.value(1).toInt();
-        library->getPhoto(photoID)->addTag(library->getTag(tagID));
+        QString filePath    = query.value(0).toString();
+        QString tagName     = query.value(1).toString();
+        library->getPhoto(filePath)->addTag(library->getTag(tagName));
     }
 
-    query.exec(tr("select PhotoID, EventID from PhotoEvent"));
+    query.exec(tr("select FilePath, Events.Name from Photos, Events, PhotoEvent \
+                   where Photos.ID = PhotoID and Events.ID = EventID"));
     while (query.next())
     {
-        int photoID = query.value(0).toInt();
-        int eventID = query.value(1).toInt();
-        library->getPhoto(photoID)->setEvent(library->getEvent(eventID));
+        QString filePath    = query.value(0).toString();
+        QString eventName   = query.value(1).toString();
+        library->getPhoto(filePath)->setEvent(library->getEvent(eventName));
+    }
+
+    query.exec(tr("select Photos.FilePath, Thumbnails.FilePath \
+                   from Photos, Thumbnails, PhotoThumbnail \
+                   where Photos.ID = PhotoID and Thumbnails.ID = ThumbnailID"));
+    while (query.next())
+    {
+        QString photoPath       = query.value(0).toString();
+        QString thumbnailPath   = query.value(1).toString();
+        library->getPhoto(photoPath)->setThumbnail(library->getThumbnail(thumbnailPath));
     }
 }
 
 void LibraryDAO::save(Library* library)
 {
-    for (Tag* tag: library->getAllTags())
-        tag->save();
-    for (People* people: library->getAllPeople())
-        people->save();
-    for (Event* event: library->getAllEvents())
-        event->save();
-    for (Photo* photo: library->getAllPhotos())
-        photo->save();
+    if (QSqlDatabase::database().transaction())
+    {
+        for (Tag* tag: library->getAllTags())
+            tag->save();
+        for (People* people: library->getAllPeople())
+            people->save();
+        for (Event* event: library->getAllEvents())
+            event->save();
+        for (Thumbnail* thumbnail: library->getAllThumbnails())
+            thumbnail->save();
+        for (Photo* photo: library->getAllPhotos())
+            photo->save();
+        QSqlDatabase::database().commit();
+    }
 }
 
 LibraryDAO::LibraryDAO()
@@ -101,6 +126,15 @@ void LibraryDAO::createTables()
     query.exec("create table Tags ( \
                     ID int primary key, \
                     Name varchar \
+                )");
+    query.exec("create table Thumbnails ( \
+                    ID int primary key, \
+                    FilePath varchar \
+               )");
+    query.exec("create table PhotoThumbnail ( \
+                    PhotoID     int references Photos    (ID) on delete cascade on update cascade, \
+                    ThumbnailID int references Thumbnails(ID) on delete cascade on update cascade, \
+                    primary key (PhotoID, ThumbnailID) \
                 )");
     query.exec("create table PhotoPeople ( \
                     PhotoID  int references Photos(ID) on delete cascade on update cascade, \

@@ -4,6 +4,7 @@
 #include "Event.h"
 #include "EventDAO.h"
 #include "Tag.h"
+#include "Thumbnail.h"
 #include <QDateTime>
 #include <QSqlQuery>
 #include <QVariant>
@@ -59,9 +60,10 @@ void PhotoDAO::removeRelationships(Persistable* persistable)
 {
     Photo* photo = static_cast<Photo*>(persistable);
     QSqlQuery query;
-    query.exec(tr("delete from PhotoPeople where PhotoID = %1").arg(photo->getID()));
-    query.exec(tr("delete from PhotoTag    where PhotoID = %1").arg(photo->getID()));
-    query.exec(tr("delete from PhotoEvent  where PhotoID = %1").arg(photo->getID()));
+    query.exec(tr("delete from PhotoPeople      where PhotoID = %1").arg(photo->getID()));
+    query.exec(tr("delete from PhotoTag         where PhotoID = %1").arg(photo->getID()));
+    query.exec(tr("delete from PhotoEvent       where PhotoID = %1").arg(photo->getID()));
+    query.exec(tr("delete from PhotoThumbnail   where PhotoID = %1").arg(photo->getID()));
 }
 
 void PhotoDAO::insertRelationships(Persistable* persistable)
@@ -79,7 +81,13 @@ void PhotoDAO::insertRelationships(Persistable* persistable)
                    .arg(photo->getID())
                    .arg(tag->getID()));
 
-    query.exec(tr("insert into PhotoEvent values (%1, %2)")
-                .arg(photo->getID())
-                .arg(photo->getEvent()->getID()));
+    if (photo->getEvent() != 0)
+        query.exec(tr("insert into PhotoEvent values (%1, %2)")
+                   .arg(photo->getID())
+                   .arg(photo->getEvent()->getID()));
+
+    if (photo->getThumbnail() != 0)
+        query.exec(tr("insert into PhotoThumbnail values (%1, %2)")
+                   .arg(photo->getID())
+                   .arg(photo->getThumbnail()->getID()));
 }

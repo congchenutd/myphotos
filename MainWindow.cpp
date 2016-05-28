@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.setupUi(this);
     connect(ui.actionScan,      SIGNAL(triggered(bool)), this, SLOT(onScan()));
     connect(ui.actionSettings,  SIGNAL(triggered(bool)), this, SLOT(onSettings()));
+    connect(Library::getInstance(), SIGNAL(photoAdded(Photo*)), ui.photoView, SLOT(addPhoto(Photo*)));
 }
 
 void MainWindow::onScan()

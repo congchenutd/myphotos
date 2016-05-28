@@ -9,6 +9,7 @@ public:
     Persistable(int id, DAO* dao);
 
     int getID() const;
+    static int getNextID();
 
     virtual ~Persistable() {}
     virtual void destroy();
@@ -17,6 +18,8 @@ public:
 private:
     int     _id;
     DAO*    _dao;
+
+    static int _maxID;
 };
 
 #endif // PERSISTABLE_H

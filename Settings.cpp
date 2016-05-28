@@ -1,5 +1,7 @@
 #include "Settings.h"
 
+#include <QSize>
+
 Settings *Settings::getInstance()
 {
     if (_instance == 0)
@@ -26,7 +28,23 @@ void Settings::setMonitoredFileTypes(const QString& list)
     setValue("MonitoredFileTypes", unsorted.join(";"));
 }
 
+QSize Settings::getThumbnailSize() const {
+    return value("ThumbnailSize").toSize();
+}
+
+void Settings::setThumbnailSize(const QSize& size) {
+    setValue("ThumbnailSize", size);
+}
+
 Settings::Settings(const QString& fileName)
     : QSettings(fileName, QSettings::IniFormat) {}
 
 Settings* Settings::_instance = 0;
+
+QString Settings::getThumbnailCacheLocation() const {
+    return value("ThumbnailCacheLocation").toString();
+}
+
+void Settings::setThumbnailCacheLocation(const QString& path) {
+    setValue("ThumbnailCacheLocation", path);
+}

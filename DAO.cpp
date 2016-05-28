@@ -42,5 +42,5 @@ int DAO::getNextID() const
 {
     QSqlQuery query;
     query.exec(tr("select max(ID) from %1").arg(_tableName));
-    return query.next() ? query.value(0).toInt() : 0;
+    return query.next() ? query.value(0).toInt() + 1 : 1;
 }

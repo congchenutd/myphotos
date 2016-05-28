@@ -4,7 +4,12 @@
 #include "Tag.h"
 
 Photo::Photo(int id, const QString& title, const QString& path, const QDateTime& time)
-    : Persistable(id, PhotoDAO::getInstance()), _title(title), _filePath(path), _time(time)
+    : Persistable(id, PhotoDAO::getInstance()),
+      _title(title),
+      _filePath(path),
+      _time(time),
+      _event(0),
+      _thumbnail(0)
 {}
 
 QString Photo::getTitle() const {
@@ -29,6 +34,10 @@ QList<People*> Photo::getPeople() const {
 
 Event* Photo::getEvent() const {
     return _event;
+}
+
+Thumbnail* Photo::getThumbnail() const {
+    return _thumbnail;
 }
 
 void Photo::setTitle(const QString& title)  {
@@ -58,4 +67,8 @@ void Photo::setEvent(Event* event)
 {
     _event = event;
     _event->addPhoto(this);
+}
+
+void Photo::setThumbnail(Thumbnail* thumbnail) {
+    _thumbnail = thumbnail;
 }
