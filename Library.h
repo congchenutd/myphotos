@@ -1,8 +1,10 @@
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
+#include <QFileInfo>
 #include <QMap>
 #include <QObject>
+#include <QQueue>
 
 class Photo;
 class Event;
@@ -21,6 +23,7 @@ public:
     QStringList getMonitoredFolders() const;
     void setMonitoredFolders(const QStringList &list);
 
+    int preScan();
     void scan();
     void save();
 
@@ -46,6 +49,9 @@ private:
     Library();
     ~Library() {}
 
+private slots:
+    void onThumbnailCreated(Photo* photo);
+
 signals:
     void photoAdded(Photo*);
 
@@ -56,6 +62,7 @@ private:
     QMap<QString, Tag*>         _tags;
     QMap<QString, Event*>       _events;
     QMap<QString, Thumbnail*>   _thumbnails;
+    QQueue<QFileInfo>           _tobeAdded;
 };
 
 #endif // LIBRARY_H

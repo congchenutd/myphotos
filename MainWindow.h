@@ -3,6 +3,9 @@
 
 #include "ui_MainWindow.h"
 
+class Photo;
+class QProgressBar;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -13,9 +16,11 @@ public:
 private slots:
     void onScan();
     void onSettings();
+    void onPhotoAdded(Photo* photo);
 
 private:
     Ui::MainWindow ui;
+    QProgressBar*   _progressBar;
 };
 
 #endif // MAINWINDOW_H

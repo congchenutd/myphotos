@@ -3,6 +3,7 @@
 #include "Photo.h"
 #include "ThumbnailDAO.h"
 #include <QDir>
+#include <QImageReader>
 
 Thumbnail::Thumbnail(int id, const QString& filePath)
     : Persistable(id, ThumbnailDAO::getInstance()),
@@ -17,37 +18,35 @@ void Thumbnail::setFilePath(const QString& path) {
     _filePath = path;
 }
 
-Thumbnail* Thumbnail::fromPhoto(Photo* photo)
+
+ThumbnailThread::ThumbnailThread(Photo* photo)
+    : _photo(photo)
 {
-    QString fileName = createThumbnailFileName(photo->getFilePath());
-    QString location = Settings::getInstance()->getThumbnailCacheLocation();
-    QString filePath = location + QDir::separator() + fileName;
-
-//    ThumbnailThread* thread = new ThumbnailThread(photo, filePath);
-//    thread->start();
-
-    QPixmap pixmap = QPixmap(photo->getFilePath());
-    QSize size = Settings::getInstance()->getThumbnailSize();
-    pixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(filePath);
-
-    return new Thumbnail(getNextID(), filePath);
+    connect(this, SIGNAL(finished()), this, SLOT(onFinished()));
 }
 
-QString Thumbnail::createThumbnailFileName(const QString& filePath)
+QString ThumbnailThread::createThumbnailFileName(const QString& filePath)
 {
     QString result = filePath;
     result.replace(QDir::separator(), '-');
     return result;
 }
 
-ThumbnailThread::ThumbnailThread(Photo* photo, const QString& filePath)
-    : _photo(photo),
-      _filePath(filePath)
-{}
-
 void ThumbnailThread::run()
 {
-    QSize size = Settings::getInstance()->getThumbnailSize();
-    QPixmap pixmap = QPixmap(_photo->getFilePath());
-    pixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(_filePath);
+    QString location    = Settings::getInstance()->getThumbnailCacheLocation();
+    QSize   size        = Settings::getInstance()->getThumbnailSize();
+    QString fileName = createThumbnailFileName(_photo->getFilePath());
+    _filePath = location + QDir::separator() + fileName;
+
+    QImageReader reader(_photo->getFilePath());
+    reader.setAutoTransform(true);
+    reader.read().scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(_filePath);
+}
+
+void ThumbnailThread::onFinished()
+{
+    Thumbnail* thumbnail = new Thumbnail(Thumbnail::getNextID(), _filePath);
+    _photo->setThumbnail(thumbnail);
+    emit finished(_photo);
 }

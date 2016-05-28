@@ -5,6 +5,7 @@
 
 #include <QPixmap>
 #include <QThread>
+#include <QObject>
 
 class Photo;
 
@@ -16,24 +17,31 @@ public:
     QString getFilePath() const;
     void setFilePath(const QString& path);
 
-    static Thumbnail* fromPhoto(Photo* photo);
-
-private:
-    static QString createThumbnailFileName(const QString &filePath);
-
 private:
     QString _filePath;
 };
 
 class ThumbnailThread: public QThread
 {
+    Q_OBJECT
+
 public:
-    ThumbnailThread(Photo* photo, const QString& filePath);
+    ThumbnailThread(Photo* photo);
     void run();
+
+private slots:
+    void onFinished();
+
+signals:
+    void finished(Photo* photo);
+
+private:
+    QString createThumbnailFileName(const QString& filePath);
 
 private:
     Photo*  _photo;
     QString _filePath;
 };
+
 
 #endif // THUMBNAIL_H

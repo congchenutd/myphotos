@@ -27,7 +27,7 @@ void Library::setMonitoredFolders(const QStringList& list) {
     Settings::getInstance()->setMonitoredFolders(list);
 }
 
-void Library::scan()
+int Library::preScan()
 {
     QStringList folders = Settings::getInstance()->getMonitoredFolders();
     for (const QString& folder: folders)
@@ -37,20 +37,27 @@ void Library::scan()
         dir.setSorting(QDir::Time | QDir::Reversed);
         dir.setNameFilters(Settings::getInstance()->getMonitoredFileTypes().split(";"));
         for (const QFileInfo& info: dir.entryInfoList())
-        {
-            QString filePath = info.filePath();
-            if (getPhoto(filePath) == 0)
-            {
-                Photo* photo = new Photo(Photo::getNextID(),
-                                         info.baseName(),
-                                         filePath,
-                                         info.lastModified());
-                addPhoto(photo);
-                emit photoAdded(photo);
-                qApp->processEvents();
-            }
-        }
+            _tobeAdded.enqueue(info);
     }
+    return _tobeAdded.length();
+}
+
+void Library::scan()
+{
+    while (!_tobeAdded.isEmpty())
+    {
+        QFileInfo fileInfo = _tobeAdded.dequeue();
+        Photo* photo = new Photo(Photo::getNextID(),
+                                 fileInfo.baseName(),
+                                 fileInfo.filePath(),
+                                 fileInfo.lastModified());
+        addPhoto(photo);
+
+        ThumbnailThread* thread = new ThumbnailThread(photo);
+        connect(thread, SIGNAL(finished(Photo*)), this, SLOT(onThumbnailCreated(Photo*)));
+        thread->start();
+    }
+
     save();
 }
 
@@ -90,7 +97,7 @@ Event* Library::getEvent(const QString& name) {
     return _events.contains(name) ? _events[name] : 0;
 }
 
-Thumbnail *Library::getThumbnail(const QString& filePath) {
+Thumbnail* Library::getThumbnail(const QString& filePath) {
     return _thumbnails.contains(filePath) ? _thumbnails[filePath] : 0;
 }
 
@@ -99,13 +106,16 @@ Photo* Library::getPhoto(const QString& filePath) {
 }
 
 void Library::addPhoto(Photo* photo) {
-    if (photo != 0)
-    {
+    if (photo != 0) {
         _photos.insert(photo->getFilePath(), photo);
-        Thumbnail* thumbnail = Thumbnail::fromPhoto(photo);
-        photo->setThumbnail(thumbnail);
-        addThumbnail(thumbnail);
     }
+}
+
+void Library::onThumbnailCreated(Photo *photo)
+{
+    addThumbnail(photo->getThumbnail());
+    emit photoAdded(photo);
+    save();
 }
 
 void Library::addEvent(Event* event) {
