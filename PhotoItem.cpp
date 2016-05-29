@@ -7,6 +7,9 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QVBoxLayout>
+#include <QPalette>
+#include <QUrl>
+#include <QDesktopServices>
 
 PhotoItem::PhotoItem(Photo* photo)
     : _photo(photo)
@@ -23,10 +26,23 @@ PhotoItem::PhotoItem(Photo* photo)
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(_thumbnail);
     layout->addWidget(_title);
+
+    setFocusPolicy(Qt::StrongFocus);
 }
 
-void PhotoItem::mouseDoubleClickEvent(QMouseEvent*) {
-    _title->edit();
+void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(_photo->getFilePath()));
+}
+
+void PhotoItem::focusInEvent(QFocusEvent*)
+{
+    setSelected(true);
+}
+
+void PhotoItem::focusOutEvent(QFocusEvent*)
+{
+    setSelected(false);
 }
 
 void PhotoItem::onTitleEdited(const QString& title)
@@ -34,3 +50,29 @@ void PhotoItem::onTitleEdited(const QString& title)
     _photo->setTitle(title);
     Library::getInstance()->save();
 }
+
+void PhotoItem::setSelected(bool selected)
+{
+    if (selected)
+    {
+        QPalette palette(this->palette());
+        _backgroundColor = palette.background().color();
+        palette.setColor(QPalette::Background, palette.highlight().color());
+        setAutoFillBackground(true);
+        setPalette(palette);
+        emit itemSelected(_photo);
+    }
+    else
+    {
+        QPalette palette(this->palette());
+        palette.setColor(QPalette::Background, _backgroundColor);
+        setAutoFillBackground(true);
+        setPalette(palette);
+    }
+}
+
+Photo* PhotoItem::getPhoto() {
+    return _photo;
+}
+
+

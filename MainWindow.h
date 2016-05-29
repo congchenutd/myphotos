@@ -17,10 +17,13 @@ private slots:
     void onScan();
     void onOptions();
     void onPhotoAdded(Photo* photo);
+    void onSortingOrder();
+    void sort();
 
 private:
     Ui::MainWindow ui;
     QProgressBar*   _progressBar;
+    bool            _ascending;
 };
 
 #endif // MAINWINDOW_H

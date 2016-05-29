@@ -23,6 +23,10 @@ void EditableLabel::resizeEvent(QResizeEvent* event)
     QLabel::resizeEvent(event);
 }
 
+void EditableLabel::mouseDoubleClickEvent(QMouseEvent*) {
+    edit();
+}
+
 void EditableLabel::onEditingFinished()
 {
     _lineEdit->hide();

@@ -33,7 +33,10 @@ SOURCES += \
     Thumbnail.cpp \
     ThumbnailDAO.cpp \
     PhotoItem.cpp \
-    EditableLabel.cpp
+    EditableLabel.cpp \
+    ExifView.cpp \
+    QExifImageHeader.cpp \
+    ToolBar.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -57,13 +60,19 @@ HEADERS += \
     Thumbnail.h \
     ThumbnailDAO.h \
     PhotoItem.h \
-    EditableLabel.h
+    EditableLabel.h \
+    ExifView.h \
+    QExifImageHeader.h \
+    ToolBar.h
 
 FORMS += \
 	MainWindow.ui \
     SettingsDlg.ui \
     MonitoredFoldersDlg.ui \
-    PhotoView.ui
+    PhotoView.ui \
+    ExifView.ui
 
 RESOURCES += \
     Resources.qrc
+
+DISTFILES +=

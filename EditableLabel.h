@@ -15,6 +15,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent* event);
+    void mouseDoubleClickEvent(QMouseEvent*);
 
 private slots:
     void onEditingFinished();

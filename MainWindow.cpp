@@ -4,9 +4,11 @@
 #include "Library.h"
 
 #include <QProgressBar>
+#include <QActionGroup>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+    QMainWindow(parent),
+    _ascending(true)
 {
     ui.setupUi(this);
     _progressBar = new QProgressBar(this);
@@ -15,9 +17,18 @@ MainWindow::MainWindow(QWidget *parent) :
     _progressBar->hide();
     ui.statusBar->addPermanentWidget(_progressBar);
 
+    QActionGroup* actionGroup = new QActionGroup(this);
+    actionGroup->addAction(ui.actionSortByTitle);
+    actionGroup->addAction(ui.actionSortByTime);
+    ui.actionSortByTime->setChecked(true);
+
     connect(ui.actionScan,      SIGNAL(triggered(bool)), this, SLOT(onScan()));
     connect(ui.actionOptions,   SIGNAL(triggered(bool)), this, SLOT(onOptions()));
     connect(Library::getInstance(), SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
+    connect(ui.photoView, SIGNAL(photoSelected(Photo*)), ui.exifView, SLOT(onPhotoSelected(Photo*)));
+    connect(ui.actionSortByTitle,   SIGNAL(triggered()), this, SLOT(sort()));
+    connect(ui.actionSortByTime,    SIGNAL(triggered()), this, SLOT(sort()));
+    connect(ui.actionOrder,         SIGNAL(triggered()), this, SLOT(onSortingOrder()));
 }
 
 void MainWindow::onScan()
@@ -52,4 +63,18 @@ void MainWindow::onPhotoAdded(Photo* photo)
                                   .arg(_progressBar->value())
                                   .arg(_progressBar->maximum()));
     qApp->processEvents();
+}
+
+void MainWindow::onSortingOrder()
+{
+    _ascending = !_ascending;
+    QString iconPath = _ascending ? ":/Images/Up.png" : ":/Images/Down.png";
+    ui.actionOrder->setIcon(QIcon(iconPath));
+    sort();
+}
+
+void MainWindow::sort()
+{
+    QString sortBy = ui.actionSortByTitle->isChecked() ? "Title" : "Time";
+    ui.photoView->sort(sortBy, _ascending);
 }
