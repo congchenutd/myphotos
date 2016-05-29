@@ -40,6 +40,7 @@ void PhotoItem::onTitleEdited(const QString& title)
 {
     _photo->setTitle(title);
     Library::getInstance()->save();
+    emit titleEdited(title);
 }
 
 void PhotoItem::setSelected(bool selected)
@@ -63,6 +64,10 @@ void PhotoItem::setSelected(bool selected)
 
 Photo* PhotoItem::getPhoto() {
     return _photo;
+}
+
+void PhotoItem::rename() {
+    _title->edit();
 }
 
 

@@ -6,12 +6,16 @@
 #include "PhotoItem.h"
 #include <QFileSystemModel>
 #include <QLabel>
+#include <QMenu>
 #include <QMouseEvent>
 #include <algorithm>
+#include <QAction>
 
 PhotoView::PhotoView(QWidget *parent) :
     QWidget(parent),
-    _rubberBand(0)
+    _rubberBand(0),
+    _sortBy("Time"),
+    _ascending(true)
 {
     ui.setupUi(this);
     _layout = new FlowLayout(this);
@@ -27,8 +31,8 @@ void PhotoView::load()
 
 void PhotoView::sort(const QString& byWhat, bool ascending)
 {
-
-//    PhotoItemComparator* comparator = getComparator(byWhat, ascending);
+    _sortBy = byWhat;
+    _ascending = ascending;
     QList<PhotoItem*> items;
     while (!_layout->isEmpty())
         items << (PhotoItem*) _layout->takeAt(0)->widget();
@@ -41,18 +45,26 @@ void PhotoView::sort(const QString& byWhat, bool ascending)
         if (ascending)  std::sort(items.begin(), items.end(), PhotoItemLessTime());
         else            std::sort(items.begin(), items.end(), PhotoItemGreaterTime());
     }
-//    std::sort(items.begin(), items.end(), *comparator);
 
     for (PhotoItem* item: items)
         _layout->addWidget(item);
     _layout->update();
 }
 
+QList<PhotoItem*> PhotoView::getSelectedItems() const {
+    return _selected;
+}
+
 void PhotoView::addPhoto(Photo* photo)
 {
     PhotoItem* photoItem = new PhotoItem(photo);
     connect(photoItem, SIGNAL(itemSelected(Photo*)), this, SIGNAL(photoSelected(Photo*)));
+    connect(photoItem, SIGNAL(titleEdited(QString)), this, SLOT(sort()));
     _layout->addWidget(photoItem);
+}
+
+void PhotoView::sort() {
+    sort(_sortBy, _ascending);
 }
 
 void PhotoView::mousePressEvent(QMouseEvent* event)
@@ -63,7 +75,8 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
     _rubberBand->setGeometry(QRect(_selectionStart, QSize()));
     _rubberBand->show();
 
-    selectItems();
+    if (event->button() == Qt::LeftButton)
+        selectItems();
 }
 
 void PhotoView::mouseMoveEvent(QMouseEvent* event)
@@ -87,10 +100,12 @@ void PhotoView::selectItems()
         if (select)
             _selected << item;
     }
+    emit selectionChanged(_selected);
 }
 
-void PhotoView::mouseReleaseEvent(QMouseEvent*) {
-    _rubberBand->hide();
+void PhotoView::mouseReleaseEvent(QMouseEvent* event) {
+    if (event->button() == Qt::LeftButton)
+        _rubberBand->hide();
 }
 
 
@@ -109,17 +124,4 @@ bool PhotoItemLessTime::operator() (PhotoItem* lhs, PhotoItem* rhs) const {
 
 bool PhotoItemGreaterTime::operator() (PhotoItem* lhs, PhotoItem* rhs) const {
     return lhs->getPhoto()->getTimeTaken() > rhs->getPhoto()->getTimeTaken();
-}
-
-PhotoItemComparator* PhotoView::getComparator(const QString& byWhat, bool ascending)
-{
-    if (byWhat == "Title") {
-        if (ascending)  return new PhotoItemLessTitle();
-        else            return new PhotoItemGreaterTitle();
-    }
-    if (byWhat == "Time") {
-        if (ascending)  return new PhotoItemLessTime();
-        else            return new PhotoItemGreaterTime();
-    }
-    return 0;
 }

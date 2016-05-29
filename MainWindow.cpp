@@ -2,9 +2,11 @@
 #include "SettingsDlg.h"
 #include "Settings.h"
 #include "Library.h"
+#include "PhotoItem.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,10 +27,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionScan,      SIGNAL(triggered(bool)), this, SLOT(onScan()));
     connect(ui.actionOptions,   SIGNAL(triggered(bool)), this, SLOT(onOptions()));
     connect(Library::getInstance(), SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
-    connect(ui.photoView, SIGNAL(photoSelected(Photo*)), ui.exifView, SLOT(onPhotoSelected(Photo*)));
+//    connect(ui.photoView, SIGNAL(photoSelected(Photo*)), ui.exifView, SLOT(onPhotoSelected(Photo*)));
     connect(ui.actionSortByTitle,   SIGNAL(triggered()), this, SLOT(sort()));
     connect(ui.actionSortByTime,    SIGNAL(triggered()), this, SLOT(sort()));
     connect(ui.actionOrder,         SIGNAL(triggered()), this, SLOT(onSortingOrder()));
+    connect(ui.photoView, SIGNAL(selectionChanged(QList<PhotoItem*>)),
+            this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
+    connect(ui.actionRemove, SIGNAL(triggered(bool)), this, SLOT(onRemove()));
+    connect(ui.actionDelete, SIGNAL(triggered(bool)), this, SLOT(onDelete()));
+    connect(ui.actionRename, SIGNAL(triggered(bool)), this, SLOT(onRename()));
 }
 
 void MainWindow::onScan()
@@ -77,4 +84,35 @@ void MainWindow::sort()
 {
     QString sortBy = ui.actionSortByTitle->isChecked() ? "Title" : "Time";
     ui.photoView->sort(sortBy, _ascending);
+}
+
+void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
+{
+    ui.actionRemove->setEnabled(!selected.isEmpty());
+    ui.actionDelete->setEnabled(!selected.isEmpty());
+    ui.actionRename->setEnabled(!selected.isEmpty());
+}
+
+void MainWindow::onRename() {
+    ui.photoView->getSelectedItems().front()->rename();
+}
+
+void MainWindow::onRemove()
+{
+    if (QMessageBox::warning(this, tr("Remove"),
+                             tr("Are you sure to remove the selected photo(s) from the library?"),
+                             QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+
+    }
+}
+
+void MainWindow::onDelete()
+{
+    if (QMessageBox::warning(this, tr("Delete"),
+                             tr("Are you sure to permanently delete the selected photo(s) from the computer?"),
+                             QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+
+    }
 }

@@ -19,20 +19,22 @@ public:
 
     void load();
     void sort(const QString& byWhat, bool ascending);
+    QList<PhotoItem*> getSelectedItems() const;
 
 public slots:
     void addPhoto(Photo* photo);
+    void sort();
 
 signals:
     void photoSelected(Photo*);
+    void selectionChanged(const QList<PhotoItem*>&);
 
 protected:
     void mousePressEvent    (QMouseEvent* event);
     void mouseMoveEvent     (QMouseEvent* event);
-    void mouseReleaseEvent  (QMouseEvent*);
+    void mouseReleaseEvent  (QMouseEvent*event);
 
 private:
-    PhotoItemComparator* getComparator(const QString& byWhat, bool ascending);
     void selectItems();
 
 private:
@@ -42,6 +44,8 @@ private:
     QPoint              _selectionStart;
     QRubberBand*        _rubberBand;
     QList<PhotoItem*>   _selected;
+    QString             _sortBy;
+    bool                _ascending;
 };
 
 struct PhotoItemComparator: public std::less<PhotoItem*> {

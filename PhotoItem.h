@@ -15,6 +15,7 @@ public:
     PhotoItem(Photo* photo);
     void setSelected(bool selected);
     Photo* getPhoto();
+    void rename();
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);
@@ -24,6 +25,7 @@ private slots:
 
 signals:
     void itemSelected(Photo* photo);
+    void titleEdited(const QString&);
 
 private:
     Photo*          _photo;

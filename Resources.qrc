@@ -15,5 +15,10 @@
         <file>Images/Tag.png</file>
         <file>Images/Up.png</file>
         <file>Images/Clock.png</file>
+        <file>Images/Delete.png</file>
+        <file>Images/Remove.png</file>
+        <file>Images/ZoomIn.png</file>
+        <file>Images/ZoomOut.png</file>
+        <file>Images/Rename.png</file>
     </qresource>
 </RCC>

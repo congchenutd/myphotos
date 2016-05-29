@@ -19,6 +19,10 @@ private slots:
     void onPhotoAdded(Photo* photo);
     void onSortingOrder();
     void sort();
+    void onPhotoSelected(const QList<PhotoItem*> &selected);
+    void onRename();
+    void onRemove();
+    void onDelete();
 
 private:
     Ui::MainWindow ui;

@@ -78,6 +78,10 @@
    <addaction name="actionSortByTitle"/>
    <addaction name="actionSortByTime"/>
    <addaction name="actionOrder"/>
+   <addaction name="separator"/>
+   <addaction name="actionRename"/>
+   <addaction name="actionRemove"/>
+   <addaction name="actionDelete"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -108,8 +112,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>30</height>
+          <width>176</width>
+          <height>119</height>
          </rect>
         </property>
         <attribute name="label">
@@ -121,8 +125,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>30</height>
+          <width>176</width>
+          <height>119</height>
          </rect>
         </property>
         <attribute name="label">
@@ -134,8 +138,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>30</height>
+          <width>176</width>
+          <height>119</height>
          </rect>
         </property>
         <attribute name="label">
@@ -247,6 +251,39 @@
    </property>
    <property name="toolTip">
     <string>Sorting order</string>
+   </property>
+  </action>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Remove.png</normaloff>:/Images/Remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove the photo(s) from the library</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Delete.png</normaloff>:/Images/Delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete the photo(s) from the computer</string>
+   </property>
+  </action>
+  <action name="actionRename">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Rename.png</normaloff>:/Images/Rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename</string>
    </property>
   </action>
  </widget>
