@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.statusBar->addPermanentWidget(_progressBar);
 
     connect(ui.actionScan,      SIGNAL(triggered(bool)), this, SLOT(onScan()));
-    connect(ui.actionSettings,  SIGNAL(triggered(bool)), this, SLOT(onSettings()));
+    connect(ui.actionOptions,   SIGNAL(triggered(bool)), this, SLOT(onOptions()));
     connect(Library::getInstance(), SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
 }
 
@@ -32,7 +32,7 @@ void MainWindow::onScan()
     }
 }
 
-void MainWindow::onSettings()
+void MainWindow::onOptions()
 {
     SettingsDlg dlg(this);
     dlg.exec();

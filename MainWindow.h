@@ -15,7 +15,7 @@ public:
 
 private slots:
     void onScan();
-    void onSettings();
+    void onOptions();
     void onPhotoAdded(Photo* photo);
 
 private:

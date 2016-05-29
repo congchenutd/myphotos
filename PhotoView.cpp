@@ -3,6 +3,7 @@
 #include "Library.h"
 #include "Photo.h"
 #include "Thumbnail.h"
+#include "PhotoItem.h"
 #include <QFileSystemModel>
 #include <QLabel>
 
@@ -17,19 +18,16 @@ PhotoView::PhotoView(QWidget *parent) :
 
 void PhotoView::load()
 {
-//    QLayoutItem* child;
-//    while ((child = _layout->takeAt(0)) != 0) {
-//        delete child;
-//    }
-
     for (Photo* photo: _library->getAllPhotos().values())
         addPhoto(photo);
 }
 
 void PhotoView::addPhoto(Photo* photo)
 {
-    QPixmap pixmap(photo->getThumbnail()->getFilePath());
-    QLabel* label = new QLabel();
-    label->setPixmap(pixmap);
-    _layout->addWidget(label);
+//    QPixmap pixmap(photo->getThumbnail()->getFilePath());
+//    QLabel* label = new QLabel();
+//    label->setPixmap(pixmap);
+//    _layout->addWidget(label);
+
+    _layout->addWidget(new PhotoItem(photo));
 }

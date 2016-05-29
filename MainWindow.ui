@@ -52,6 +52,14 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOptions"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="windowTitle">
@@ -64,7 +72,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionScan"/>
-   <addaction name="actionSettings"/>
+   <addaction name="actionOptions"/>
    <addaction name="actionQuit"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -97,13 +105,16 @@
     <string>Scan</string>
    </property>
   </action>
-  <action name="actionSettings">
+  <action name="actionOptions">
    <property name="icon">
     <iconset resource="Resources.qrc">
      <normaloff>:/Images/Settings.png</normaloff>:/Images/Settings.png</iconset>
    </property>
    <property name="text">
-    <string>Settings</string>
+    <string>Options</string>
+   </property>
+   <property name="toolTip">
+    <string>Options</string>
    </property>
   </action>
  </widget>

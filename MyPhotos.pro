@@ -31,7 +31,9 @@ SOURCES += \
     PhotoView.cpp \
     FlowLayout.cpp \
     Thumbnail.cpp \
-    ThumbnailDAO.cpp
+    ThumbnailDAO.cpp \
+    PhotoItem.cpp \
+    EditableLabel.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -53,7 +55,9 @@ HEADERS += \
     PhotoView.h \
     FlowLayout.h \
     Thumbnail.h \
-    ThumbnailDAO.h
+    ThumbnailDAO.h \
+    PhotoItem.h \
+    EditableLabel.h
 
 FORMS += \
 	MainWindow.ui \

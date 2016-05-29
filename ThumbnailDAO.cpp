@@ -2,17 +2,10 @@
 #include "ThumbnailDAO.h"
 #include "Settings.h"
 #include <QSqlQuery>
-#include <QDir>
 
 ThumbnailDAO::ThumbnailDAO()
     : DAO("Thumbnails")
-{
-    QDir dir = QDir::current();
-    dir.mkdir("Thumbnails");
-    dir.cd("Thumbnails");
-    Settings::getInstance()->setThumbnailCacheLocation(dir.absolutePath());
-    Settings::getInstance()->setThumbnailSize(QSize(200, 200));
-}
+{}
 
 ThumbnailDAO* ThumbnailDAO::getInstance()
 {

@@ -8,7 +8,9 @@
 #include "Library.h"
 #include "TagDAO.h"
 #include "ThumbnailDAO.h"
+#include "Settings.h"
 
+#include <QDir>
 #include <QSqlQuery>
 #include <QVariant>
 
@@ -101,6 +103,12 @@ void LibraryDAO::save(Library* library)
 
 LibraryDAO::LibraryDAO()
 {
+    QDir dir = QDir::current();
+    dir.mkdir("Thumbnails");
+    dir.cd("Thumbnails");
+    Settings::getInstance()->setThumbnailCacheLocation(dir.absolutePath());
+    Settings::getInstance()->setThumbnailSize(QSize(200, 200));
+
     createTables();
 }
 

@@ -1,5 +1,4 @@
 #include "MainWindow.h"
-#include <QApplication>
 #include <QSqlDatabase>
 #include <QMessageBox>
 

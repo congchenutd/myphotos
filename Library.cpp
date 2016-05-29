@@ -37,7 +37,8 @@ int Library::preScan()
         dir.setSorting(QDir::Time | QDir::Reversed);
         dir.setNameFilters(Settings::getInstance()->getMonitoredFileTypes().split(";"));
         for (const QFileInfo& info: dir.entryInfoList())
-            _tobeAdded.enqueue(info);
+            if (getPhoto(info.filePath()) == 0)
+                _tobeAdded.enqueue(info);
     }
     return _tobeAdded.length();
 }

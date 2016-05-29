@@ -41,7 +41,7 @@ void ThumbnailThread::run()
 
     QImageReader reader(_photo->getFilePath());
     reader.setAutoTransform(true);
-    reader.read().scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(_filePath);
+    bool success = reader.read().scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(_filePath);
 }
 
 void ThumbnailThread::onFinished()

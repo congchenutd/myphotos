@@ -34,7 +34,7 @@ void PhotoDAO::update(Persistable* persistable)
 {
     Photo* photo = static_cast<Photo*>(persistable);
     QSqlQuery query;
-    query.exec(tr("update Photos set Title = \"%1\", FilePath = \"%2\", Time = \"%3\", where ID = %4")
+    query.exec(tr("update Photos set Title = \"%1\", FilePath = \"%2\", Time = \"%3\" where ID = %4")
                .arg(photo->getTitle())
                .arg(photo->getFilePath())
                .arg(photo->getTimeTaken().toString(Qt::ISODate))
