@@ -28,21 +28,12 @@ PhotoItem::PhotoItem(Photo* photo)
     layout->addWidget(_title);
 
     setFocusPolicy(Qt::StrongFocus);
+    _backgroundColor = palette().background().color();
 }
 
 void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
 {
     QDesktopServices::openUrl(QUrl::fromLocalFile(_photo->getFilePath()));
-}
-
-void PhotoItem::focusInEvent(QFocusEvent*)
-{
-    setSelected(true);
-}
-
-void PhotoItem::focusOutEvent(QFocusEvent*)
-{
-    setSelected(false);
 }
 
 void PhotoItem::onTitleEdited(const QString& title)
@@ -56,7 +47,6 @@ void PhotoItem::setSelected(bool selected)
     if (selected)
     {
         QPalette palette(this->palette());
-        _backgroundColor = palette.background().color();
         palette.setColor(QPalette::Background, palette.highlight().color());
         setAutoFillBackground(true);
         setPalette(palette);

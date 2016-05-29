@@ -3,6 +3,7 @@
 
 #include "ui_PhotoView.h"
 #include <functional>
+#include <QList>
 
 class Library;
 class Photo;
@@ -25,13 +26,22 @@ public slots:
 signals:
     void photoSelected(Photo*);
 
+protected:
+    void mousePressEvent    (QMouseEvent* event);
+    void mouseMoveEvent     (QMouseEvent* event);
+    void mouseReleaseEvent  (QMouseEvent*);
+
 private:
     PhotoItemComparator* getComparator(const QString& byWhat, bool ascending);
+    void selectItems();
 
 private:
     Ui::PhotoView ui;
-    QLayout* _layout;
-    Library* _library;
+    QLayout*            _layout;
+    Library*            _library;
+    QPoint              _selectionStart;
+    QRubberBand*        _rubberBand;
+    QList<PhotoItem*>   _selected;
 };
 
 struct PhotoItemComparator: public std::less<PhotoItem*> {

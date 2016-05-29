@@ -18,8 +18,6 @@ public:
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);
-    void focusInEvent(QFocusEvent*);
-    void focusOutEvent(QFocusEvent*);
 
 private slots:
     void onTitleEdited(const QString& title);

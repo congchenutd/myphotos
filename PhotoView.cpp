@@ -6,10 +6,12 @@
 #include "PhotoItem.h"
 #include <QFileSystemModel>
 #include <QLabel>
+#include <QMouseEvent>
 #include <algorithm>
 
 PhotoView::PhotoView(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    _rubberBand(0)
 {
     ui.setupUi(this);
     _layout = new FlowLayout(this);
@@ -53,6 +55,46 @@ void PhotoView::addPhoto(Photo* photo)
     _layout->addWidget(photoItem);
 }
 
+void PhotoView::mousePressEvent(QMouseEvent* event)
+{
+    _selectionStart = event->pos();
+    if (!_rubberBand)
+        _rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+    _rubberBand->setGeometry(QRect(_selectionStart, QSize()));
+    _rubberBand->show();
+
+    selectItems();
+}
+
+void PhotoView::mouseMoveEvent(QMouseEvent* event)
+{
+    _rubberBand->setGeometry(QRect(_selectionStart, event->pos()).normalized());
+    selectItems();
+}
+
+void PhotoView::selectItems()
+{
+    QRect rubberBandRect = _rubberBand->geometry();
+    _selected.clear();
+    int count = _layout->count();
+    for (int i = 0; i < count; ++i)
+    {
+        PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
+        bool select = item->geometry().contains(_selectionStart) ||
+                      rubberBandRect.contains(item->geometry()) ||
+                      rubberBandRect.intersects(item->geometry());
+        item->setSelected(select);
+        if (select)
+            _selected << item;
+    }
+}
+
+void PhotoView::mouseReleaseEvent(QMouseEvent*) {
+    _rubberBand->hide();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
 bool PhotoItemLessTitle::operator() (PhotoItem* lhs, PhotoItem* rhs) const {
     return lhs->getPhoto()->getTitle() < rhs->getPhoto()->getTitle();
 }
