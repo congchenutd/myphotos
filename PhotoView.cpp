@@ -60,6 +60,15 @@ void PhotoView::removeItem(PhotoItem* item) {
     delete item;
 }
 
+void PhotoView::resizeThumbnails(int size)
+{
+    for (int i = 0; i < _layout->count(); ++i)
+    {
+        PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
+        item->resizeThumbnail(size);
+    }
+}
+
 void PhotoView::addPhoto(Photo* photo)
 {
     PhotoItem* photoItem = new PhotoItem(photo);
@@ -100,8 +109,7 @@ void PhotoView::mouseMoveEvent(QMouseEvent* event)
     QRect rubberBandRect = _rubberBand->geometry();
 
     _selected.clear();
-    int count = _layout->count();
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < _layout->count(); ++i)
     {
         PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
         if (rubberBandRect.contains  (item->geometry()) ||
@@ -113,8 +121,7 @@ void PhotoView::mouseMoveEvent(QMouseEvent* event)
 
 void PhotoView::updateSelection()
 {
-    int count = _layout->count();
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < _layout->count(); ++i)
     {
         PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
         item->setSelected(_selected.contains(item));
@@ -124,8 +131,7 @@ void PhotoView::updateSelection()
 
 PhotoItem* PhotoView::clickedItem(const QPoint& point)
 {
-    int count = _layout->count();
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < _layout->count(); ++i)
     {
         PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
         if (item->geometry().contains(point))

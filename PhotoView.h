@@ -20,6 +20,7 @@ public:
     void sort(const QString& byWhat, bool ascending);
     QList<PhotoItem*> getSelectedItems() const;
     void removeItem(PhotoItem* item);
+    void resizeThumbnails(int size);
 
 public slots:
     void addPhoto(Photo* photo);

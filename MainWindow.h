@@ -23,6 +23,7 @@ private slots:
     void onRename();
     void onRemove();
     void onDelete();
+    void onThumbnailSize(int size);
 
 private:
     Ui::MainWindow ui;

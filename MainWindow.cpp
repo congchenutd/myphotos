@@ -24,10 +24,17 @@ MainWindow::MainWindow(QWidget *parent) :
     actionGroup->addAction(ui.actionSortByTime);
     ui.actionSortByTime->setChecked(true);
 
+    QSlider* slider = new QSlider(Qt::Horizontal, this);
+    slider->setMinimumWidth(150);
+    slider->setMaximumWidth(150);
+    slider->setRange(100, 200);
+    slider->setValue(200);
+    ui.statusBar->addPermanentWidget(slider);
+    ui.statusBar->addPermanentWidget(new QLabel("  "));
+
     connect(ui.actionScan,      SIGNAL(triggered(bool)), this, SLOT(onScan()));
     connect(ui.actionOptions,   SIGNAL(triggered(bool)), this, SLOT(onOptions()));
     connect(Library::getInstance(), SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
-//    connect(ui.photoView, SIGNAL(photoSelected(Photo*)), ui.exifView, SLOT(onPhotoSelected(Photo*)));
     connect(ui.actionSortByTitle,   SIGNAL(triggered()), this, SLOT(sort()));
     connect(ui.actionSortByTime,    SIGNAL(triggered()), this, SLOT(sort()));
     connect(ui.actionOrder,         SIGNAL(triggered()), this, SLOT(onSortingOrder()));
@@ -36,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionRemove, SIGNAL(triggered(bool)), this, SLOT(onRemove()));
     connect(ui.actionDelete, SIGNAL(triggered(bool)), this, SLOT(onDelete()));
     connect(ui.actionRename, SIGNAL(triggered(bool)), this, SLOT(onRename()));
+    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(onThumbnailSize(int)));
 
     sort();
 }
@@ -122,4 +130,9 @@ void MainWindow::onDelete()
     {
 
     }
+}
+
+void MainWindow::onThumbnailSize(int size)
+{
+    ui.photoView->resizeThumbnails(size);
 }

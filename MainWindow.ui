@@ -61,7 +61,7 @@
    </widget>
    <addaction name="menuFile"/>
   </widget>
-  <widget class="ToolBar" name="mainToolBar">
+  <widget class="QToolBar" name="mainToolBar">
    <property name="windowTitle">
     <string>Main Toolbar</string>
    </property>
@@ -112,8 +112,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>30</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -125,8 +125,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>30</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -138,8 +138,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>30</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -309,11 +309,6 @@
    <extends>QWidget</extends>
    <header>ExifView.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ToolBar</class>
-   <extends>QToolBar</extends>
-   <header>ToolBar.h</header>
   </customwidget>
  </customwidgets>
  <resources>

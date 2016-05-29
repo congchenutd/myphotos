@@ -16,6 +16,7 @@ public:
     void setSelected(bool selected);
     Photo* getPhoto();
     void rename();
+    void resizeThumbnail(int size);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);

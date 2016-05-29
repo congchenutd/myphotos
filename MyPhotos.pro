@@ -34,9 +34,7 @@ SOURCES += \
     ThumbnailDAO.cpp \
     PhotoItem.cpp \
     EditableLabel.cpp \
-    ExifView.cpp \
-    QExifImageHeader.cpp \
-    ToolBar.cpp
+    ExifView.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -61,9 +59,7 @@ HEADERS += \
     ThumbnailDAO.h \
     PhotoItem.h \
     EditableLabel.h \
-    ExifView.h \
-    QExifImageHeader.h \
-    ToolBar.h
+    ExifView.h
 
 FORMS += \
 	MainWindow.ui \
