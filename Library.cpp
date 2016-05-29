@@ -129,6 +129,12 @@ void Library::addThumbnail(Thumbnail* thumbnail) {
         _thumbnails.insert(thumbnail->getFilePath(), thumbnail);
 }
 
+void Library::removePhoto(Photo* photo)
+{
+    _photos.remove(photo->getFilePath());
+    photo->destroy();
+}
+
 Library::Library()
 {
     _dao = LibraryDAO::getInstance();

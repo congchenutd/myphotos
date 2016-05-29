@@ -17,9 +17,9 @@ class PhotoView : public QWidget
 public:
     explicit PhotoView(QWidget* parent = 0);
 
-    void load();
     void sort(const QString& byWhat, bool ascending);
     QList<PhotoItem*> getSelectedItems() const;
+    void removeItem(PhotoItem* item);
 
 public slots:
     void addPhoto(Photo* photo);
@@ -32,10 +32,15 @@ signals:
 protected:
     void mousePressEvent    (QMouseEvent* event);
     void mouseMoveEvent     (QMouseEvent* event);
-    void mouseReleaseEvent  (QMouseEvent*event);
+    void mouseReleaseEvent  (QMouseEvent* event);
 
 private:
-    void selectItems();
+    void load();
+    void updateSelection();
+    PhotoItem* clickedItem(const QPoint& point);
+
+private slots:
+    void onItemSelected(bool selected);
 
 private:
     Ui::PhotoView ui;

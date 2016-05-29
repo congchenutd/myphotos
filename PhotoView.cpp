@@ -55,10 +55,14 @@ QList<PhotoItem*> PhotoView::getSelectedItems() const {
     return _selected;
 }
 
+void PhotoView::removeItem(PhotoItem* item) {
+    _layout->removeWidget(item);
+    delete item;
+}
+
 void PhotoView::addPhoto(Photo* photo)
 {
     PhotoItem* photoItem = new PhotoItem(photo);
-    connect(photoItem, SIGNAL(itemSelected(Photo*)), this, SIGNAL(photoSelected(Photo*)));
     connect(photoItem, SIGNAL(titleEdited(QString)), this, SLOT(sort()));
     _layout->addWidget(photoItem);
 }
@@ -76,35 +80,71 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
     _rubberBand->show();
 
     if (event->button() == Qt::LeftButton)
-        selectItems();
+    {
+        if (event->modifiers() != Qt::ShiftModifier)
+            _selected.clear();
+        if (PhotoItem* item = clickedItem(_selectionStart))
+        {
+            if (_selected.contains(item))
+                _selected.removeAt(_selected.indexOf(item));
+            else
+                _selected << item;
+        }
+        updateSelection();
+    }
 }
 
 void PhotoView::mouseMoveEvent(QMouseEvent* event)
 {
     _rubberBand->setGeometry(QRect(_selectionStart, event->pos()).normalized());
-    selectItems();
-}
-
-void PhotoView::selectItems()
-{
     QRect rubberBandRect = _rubberBand->geometry();
+
     _selected.clear();
     int count = _layout->count();
     for (int i = 0; i < count; ++i)
     {
         PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
-        bool select = item->geometry().contains(_selectionStart) ||
-                      rubberBandRect.contains(item->geometry()) ||
-                      rubberBandRect.intersects(item->geometry());
-        item->setSelected(select);
-        if (select)
+        if (rubberBandRect.contains  (item->geometry()) ||
+            rubberBandRect.intersects(item->geometry()))
             _selected << item;
+    }
+    updateSelection();
+}
+
+void PhotoView::updateSelection()
+{
+    int count = _layout->count();
+    for (int i = 0; i < count; ++i)
+    {
+        PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
+        item->setSelected(_selected.contains(item));
     }
     emit selectionChanged(_selected);
 }
 
+PhotoItem* PhotoView::clickedItem(const QPoint& point)
+{
+    int count = _layout->count();
+    for (int i = 0; i < count; ++i)
+    {
+        PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
+        if (item->geometry().contains(point))
+            return item;
+    }
+    return 0;
+}
+
+void PhotoView::onItemSelected(bool selected)
+{
+    PhotoItem* item = (PhotoItem*) sender();
+    if (selected)
+        _selected << item;
+    else
+        _selected.removeAt(_selected.indexOf(item));
+}
+
 void PhotoView::mouseReleaseEvent(QMouseEvent* event) {
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton && _rubberBand != 0)
         _rubberBand->hide();
 }
 

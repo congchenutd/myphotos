@@ -1,12 +1,14 @@
 #include "EditableLabel.h"
 
 #include <QLineEdit>
+#include <QKeyEvent>
+#include <QEvent>
 
 EditableLabel::EditableLabel()
 {
     _lineEdit = new QLineEdit(this);
     _lineEdit->hide();
-    connect(_lineEdit, SIGNAL(editingFinished()), this, SLOT(onEditingFinished()));
+    _lineEdit->installEventFilter(this);
 }
 
 void EditableLabel::edit()
@@ -19,7 +21,7 @@ void EditableLabel::edit()
 
 void EditableLabel::resizeEvent(QResizeEvent* event)
 {
-    _lineEdit->resize(width(), height());
+    _lineEdit->resize(size());
     QLabel::resizeEvent(event);
 }
 
@@ -27,10 +29,34 @@ void EditableLabel::mouseDoubleClickEvent(QMouseEvent*) {
     edit();
 }
 
-void EditableLabel::onEditingFinished()
+void EditableLabel::keyPressEvent(QKeyEvent* event)
 {
-    _lineEdit->hide();
+    if (event->key() == Qt::Key_Enter ||
+        event->key() == Qt::Key_Return)
+        finishEditing();
+    else if (event->key() == Qt::Key_Escape)
+        cancelEditing();
+}
+
+bool EditableLabel::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == QEvent::FocusOut)
+    {
+        finishEditing();
+        return true;
+    }
+    return QObject::eventFilter(obj, event);
+}
+
+void EditableLabel::finishEditing()
+{
     setText(_lineEdit->text());
+    _lineEdit->hide();
     emit editingFinished(_lineEdit->text());
+}
+
+void EditableLabel::cancelEditing() {
+    _lineEdit->setText(text());
+    _lineEdit->hide();
 }
 

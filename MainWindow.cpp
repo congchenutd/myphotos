@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionRemove, SIGNAL(triggered(bool)), this, SLOT(onRemove()));
     connect(ui.actionDelete, SIGNAL(triggered(bool)), this, SLOT(onDelete()));
     connect(ui.actionRename, SIGNAL(triggered(bool)), this, SLOT(onRename()));
+
+    sort();
 }
 
 void MainWindow::onScan()
@@ -70,6 +72,7 @@ void MainWindow::onPhotoAdded(Photo* photo)
                                   .arg(_progressBar->value())
                                   .arg(_progressBar->maximum()));
     qApp->processEvents();
+    sort();
 }
 
 void MainWindow::onSortingOrder()
@@ -103,7 +106,11 @@ void MainWindow::onRemove()
                              tr("Are you sure to remove the selected photo(s) from the library?"),
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
-
+        for (PhotoItem* item: ui.photoView->getSelectedItems())
+        {
+            Library::getInstance()->removePhoto(item->getPhoto());
+            ui.photoView->removeItem(item);
+        }
     }
 }
 

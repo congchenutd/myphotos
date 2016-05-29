@@ -45,6 +45,8 @@ public:
     void addEvent       (Event*     event);
     void addThumbnail   (Thumbnail* thumbnail);
 
+    void removePhoto(Photo* photo);
+
 private:
     Library();
     ~Library() {}

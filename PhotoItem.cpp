@@ -12,7 +12,8 @@
 #include <QDesktopServices>
 
 PhotoItem::PhotoItem(Photo* photo)
-    : _photo(photo)
+    : _photo(photo),
+      _selected(false)
 {
     _thumbnail = new QLabel(this);
     _thumbnail->setPixmap(QPixmap(photo->getThumbnail()->getFilePath()));
@@ -45,13 +46,13 @@ void PhotoItem::onTitleEdited(const QString& title)
 
 void PhotoItem::setSelected(bool selected)
 {
+    _selected = selected;
     if (selected)
     {
         QPalette palette(this->palette());
         palette.setColor(QPalette::Background, palette.highlight().color());
         setAutoFillBackground(true);
         setPalette(palette);
-        emit itemSelected(_photo);
     }
     else
     {

@@ -24,7 +24,7 @@ private slots:
     void onTitleEdited(const QString& title);
 
 signals:
-    void itemSelected(Photo* photo);
+    void selectionChanged(bool selected);
     void titleEdited(const QString&);
 
 private:
@@ -32,6 +32,7 @@ private:
     QLabel*         _thumbnail;
     EditableLabel*  _title;
     QColor          _backgroundColor;
+    bool            _selected;
 };
 
 
