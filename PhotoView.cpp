@@ -4,12 +4,14 @@
 #include "Photo.h"
 #include "Thumbnail.h"
 #include "PhotoItem.h"
+#include "MainWindow.h"
 #include <QFileSystemModel>
 #include <QLabel>
 #include <QMenu>
 #include <QMouseEvent>
 #include <algorithm>
 #include <QAction>
+#include <QDebug>
 
 PhotoView::PhotoView(QWidget *parent) :
     QWidget(parent),
@@ -31,24 +33,21 @@ void PhotoView::load()
 
 void PhotoView::sort(const QString& byWhat, bool ascending)
 {
-    _sortBy = byWhat;
-    _ascending = ascending;
-    QList<PhotoItem*> items;
-    while (!_layout->isEmpty())
-        items << (PhotoItem*) _layout->takeAt(0)->widget();
+    _sortBy     = byWhat;
+    _ascending  = ascending;
 
     if (byWhat == "Title") {
-        if (ascending)  std::sort(items.begin(), items.end(), PhotoItemLessTitle());
-        else            std::sort(items.begin(), items.end(), PhotoItemGreaterTitle());
+        if (ascending)  _layout->sort(PhotoItemLessTitle());
+        else            _layout->sort(PhotoItemGreaterTitle());
     }
     if (byWhat == "Time") {
-        if (ascending)  std::sort(items.begin(), items.end(), PhotoItemLessTime());
-        else            std::sort(items.begin(), items.end(), PhotoItemGreaterTime());
+        if (ascending)  _layout->sort(PhotoItemLessTime());
+        else            _layout->sort(PhotoItemGreaterTime());
     }
+}
 
-    for (PhotoItem* item: items)
-        _layout->addWidget(item);
-    _layout->update();
+void PhotoView::sort() {
+    sort(_sortBy, _ascending);
 }
 
 QList<PhotoItem*> PhotoView::getSelectedItems() const {
@@ -76,10 +75,6 @@ void PhotoView::addPhoto(Photo* photo)
     _layout->addWidget(photoItem);
 }
 
-void PhotoView::sort() {
-    sort(_sortBy, _ascending);
-}
-
 void PhotoView::mousePressEvent(QMouseEvent* event)
 {
     _selectionStart = event->pos();
@@ -88,18 +83,39 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
     _rubberBand->setGeometry(QRect(_selectionStart, QSize()));
     _rubberBand->show();
 
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton && event->modifiers() != Qt::ShiftModifier)
+        _selected.clear();
+    if (PhotoItem* item = clickedItem(_selectionStart))
     {
-        if (event->modifiers() != Qt::ShiftModifier)
-            _selected.clear();
-        if (PhotoItem* item = clickedItem(_selectionStart))
+        if (event->button() == Qt::LeftButton && _selected.contains(item))
+            _selected.removeAt(_selected.indexOf(item));
+        else
+            _selected << item;
+    }
+    updateSelection();
+
+    if (event->button() == Qt::RightButton)
+    {
+        if (clickedItem(_selectionStart) == 0)
         {
-            if (_selected.contains(item))
-                _selected.removeAt(_selected.indexOf(item));
-            else
-                _selected << item;
+            _selected.clear();
+            updateSelection();
         }
-        updateSelection();
+
+        QMenu menu(this);
+        MainWindow* mainWindow = MainWindow::getInstance();
+        menu.addAction(mainWindow->getSortByTitleAction());
+        menu.addAction(mainWindow->getSortByTimeAction());
+        menu.addAction(mainWindow->getSortingOrderAction());
+        if (!_selected.isEmpty())
+        {
+            menu.addSeparator();
+            menu.addAction(mainWindow->getRenameAction());
+            menu.addAction(mainWindow->getRemoveAction());
+            menu.addAction(mainWindow->getDeleteAction());
+            menu.addAction(mainWindow->getTagsAction());
+        }
+        menu.exec(event->globalPos());
     }
 }
 
@@ -156,18 +172,23 @@ void PhotoView::mouseReleaseEvent(QMouseEvent* event) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-bool PhotoItemLessTitle::operator() (PhotoItem* lhs, PhotoItem* rhs) const {
-    return lhs->getPhoto()->getTitle() < rhs->getPhoto()->getTitle();
+bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
+    return  ((PhotoItem*) lhs->widget())->getPhoto()->getTitle() <
+            ((PhotoItem*) rhs->widget())->getPhoto()->getTitle();
 }
 
-bool PhotoItemGreaterTitle::operator() (PhotoItem* lhs, PhotoItem* rhs) const {
-    return lhs->getPhoto()->getTitle() > rhs->getPhoto()->getTitle();
+bool PhotoItemGreaterTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
+    return  ((PhotoItem*) lhs->widget())->getPhoto()->getTitle() >
+            ((PhotoItem*) rhs->widget())->getPhoto()->getTitle();
 }
 
-bool PhotoItemLessTime::operator() (PhotoItem* lhs, PhotoItem* rhs) const {
-    return lhs->getPhoto()->getTimeTaken() < rhs->getPhoto()->getTimeTaken();
+bool PhotoItemLessTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
+    return  ((PhotoItem*) lhs->widget())->getPhoto()->getTimeTaken() <
+            ((PhotoItem*) rhs->widget())->getPhoto()->getTimeTaken();
 }
 
-bool PhotoItemGreaterTime::operator() (PhotoItem* lhs, PhotoItem* rhs) const {
-    return lhs->getPhoto()->getTimeTaken() > rhs->getPhoto()->getTimeTaken();
+bool PhotoItemGreaterTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
+    return  ((PhotoItem*) lhs->widget())->getPhoto()->getTimeTaken() >
+            ((PhotoItem*) rhs->widget())->getPhoto()->getTimeTaken();
 }
+

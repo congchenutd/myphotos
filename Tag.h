@@ -4,7 +4,7 @@
 #include "Persistable.h"
 #include <QString>
 
-class Tag : public Persistable
+class Tag: public Persistable
 {
 public:
     Tag(int id, const QString& name);

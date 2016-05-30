@@ -12,6 +12,14 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget* parent = 0);
+    static MainWindow* getInstance();
+    QAction* getRenameAction();
+    QAction* getRemoveAction();
+    QAction* getDeleteAction();
+    QAction* getSortByTitleAction();
+    QAction* getSortByTimeAction();
+    QAction* getSortingOrderAction();
+    QAction* getTagsAction();
 
 private slots:
     void onScan();
@@ -24,11 +32,13 @@ private slots:
     void onRemove();
     void onDelete();
     void onThumbnailSize(int size);
+    void onTags();
 
 private:
     Ui::MainWindow ui;
-    QProgressBar*   _progressBar;
-    bool            _ascending;
+    QProgressBar*       _progressBar;
+    bool                _ascending;
+    static MainWindow*  _instance;
 };
 
 #endif // MAINWINDOW_H

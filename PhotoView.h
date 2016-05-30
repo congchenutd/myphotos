@@ -8,7 +8,8 @@
 class Library;
 class Photo;
 class PhotoItem;
-struct PhotoItemComparator;
+class QLayoutItem;
+class FlowLayout;
 
 class PhotoView : public QWidget
 {
@@ -45,7 +46,7 @@ private slots:
 
 private:
     Ui::PhotoView ui;
-    QLayout*            _layout;
+    FlowLayout*         _layout;
     Library*            _library;
     QPoint              _selectionStart;
     QRubberBand*        _rubberBand;
@@ -54,24 +55,22 @@ private:
     bool                _ascending;
 };
 
-struct PhotoItemComparator: public std::less<PhotoItem*> {
-    virtual bool operator() (PhotoItem* lhs, PhotoItem* rhs) const = 0;
+
+struct PhotoItemLessTitle {
+    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 };
 
-struct PhotoItemLessTitle: public PhotoItemComparator {
-    bool operator() (PhotoItem* lhs, PhotoItem* rhs) const;
+struct PhotoItemGreaterTitle {
+    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 };
 
-struct PhotoItemGreaterTitle: public PhotoItemComparator {
-    bool operator() (PhotoItem* lhs, PhotoItem* rhs) const;
+struct PhotoItemLessTime {
+    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 };
 
-struct PhotoItemLessTime: public PhotoItemComparator {
-    bool operator() (PhotoItem* lhs, PhotoItem* rhs) const;
+struct PhotoItemGreaterTime {
+    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 };
 
-struct PhotoItemGreaterTime: public PhotoItemComparator {
-    bool operator() (PhotoItem* lhs, PhotoItem* rhs) const;
-};
 
 #endif // PHOTOVIEW_H

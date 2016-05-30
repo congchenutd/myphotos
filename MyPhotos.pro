@@ -34,7 +34,9 @@ SOURCES += \
     ThumbnailDAO.cpp \
     PhotoItem.cpp \
     EditableLabel.cpp \
-    ExifView.cpp
+    ExifView.cpp \
+    TagsView.cpp \
+    TagsViewlet.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -52,21 +54,24 @@ HEADERS += \
     DAO.h \
     PhotoDAO.h \
     Tag.h \
-    TagDAO.h \
     PhotoView.h \
     FlowLayout.h \
     Thumbnail.h \
     ThumbnailDAO.h \
     PhotoItem.h \
     EditableLabel.h \
-    ExifView.h
+    ExifView.h \
+    TagDAO.h \
+    TagsView.h \
+    TagsViewlet.h
 
 FORMS += \
 	MainWindow.ui \
     SettingsDlg.ui \
     MonitoredFoldersDlg.ui \
     PhotoView.ui \
-    ExifView.ui
+    ExifView.ui \
+    TagsView.ui
 
 RESOURCES += \
     Resources.qrc

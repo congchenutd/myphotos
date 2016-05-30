@@ -8,10 +8,14 @@
 #include <QActionGroup>
 #include <QMessageBox>
 
+MainWindow* MainWindow::_instance = 0;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     _ascending(true)
 {
+    _instance = this;
+
     ui.setupUi(this);
     _progressBar = new QProgressBar(this);
     _progressBar->setTextVisible(true);
@@ -32,20 +36,54 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.statusBar->addPermanentWidget(slider);
     ui.statusBar->addPermanentWidget(new QLabel("  "));
 
-    connect(ui.actionScan,      SIGNAL(triggered(bool)), this, SLOT(onScan()));
-    connect(ui.actionOptions,   SIGNAL(triggered(bool)), this, SLOT(onOptions()));
+    connect(ui.actionScan,          SIGNAL(triggered(bool)),    this, SLOT(onScan()));
+    connect(ui.actionOptions,       SIGNAL(triggered(bool)),    this, SLOT(onOptions()));
     connect(Library::getInstance(), SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
-    connect(ui.actionSortByTitle,   SIGNAL(triggered()), this, SLOT(sort()));
-    connect(ui.actionSortByTime,    SIGNAL(triggered()), this, SLOT(sort()));
-    connect(ui.actionOrder,         SIGNAL(triggered()), this, SLOT(onSortingOrder()));
+    connect(ui.actionSortByTitle,   SIGNAL(triggered()),        this, SLOT(sort()));
+    connect(ui.actionSortByTime,    SIGNAL(triggered()),        this, SLOT(sort()));
+    connect(ui.actionOrder,         SIGNAL(triggered()),        this, SLOT(onSortingOrder()));
     connect(ui.photoView, SIGNAL(selectionChanged(QList<PhotoItem*>)),
             this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
-    connect(ui.actionRemove, SIGNAL(triggered(bool)), this, SLOT(onRemove()));
-    connect(ui.actionDelete, SIGNAL(triggered(bool)), this, SLOT(onDelete()));
-    connect(ui.actionRename, SIGNAL(triggered(bool)), this, SLOT(onRename()));
-    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(onThumbnailSize(int)));
+    connect(ui.actionRemove,    SIGNAL(triggered(bool)),    this, SLOT(onRemove()));
+    connect(ui.actionDelete,    SIGNAL(triggered(bool)),    this, SLOT(onDelete()));
+    connect(ui.actionRename,    SIGNAL(triggered(bool)),    this, SLOT(onRename()));
+    connect(ui.actionTags,      SIGNAL(triggered(bool)),    this, SLOT(onTags()));
+    connect(slider,             SIGNAL(valueChanged(int)),  this, SLOT(onThumbnailSize(int)));
 
     sort();
+    onPhotoSelected(QList<PhotoItem*>());
+}
+
+MainWindow* MainWindow::getInstance() {
+    return _instance;
+}
+
+QAction* MainWindow::getRenameAction() {
+    return ui.actionRename;
+}
+
+QAction* MainWindow::getRemoveAction() {
+    return ui.actionRemove;
+}
+
+QAction* MainWindow::getDeleteAction() {
+    return ui.actionDelete;
+}
+
+QAction* MainWindow::getSortByTitleAction() {
+    return ui.actionSortByTitle;
+}
+
+QAction* MainWindow::getSortByTimeAction() {
+    return ui.actionSortByTime;
+}
+
+QAction* MainWindow::getSortingOrderAction() {
+    return ui.actionOrder;
+}
+
+QAction* MainWindow::getTagsAction() {
+    return ui.actionTags;
 }
 
 void MainWindow::onScan()
@@ -88,6 +126,9 @@ void MainWindow::onSortingOrder()
     _ascending = !_ascending;
     QString iconPath = _ascending ? ":/Images/Up.png" : ":/Images/Down.png";
     ui.actionOrder->setIcon(QIcon(iconPath));
+    QString text = _ascending ? tr("Ascending") : tr("Descending");
+    ui.actionOrder->setText(text);
+    ui.actionOrder->setToolTip(text);
     sort();
 }
 
@@ -99,9 +140,12 @@ void MainWindow::sort()
 
 void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
 {
-    ui.actionRemove->setEnabled(!selected.isEmpty());
-    ui.actionDelete->setEnabled(!selected.isEmpty());
-    ui.actionRename->setEnabled(!selected.isEmpty());
+    ui.actionRemove ->setEnabled(!selected.isEmpty());
+    ui.actionDelete ->setEnabled(!selected.isEmpty());
+    ui.actionRename ->setEnabled(!selected.isEmpty());
+    ui.actionTags   ->setEnabled(!selected.isEmpty());
+
+    ui.pageTags->setEnabled(!selected.isEmpty());
 }
 
 void MainWindow::onRename() {
@@ -135,4 +179,9 @@ void MainWindow::onDelete()
 void MainWindow::onThumbnailSize(int size)
 {
     ui.photoView->resizeThumbnails(size);
+}
+
+void MainWindow::onTags()
+{
+    ui.sidebar->setCurrentIndex(2);
 }
