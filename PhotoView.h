@@ -10,6 +10,7 @@ class Photo;
 class PhotoItem;
 class QLayoutItem;
 class FlowLayout;
+class TagMenu;
 
 class PhotoView : public QWidget
 {
@@ -27,6 +28,10 @@ public slots:
     void addPhoto(Photo* photo);
     void sort();
 
+private slots:
+    void onNewTag(const QString& tagValue);
+    void onTagChecked(bool checked);
+
 signals:
     void photoSelected(Photo*);
     void selectionChanged(const QList<PhotoItem*>&);
@@ -39,7 +44,8 @@ protected:
 private:
     void load();
     void updateSelection();
-    PhotoItem* clickedItem(const QPoint& point);
+    PhotoItem* getClickedItem(const QPoint& point);
+    TagMenu* createTagMenu();
 
 private slots:
     void onItemSelected(bool selected);

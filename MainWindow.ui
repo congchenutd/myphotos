@@ -74,7 +74,6 @@
     <addaction name="actionRename"/>
     <addaction name="actionRemove"/>
     <addaction name="actionDelete"/>
-    <addaction name="actionTags"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuVuew"/>
@@ -101,7 +100,6 @@
    <addaction name="actionRename"/>
    <addaction name="actionRemove"/>
    <addaction name="actionDelete"/>
-   <addaction name="actionTags"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -296,18 +294,6 @@
    </property>
    <property name="shortcut">
     <string>F2</string>
-   </property>
-  </action>
-  <action name="actionTags">
-   <property name="icon">
-    <iconset resource="Resources.qrc">
-     <normaloff>:/Images/Tag.png</normaloff>:/Images/Tag.png</iconset>
-   </property>
-   <property name="text">
-    <string>Tags</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

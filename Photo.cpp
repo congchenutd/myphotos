@@ -28,6 +28,14 @@ QList<Tag*> Photo::getTags() const {
     return _tags;
 }
 
+QSet<QString> Photo::getTagValues() const
+{
+    QSet<QString> result;
+    foreach (Tag* tag, _tags)
+        result.insert(tag->getName());
+    return result;
+}
+
 QList<People*> Photo::getPeople() const {
     return _people;
 }
@@ -71,4 +79,11 @@ void Photo::setEvent(Event* event)
 
 void Photo::setThumbnail(Thumbnail* thumbnail) {
     _thumbnail = thumbnail;
+}
+
+void Photo::removeTag(const QString& tagValue)
+{
+    for (int i = 0; i < _tags.count(); ++i)
+        if (_tags.at(i)->getName() == tagValue)
+            _tags.removeAt(i);
 }

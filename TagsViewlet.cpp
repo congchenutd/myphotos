@@ -6,13 +6,13 @@
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPalette>
+#include <QDebug>
 
 TagsViewlet::TagsViewlet(QWidget* parent)
     : QWidget(parent),
       _removable(false)
 {
     _layout = new FlowLayout(this);
-    setAcceptDrops(true);
 }
 
 void TagsViewlet::loadTags(const QStringList& tags)
@@ -59,59 +59,6 @@ bool TagsViewlet::tagExists(const QString& tag) const
             return true;
     }
     return false;
-}
-
-void TagsViewlet::mousePressEvent(QMouseEvent* event)
-{
-    if (event->button() == Qt::LeftButton)
-    {
-        QLabel* child = qobject_cast<QLabel*>(childAt(event->pos()));
-        if (child == 0)
-            return;
-
-        QMimeData* mimeData = new QMimeData;
-        mimeData->setText(child->text());
-
-        QPixmap pixmap(child->size());
-        child->render(&pixmap);
-
-        QDrag* drag = new QDrag(this);
-        drag->setMimeData(mimeData);
-        drag->setPixmap(pixmap);
-        drag->setHotSpot(event->pos() - child->pos());
-
-        if (drag->exec(Qt::MoveAction) == Qt::MoveAction &&
-            drag->source() != drag->target() &&
-            _removable)
-            removeTag(child->text());
-    }
-}
-
-void TagsViewlet::dragEnterEvent(QDragEnterEvent* event)
-{
-    if (event->mimeData()->hasText())
-        event->acceptProposedAction();
-    else
-        event->ignore();
-}
-
-void TagsViewlet::dropEvent(QDropEvent* event)
-{
-    if (event->source() != this && _removable)
-    {
-        QString tag = event->mimeData()->text();
-        if (!tagExists(tag))
-        {
-            addTag(tag);
-            event->setDropAction(Qt::MoveAction);
-            event->accept();
-            sort();
-        }
-        else
-            event->accept();
-    }
-    else
-        event->acceptProposedAction();
 }
 
 void TagsViewlet::sort() {

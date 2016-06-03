@@ -19,7 +19,9 @@ public:
     QAction* getSortByTitleAction();
     QAction* getSortByTimeAction();
     QAction* getSortingOrderAction();
-    QAction* getTagsAction();
+
+protected:
+    void closeEvent(QCloseEvent*);
 
 private slots:
     void onScan();
@@ -32,7 +34,6 @@ private slots:
     void onRemove();
     void onDelete();
     void onThumbnailSize(int size);
-    void onTags();
 
 private:
     Ui::MainWindow ui;

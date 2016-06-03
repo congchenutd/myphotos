@@ -10,9 +10,6 @@ class TagsView : public QWidget
 public:
     explicit TagsView(QWidget* parent = 0);
 
-private slots:
-    void onNewTag();
-
 private:
     Ui::TagsView ui;
 };

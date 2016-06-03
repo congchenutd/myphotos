@@ -12,6 +12,10 @@ public:
     static LibraryDAO* getInstance();
     void load(Library* library);
     void save(Library* library);
+    void clean();
+
+private:
+    void removeUnusedTags();
 
 private:
     LibraryDAO();

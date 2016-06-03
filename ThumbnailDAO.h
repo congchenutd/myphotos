@@ -11,6 +11,7 @@ public:
     static ThumbnailDAO* getInstance();
 
     Thumbnail* load(int id) const;
+    void remove(Persistable* persistable);
 
 private:
     ThumbnailDAO();

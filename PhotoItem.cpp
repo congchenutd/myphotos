@@ -16,7 +16,8 @@ PhotoItem::PhotoItem(Photo* photo)
       _selected(false)
 {
     _thumbnail = new QLabel(this);
-    _thumbnail->setPixmap(QPixmap(photo->getThumbnail()->getFilePath()));
+    if (photo->getThumbnail() != 0)
+        _thumbnail->setPixmap(QPixmap(photo->getThumbnail()->getFilePath()));
     _thumbnail->setAlignment(Qt::AlignCenter);
 
     _title = new EditableLabel;
@@ -40,7 +41,7 @@ void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
 void PhotoItem::onTitleEdited(const QString& title)
 {
     _photo->setTitle(title);
-    Library::getInstance()->save();
+    _photo->save();
     emit titleEdited(title);
 }
 

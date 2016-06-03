@@ -4,6 +4,7 @@
 #include "Persistable.h"
 
 #include <QDateTime>
+#include <QSet>
 #include <QString>
 #include <QStringList>
 
@@ -22,6 +23,7 @@ public:
     QString         getFilePath()   const;
     QDateTime       getTimeTaken()  const;
     QList<Tag *>    getTags()       const;
+    QSet<QString>   getTagValues()  const;
     QList<People*>  getPeople()     const;
     Event*          getEvent()      const;
     Thumbnail*      getThumbnail()  const;
@@ -33,6 +35,7 @@ public:
     void addPeople      (People*    people);
     void setEvent       (Event*     event);
     void setThumbnail   (Thumbnail* thumbnail);
+    void removeTag      (const QString& tagValue);
 
 private:
     QString         _title;

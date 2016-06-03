@@ -101,6 +101,21 @@ void LibraryDAO::save(Library* library)
     }
 }
 
+void LibraryDAO::clean()
+{
+    removeUnusedTags();
+}
+
+/**
+ * @brief Clean up unused tags
+ */
+void LibraryDAO::removeUnusedTags()
+{
+    QSqlQuery query;
+    query.exec(tr("delete from Tags where ID in (select ID from Tags \
+                   where ID not in (select TagID from PhotoTag))"));
+}
+
 LibraryDAO::LibraryDAO()
 {
     QDir dir = QDir::current();

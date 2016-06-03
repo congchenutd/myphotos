@@ -28,6 +28,17 @@ Photo* PhotoDAO::load(int id) const
                      QDateTime::fromString(query.value(2).toString(), Qt::ISODate));
 }
 
+void PhotoDAO::remove(Persistable* persistable)
+{
+    Photo* photo = static_cast<Photo*>(persistable);
+    if (Thumbnail* thumbnail = photo->getThumbnail())
+    {
+        thumbnail->destroy();
+        photo->setThumbnail(0);
+    }
+    DAO::remove(persistable);
+}
+
 PhotoDAO::PhotoDAO(): DAO("Photos") {}
 
 void PhotoDAO::update(Persistable* persistable)

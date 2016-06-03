@@ -1,6 +1,7 @@
 #include "Persistable.h"
 #include "ThumbnailDAO.h"
 #include "Settings.h"
+#include <QFile>
 #include <QSqlQuery>
 
 ThumbnailDAO::ThumbnailDAO()
@@ -19,6 +20,12 @@ Thumbnail* ThumbnailDAO::load(int id) const
     query.exec(tr("select FilePath from Thumbnails where id = %1").arg(id));
     return query.next() ? new Thumbnail(id, query.value(0).toString())
                         : 0;
+}
+
+void ThumbnailDAO::remove(Persistable* persistable)
+{
+    Thumbnail* thumbnail = static_cast<Thumbnail*>(persistable);
+    QFile(thumbnail->getFilePath()).remove();
 }
 
 void ThumbnailDAO::update(Persistable* persistable)

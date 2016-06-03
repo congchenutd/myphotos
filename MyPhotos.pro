@@ -36,7 +36,8 @@ SOURCES += \
     EditableLabel.cpp \
     ExifView.cpp \
     TagsView.cpp \
-    TagsViewlet.cpp
+    TagsViewlet.cpp \
+    TagMenu.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -63,7 +64,8 @@ HEADERS += \
     ExifView.h \
     TagDAO.h \
     TagsView.h \
-    TagsViewlet.h
+    TagsViewlet.h \
+    TagMenu.h
 
 FORMS += \
 	MainWindow.ui \

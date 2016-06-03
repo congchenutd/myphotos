@@ -13,7 +13,7 @@ MainWindow* MainWindow::_instance = 0;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     _ascending(true)
-{
+ {
     _instance = this;
 
     ui.setupUi(this);
@@ -47,43 +47,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionRemove,    SIGNAL(triggered(bool)),    this, SLOT(onRemove()));
     connect(ui.actionDelete,    SIGNAL(triggered(bool)),    this, SLOT(onDelete()));
     connect(ui.actionRename,    SIGNAL(triggered(bool)),    this, SLOT(onRename()));
-    connect(ui.actionTags,      SIGNAL(triggered(bool)),    this, SLOT(onTags()));
     connect(slider,             SIGNAL(valueChanged(int)),  this, SLOT(onThumbnailSize(int)));
 
     sort();
     onPhotoSelected(QList<PhotoItem*>());
 }
 
-MainWindow* MainWindow::getInstance() {
-    return _instance;
-}
+MainWindow* MainWindow::getInstance()           { return _instance;             }
+QAction*    MainWindow::getRenameAction()       { return ui.actionRename;       }
+QAction*    MainWindow::getRemoveAction()       { return ui.actionRemove;       }
+QAction*    MainWindow::getDeleteAction()       { return ui.actionDelete;       }
+QAction*    MainWindow::getSortByTitleAction()  { return ui.actionSortByTitle;  }
+QAction*    MainWindow::getSortByTimeAction()   { return ui.actionSortByTime;   }
+QAction*    MainWindow::getSortingOrderAction() { return ui.actionOrder;        }
 
-QAction* MainWindow::getRenameAction() {
-    return ui.actionRename;
-}
-
-QAction* MainWindow::getRemoveAction() {
-    return ui.actionRemove;
-}
-
-QAction* MainWindow::getDeleteAction() {
-    return ui.actionDelete;
-}
-
-QAction* MainWindow::getSortByTitleAction() {
-    return ui.actionSortByTitle;
-}
-
-QAction* MainWindow::getSortByTimeAction() {
-    return ui.actionSortByTime;
-}
-
-QAction* MainWindow::getSortingOrderAction() {
-    return ui.actionOrder;
-}
-
-QAction* MainWindow::getTagsAction() {
-    return ui.actionTags;
+void MainWindow::closeEvent(QCloseEvent*) {
+    Library::getInstance()->clean();
 }
 
 void MainWindow::onScan()
@@ -140,12 +119,11 @@ void MainWindow::sort()
 
 void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
 {
-    ui.actionRemove ->setEnabled(!selected.isEmpty());
-    ui.actionDelete ->setEnabled(!selected.isEmpty());
-    ui.actionRename ->setEnabled(!selected.isEmpty());
-    ui.actionTags   ->setEnabled(!selected.isEmpty());
-
-    ui.pageTags->setEnabled(!selected.isEmpty());
+    bool hasSelection = !selected.isEmpty();
+    ui.actionRemove ->setEnabled(hasSelection);
+    ui.actionDelete ->setEnabled(hasSelection);
+    ui.actionRename ->setEnabled(hasSelection);
+    ui.pageTags     ->setEnabled(hasSelection);
 }
 
 void MainWindow::onRename() {
@@ -179,9 +157,4 @@ void MainWindow::onDelete()
 void MainWindow::onThumbnailSize(int size)
 {
     ui.photoView->resizeThumbnails(size);
-}
-
-void MainWindow::onTags()
-{
-    ui.sidebar->setCurrentIndex(2);
 }

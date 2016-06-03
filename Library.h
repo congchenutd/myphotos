@@ -26,6 +26,7 @@ public:
     int preScan();
     void scan();
     void save();
+    void clean();
 
     QMap<QString, Photo*>       getAllPhotos()      const;
     QMap<QString, People*>      getAllPeople()      const;

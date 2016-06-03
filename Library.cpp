@@ -66,6 +66,11 @@ void Library::save() {
     _dao->save(this);
 }
 
+void Library::clean() {
+    save();
+    _dao->clean();
+}
+
 QMap<QString, People*> Library::getAllPeople() const {
     return _people;
 }
@@ -112,11 +117,12 @@ void Library::addPhoto(Photo* photo) {
     }
 }
 
-void Library::onThumbnailCreated(Photo *photo)
+void Library::onThumbnailCreated(Photo* photo)
 {
     addThumbnail(photo->getThumbnail());
+    photo->getThumbnail()->save();
+    photo->save();
     emit photoAdded(photo);
-    save();
 }
 
 void Library::addEvent(Event* event) {

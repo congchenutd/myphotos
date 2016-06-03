@@ -12,6 +12,7 @@ public:
     static PhotoDAO* getInstance();
 
     Photo* load(int id) const;
+    void remove(Persistable* persistable);
 
 private:
     PhotoDAO();

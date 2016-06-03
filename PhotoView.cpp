@@ -5,6 +5,9 @@
 #include "Thumbnail.h"
 #include "PhotoItem.h"
 #include "MainWindow.h"
+#include "TagMenu.h"
+#include "Tag.h"
+
 #include <QFileSystemModel>
 #include <QLabel>
 #include <QMenu>
@@ -56,7 +59,7 @@ QList<PhotoItem*> PhotoView::getSelectedItems() const {
 
 void PhotoView::removeItem(PhotoItem* item) {
     _layout->removeWidget(item);
-    delete item;
+    item->deleteLater();
 }
 
 void PhotoView::resizeThumbnails(int size)
@@ -77,26 +80,30 @@ void PhotoView::addPhoto(Photo* photo)
 
 void PhotoView::mousePressEvent(QMouseEvent* event)
 {
+    // show the selection rubber band
     _selectionStart = event->pos();
     if (!_rubberBand)
         _rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     _rubberBand->setGeometry(QRect(_selectionStart, QSize()));
     _rubberBand->show();
 
+    // single click will clear the selection
     if (event->button() == Qt::LeftButton && event->modifiers() != Qt::ShiftModifier)
         _selected.clear();
-    if (PhotoItem* item = clickedItem(_selectionStart))
-    {
-        if (event->button() == Qt::LeftButton && _selected.contains(item))
-            _selected.removeAt(_selected.indexOf(item));
-        else
-            _selected << item;
-    }
+
+    // add clicked item to selection
+    PhotoItem* clickedItem = getClickedItem(_selectionStart);
+    if (clickedItem != 0)
+        _selected << clickedItem;
+
+    // show the selection
     updateSelection();
 
+    // context menu
     if (event->button() == Qt::RightButton)
     {
-        if (clickedItem(_selectionStart) == 0)
+        // right click on empty space will clear the selection
+        if (clickedItem == 0)
         {
             _selected.clear();
             updateSelection();
@@ -113,10 +120,58 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
             menu.addAction(mainWindow->getRenameAction());
             menu.addAction(mainWindow->getRemoveAction());
             menu.addAction(mainWindow->getDeleteAction());
-            menu.addAction(mainWindow->getTagsAction());
+
+            menu.addMenu(createTagMenu());
         }
         menu.exec(event->globalPos());
     }
+}
+
+void PhotoView::onNewTag(const QString& tagValue)
+{
+    Tag* tag = new Tag(Tag::getNextID(), tagValue);
+    _library->addTag(tag);
+    tag->save();
+    foreach(PhotoItem* item, _selected)
+    {
+        Photo* photo = item->getPhoto();
+        photo->addTag(tag);
+        photo->save();
+    }
+}
+
+void PhotoView::onTagChecked(bool checked)
+{
+    QString tagValue = ((QAction*) sender())->text();
+    foreach (PhotoItem* item, _selected)
+    {
+        Photo* photo = item->getPhoto();
+        if (checked)
+            photo->addTag(_library->getTag(tagValue));
+        else
+            photo->removeTag(tagValue);
+        photo->save();
+    }
+}
+
+TagMenu* PhotoView::createTagMenu()
+{
+    TagMenu* tagMenu = new TagMenu(this);
+    connect(tagMenu, SIGNAL(newTag(QString)), this, SLOT(onNewTag(QString)));
+
+    QSet<QString> commonTags = _library->getAllTags().keys().toSet();
+    foreach (PhotoItem* item, _selected)
+        commonTags = commonTags.intersect(item->getPhoto()->getTagValues());
+
+    foreach (const QString& tag, _library->getAllTags().keys())
+    {
+        QAction* action = new QAction(tag, this);
+        action->setCheckable(true);
+        action->setChecked(commonTags.contains(tag));
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(onTagChecked(bool)));
+        tagMenu->addAction(action);
+    }
+    return tagMenu;
 }
 
 void PhotoView::mouseMoveEvent(QMouseEvent* event)
@@ -145,7 +200,7 @@ void PhotoView::updateSelection()
     emit selectionChanged(_selected);
 }
 
-PhotoItem* PhotoView::clickedItem(const QPoint& point)
+PhotoItem* PhotoView::getClickedItem(const QPoint& point)
 {
     for (int i = 0; i < _layout->count(); ++i)
     {

@@ -14,12 +14,12 @@ public:
 
     void save(Persistable* persistable);
     bool exists(Persistable* persistable) const;
-    void remove(Persistable* persistable);
 
     QString getTableName() const;
     int getNextID() const;
 
     virtual Persistable* load(int id) const = 0;
+    virtual void remove(Persistable* persistable);
 
 protected:
     virtual void update(Persistable* persistable) = 0;
