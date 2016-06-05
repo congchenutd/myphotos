@@ -47,6 +47,7 @@ public:
     void addThumbnail   (Thumbnail* thumbnail);
 
     void removePhoto(Photo* photo);
+    QList<Photo*> filterPhotosByTags(const QSet<QString>& tags, bool AND);
 
 private:
     Library();

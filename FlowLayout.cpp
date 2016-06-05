@@ -22,7 +22,7 @@ void FlowLayout::clear()
 {
     QLayoutItem* item;
     while ((item = takeAt(0)))
-        delete item;
+        item->widget()->deleteLater();
 }
 
 void FlowLayout::addItem(QLayoutItem* item) {

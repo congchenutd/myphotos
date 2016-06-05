@@ -36,7 +36,6 @@ SOURCES += \
     EditableLabel.cpp \
     ExifView.cpp \
     TagsView.cpp \
-    TagsViewlet.cpp \
     TagMenu.cpp
 
 HEADERS += \
@@ -64,7 +63,6 @@ HEADERS += \
     ExifView.h \
     TagDAO.h \
     TagsView.h \
-    TagsViewlet.h \
     TagMenu.h
 
 FORMS += \

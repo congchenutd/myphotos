@@ -3,10 +3,13 @@
 #include "Settings.h"
 #include "Library.h"
 #include "PhotoItem.h"
+#include "Tag.h"
+#include "Photo.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
 #include <QMessageBox>
+#include <QDebug>
 
 MainWindow* MainWindow::_instance = 0;
 
@@ -15,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _ascending(true)
  {
     _instance = this;
+    _library = Library::getInstance();
 
     ui.setupUi(this);
     _progressBar = new QProgressBar(this);
@@ -38,19 +42,25 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui.actionScan,          SIGNAL(triggered(bool)),    this, SLOT(onScan()));
     connect(ui.actionOptions,       SIGNAL(triggered(bool)),    this, SLOT(onOptions()));
-    connect(Library::getInstance(), SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
+    connect(_library, SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
     connect(ui.actionSortByTitle,   SIGNAL(triggered()),        this, SLOT(sort()));
     connect(ui.actionSortByTime,    SIGNAL(triggered()),        this, SLOT(sort()));
     connect(ui.actionOrder,         SIGNAL(triggered()),        this, SLOT(onSortingOrder()));
     connect(ui.photoView, SIGNAL(selectionChanged(QList<PhotoItem*>)),
             this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
+    connect(ui.photoView, SIGNAL(newTag(QString)), this, SLOT(onNewTag(QString)));
     connect(ui.actionRemove,    SIGNAL(triggered(bool)),    this, SLOT(onRemove()));
     connect(ui.actionDelete,    SIGNAL(triggered(bool)),    this, SLOT(onDelete()));
     connect(ui.actionRename,    SIGNAL(triggered(bool)),    this, SLOT(onRename()));
     connect(slider,             SIGNAL(valueChanged(int)),  this, SLOT(onThumbnailSize(int)));
 
+    ui.photoView->load(_library->getAllPhotos().values());
     sort();
     onPhotoSelected(QList<PhotoItem*>());
+
+    ui.pageTags->setTags(_library->getAllTags().keys());
+    connect(ui.pageTags,    SIGNAL(filterByTags(QStringList, bool)),
+            this,           SLOT(onFilterByTags(QStringList, bool)));
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }
@@ -62,15 +72,14 @@ QAction*    MainWindow::getSortByTimeAction()   { return ui.actionSortByTime;   
 QAction*    MainWindow::getSortingOrderAction() { return ui.actionOrder;        }
 
 void MainWindow::closeEvent(QCloseEvent*) {
-    Library::getInstance()->clean();
+    _library->clean();
 }
 
 void MainWindow::onScan()
 {
-    int nPhotos = Library::getInstance()->preScan();
-    if (nPhotos > 0)
+    if (int nPhotos = _library->preScan())
     {
-        Library::getInstance()->scan();
+        _library->scan();
         _progressBar->show();
         _progressBar->setRange(0, nPhotos);
         _progressBar->setValue(0);
@@ -123,7 +132,6 @@ void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
     ui.actionRemove ->setEnabled(hasSelection);
     ui.actionDelete ->setEnabled(hasSelection);
     ui.actionRename ->setEnabled(hasSelection);
-    ui.pageTags     ->setEnabled(hasSelection);
 }
 
 void MainWindow::onRename() {
@@ -138,7 +146,7 @@ void MainWindow::onRemove()
     {
         for (PhotoItem* item: ui.photoView->getSelectedItems())
         {
-            Library::getInstance()->removePhoto(item->getPhoto());
+            _library->removePhoto(item->getPhoto());
             ui.photoView->removeItem(item);
         }
     }
@@ -154,7 +162,36 @@ void MainWindow::onDelete()
     }
 }
 
-void MainWindow::onThumbnailSize(int size)
-{
+void MainWindow::onThumbnailSize(int size) {
     ui.photoView->resizeThumbnails(size);
+}
+
+void MainWindow::onFilterByTags(const QStringList& tags, bool AND)
+{
+    ui.photoView->clear();
+    if (tags.isEmpty()) {
+        ui.photoView->load(_library->getAllPhotos().values());
+    }
+    else
+    {
+        QList<Photo*> photos = _library->filterPhotosByTags(tags.toSet(), AND);
+        ui.photoView->load(photos);
+    }
+    sort();
+}
+
+void MainWindow::onNewTag(const QString& tagValue)
+{
+    Tag* tag = new Tag(Tag::getNextID(), tagValue);
+    _library->addTag(tag);
+    tag->save();
+
+    foreach(PhotoItem* item, ui.photoView->getSelectedItems())
+    {
+        Photo* photo = item->getPhoto();
+        photo->addTag(tag);
+        photo->save();
+    }
+
+    ui.pageTags->setTags(_library->getAllTags().keys());
 }

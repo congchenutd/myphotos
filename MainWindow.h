@@ -34,11 +34,15 @@ private slots:
     void onRemove();
     void onDelete();
     void onThumbnailSize(int size);
+    void onFilterByTags(const QStringList& tags, bool AND);
+    void onNewTag(const QString& tagValue);
 
 private:
     Ui::MainWindow ui;
     QProgressBar*       _progressBar;
     bool                _ascending;
+    Library*            _library;
+
     static MainWindow*  _instance;
 };
 

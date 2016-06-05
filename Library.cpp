@@ -147,6 +147,23 @@ Library::Library()
     _dao->load(this);
 }
 
+QList<Photo*> Library::filterPhotosByTags(const QSet<QString>& tags, bool AND)
+{
+    QList<Photo*> result;
+    foreach (Photo* photo, _photos)
+    {
+        if (AND) {
+            if (photo->getTagValues().contains(tags))
+                result << photo;
+        }
+        else {
+            if (photo->getTagValues().intersects(tags))
+                result << photo;
+        }
+    }
+    return result;
+}
+
 void Library::addPeople(People* people) {
     if (people != 0)
         _people.insert(people->getName(), people);

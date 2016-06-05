@@ -19,6 +19,8 @@ class PhotoView : public QWidget
 public:
     explicit PhotoView(QWidget* parent = 0);
 
+    void clear();
+    void load(const QList<Photo*>& photos);
     void sort(const QString& byWhat, bool ascending);
     QList<PhotoItem*> getSelectedItems() const;
     void removeItem(PhotoItem* item);
@@ -34,6 +36,7 @@ private slots:
 
 signals:
     void photoSelected(Photo*);
+    void newTag(const QString& tag);
     void selectionChanged(const QList<PhotoItem*>&);
 
 protected:
@@ -42,7 +45,6 @@ protected:
     void mouseReleaseEvent  (QMouseEvent* event);
 
 private:
-    void load();
     void updateSelection();
     PhotoItem* getClickedItem(const QPoint& point);
     TagMenu* createTagMenu();

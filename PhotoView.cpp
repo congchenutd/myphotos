@@ -25,12 +25,11 @@ PhotoView::PhotoView(QWidget *parent) :
     ui.setupUi(this);
     _layout = new FlowLayout(this);
     _library = Library::getInstance();
-    load();
 }
 
-void PhotoView::load()
+void PhotoView::load(const QList<Photo*>& photos)
 {
-    for (Photo* photo: _library->getAllPhotos().values())
+    for (Photo* photo: photos)
         addPhoto(photo);
 }
 
@@ -157,7 +156,7 @@ void PhotoView::onTagChecked(bool checked)
 TagMenu* PhotoView::createTagMenu()
 {
     TagMenu* tagMenu = new TagMenu(this);
-    connect(tagMenu, SIGNAL(newTag(QString)), this, SLOT(onNewTag(QString)));
+    connect(tagMenu, SIGNAL(newTag(QString)), this, SIGNAL(newTag(QString)));
 
     QSet<QString> commonTags = _library->getAllTags().keys().toSet();
     foreach (PhotoItem* item, _selected)
@@ -172,6 +171,10 @@ TagMenu* PhotoView::createTagMenu()
         tagMenu->addAction(action);
     }
     return tagMenu;
+}
+
+void PhotoView::clear() {
+    _layout->clear();
 }
 
 void PhotoView::mouseMoveEvent(QMouseEvent* event)
