@@ -13,29 +13,15 @@ Photo::Photo(int id, const QString& title, const QString& path, const QDateTime&
       _thumbnail(0)
 {}
 
-QString         Photo::getTitle()       const { return _title;      }
-QString         Photo::getFilePath()    const { return _filePath;   }
-QDateTime       Photo::getTimeTaken()   const { return _time;       }
-QList<Tag*>     Photo::getTags()        const { return _tags.values();      }
-QList<People*>  Photo::getPeople()      const { return _people.values();    }
-Event*          Photo::getEvent()       const { return _event;      }
-Thumbnail*      Photo::getThumbnail()   const { return _thumbnail;  }
-
-QSet<QString> Photo::getTagValues() const
-{
-    QSet<QString> result;
-    foreach (Tag* tag, _tags)
-        result.insert(tag->getName());
-    return result;
-}
-
-QSet<QString> Photo::getPeopleNames() const
-{
-    QSet<QString> result;
-    foreach (People* people, _people)
-        result.insert(people->getName());
-    return result;
-}
+QString                 Photo::getTitle()       const { return _title;      }
+QString                 Photo::getFilePath()    const { return _filePath;   }
+QDateTime               Photo::getTimeTaken()   const { return _time;       }
+Event*                  Photo::getEvent()       const { return _event;      }
+Thumbnail*              Photo::getThumbnail()   const { return _thumbnail;  }
+QMap<QString, Tag*>     Photo::getTags()        const { return _tags;   }
+QMap<QString, People*>  Photo::getPeople()      const { return _people; }
+QSet<QString>           Photo::getTagNames()    const { return getTags()  .keys().toSet(); }
+QSet<QString>           Photo::getPeopleNames() const { return getPeople().keys().toSet(); }
 
 void Photo::setTitle(const QString& title)  {
     _title = title;

@@ -32,8 +32,8 @@ Photo* PhotoDAO::load(int id) const
     // load its relationships
     Library* library = Library::getInstance();
     query.exec(tr("select People.Name \
-                   from Photos, Peple, PhotoPeople \
-                   where Photos.ID = %1 and Peole.ID = PeopleID").arg(id));
+                   from Photos, People, PhotoPeople \
+                   where Photos.ID = %1 and Photos.ID = PhotoID and People.ID = PeopleID").arg(id));
     while (query.next())
     {
         QString peopleName  = query.value(0).toString();

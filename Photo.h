@@ -25,15 +25,15 @@ class Photo: public Persistable
 public:
     Photo(int id, const QString& title, const QString& path, const QDateTime& time);
 
-    QString         getTitle()      const;
-    QString         getFilePath()   const;
-    QDateTime       getTimeTaken()  const;
-    QList<Tag *>    getTags()       const;
-    QSet<QString>   getTagValues()  const;
-    QList<People*>  getPeople()     const;
-    QSet<QString>   getPeopleNames() const;
-    Event*          getEvent()      const;
-    Thumbnail*      getThumbnail()  const;
+    QString                 getTitle()          const;
+    QString                 getFilePath()       const;
+    QDateTime               getTimeTaken()      const;
+    Event*                  getEvent()          const;
+    Thumbnail*              getThumbnail()      const;
+    QMap<QString, Tag*>     getTags()           const;
+    QMap<QString, People*>  getPeople()         const;
+    QSet<QString>           getTagNames()       const;
+    QSet<QString>           getPeopleNames()    const;
 
     void setTitle       (const QString& title);
     void setFilePath    (const QString& filePath);

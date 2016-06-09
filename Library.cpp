@@ -112,11 +112,28 @@ QList<Photo*> Library::filterPhotosByTags(const QSet<QString>& tags, bool AND)
     foreach (Photo* photo, _photos)
     {
         if (AND) {
-            if (photo->getTagValues().contains(tags))
+            if (photo->getTagNames().contains(tags))
                 result << photo;
         }
         else {
-            if (photo->getTagValues().intersects(tags))
+            if (photo->getTagNames().intersects(tags))
+                result << photo;
+        }
+    }
+    return result;
+}
+
+QList<Photo *> Library::filterPhotosByPeople(const QSet<QString>& people, bool AND)
+{
+    QList<Photo*> result;
+    foreach (Photo* photo, _photos)
+    {
+        if (AND) {
+            if (photo->getPeopleNames().contains(people))
+                result << photo;
+        }
+        else {
+            if (photo->getPeopleNames().intersects(people))
                 result << photo;
         }
     }

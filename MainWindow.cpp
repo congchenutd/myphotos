@@ -7,6 +7,7 @@
 #include "Photo.h"
 #include "Scanner.h"
 #include "TagDAO.h"
+#include "PeopleDAO.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
@@ -64,6 +65,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.pageTags->setTags(_library->getAllTags().keys());
     connect(ui.pageTags,    SIGNAL(filterByTags(QStringList, bool)),
             this,           SLOT(onFilterByTags(QStringList, bool)));
+
+    ui.pagePeople->setTags(_library->getAllPeople().keys());
+    connect(ui.pagePeople,  SIGNAL(filterByTags(QStringList, bool)),
+            this,           SLOT(onFilterByPeople(QStringList, bool)));
 
     _scanner = new Scanner;
     connect(_scanner, SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
@@ -202,5 +207,30 @@ void MainWindow::onNewTag(const QString& tagValue)
 
 void MainWindow::onNewPeople(const QString& name)
 {
+    People* people = new People(PeopleDAO::getInstance()->getNextID(), name);
+    _library->addPeople(people);
+    people->save();
 
+    foreach(PhotoItem* item, ui.photoView->getSelectedItems())
+    {
+        Photo* photo = item->getPhoto();
+        photo->addPeople(people);
+        photo->save();
+    }
+
+    ui.pagePeople->setTags(_library->getAllPeople().keys());
+}
+
+void MainWindow::onFilterByPeople(const QStringList& people, bool AND)
+{
+    ui.photoView->clear();
+    if (people.isEmpty()) {
+        ui.photoView->load(_library->getAllPhotos().values());
+    }
+    else
+    {
+        QList<Photo*> photos = _library->filterPhotosByPeople(people.toSet(), AND);
+        ui.photoView->load(photos);
+    }
+    sort();
 }

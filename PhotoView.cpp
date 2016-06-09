@@ -178,7 +178,7 @@ NewItemMenu* PhotoView::createTagMenu()
 
     QSet<QString> commonTags = _library->getAllTags().keys().toSet();
     foreach (PhotoItem* item, _selected)
-        commonTags = commonTags.intersect(item->getPhoto()->getTagValues());
+        commonTags = commonTags.intersect(item->getPhoto()->getTagNames());
 
     foreach (const QString& tag, _library->getAllTags().keys())
     {

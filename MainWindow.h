@@ -35,9 +35,10 @@ private slots:
     void onRemove();
     void onDelete();
     void onThumbnailSize(int size);
-    void onFilterByTags(const QStringList& tags, bool AND);
     void onNewTag   (const QString& tagValue);
     void onNewPeople(const QString& name);
+    void onFilterByTags     (const QStringList& tags,   bool AND);
+    void onFilterByPeople   (const QStringList& people, bool AND);
 
 private:
     Ui::MainWindow ui;
