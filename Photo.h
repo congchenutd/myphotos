@@ -4,6 +4,7 @@
 #include "Persistable.h"
 
 #include <QDateTime>
+#include <QMap>
 #include <QSet>
 #include <QString>
 #include <QStringList>
@@ -14,6 +15,11 @@ class Tag;
 class PhotoDAO;
 class Thumbnail;
 
+/**
+ * A Photo object represents a photo
+ * A Photo may have 0 or 1 event, 1 thumbnail, 0-n tags, and 0-n people.
+ * NOTE: all the relationship between Photo and others are managed by Photo and PhotoDAO
+ */
 class Photo: public Persistable
 {
 public:
@@ -25,6 +31,7 @@ public:
     QList<Tag *>    getTags()       const;
     QSet<QString>   getTagValues()  const;
     QList<People*>  getPeople()     const;
+    QSet<QString>   getPeopleNames() const;
     Event*          getEvent()      const;
     Thumbnail*      getThumbnail()  const;
 
@@ -36,15 +43,16 @@ public:
     void setEvent       (Event*     event);
     void setThumbnail   (Thumbnail* thumbnail);
     void removeTag      (const QString& tagValue);
+    void removePeople   (const QString& name);
 
 private:
-    QString         _title;
-    QString         _filePath;
-    QDateTime       _time;
-    QList<Tag*>     _tags;
-    QList<People*>  _people;
-    Event*          _event;
-    Thumbnail*      _thumbnail;
+    QString                 _title;
+    QString                 _filePath;
+    QDateTime               _time;
+    QMap<QString, Tag*>     _tags;
+    QMap<QString, People*>  _people;
+    Event*                  _event;
+    Thumbnail*              _thumbnail;
 };
 
 #endif // PHOTO_H

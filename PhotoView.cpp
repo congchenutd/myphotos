@@ -5,8 +5,9 @@
 #include "Thumbnail.h"
 #include "PhotoItem.h"
 #include "MainWindow.h"
-#include "TagMenu.h"
+#include "NewItemMenu.h"
 #include "Tag.h"
+#include "TagDAO.h"
 
 #include <QFileSystemModel>
 #include <QLabel>
@@ -121,6 +122,7 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
             menu.addAction(mainWindow->getDeleteAction());
 
             menu.addMenu(createTagMenu());
+            menu.addMenu(createPeopleMenu());
         }
         menu.exec(event->globalPos());
     }
@@ -128,7 +130,7 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
 
 void PhotoView::onNewTag(const QString& tagValue)
 {
-    Tag* tag = new Tag(Tag::getNextID(), tagValue);
+    Tag* tag = new Tag(TagDAO::getInstance()->getNextID(), tagValue);
     _library->addTag(tag);
     tag->save();
     foreach(PhotoItem* item, _selected)
@@ -153,10 +155,26 @@ void PhotoView::onTagChecked(bool checked)
     }
 }
 
-TagMenu* PhotoView::createTagMenu()
+void PhotoView::onPeopleChecked(bool checked)
 {
-    TagMenu* tagMenu = new TagMenu(this);
-    connect(tagMenu, SIGNAL(newTag(QString)), this, SIGNAL(newTag(QString)));
+    QString name = ((QAction*) sender())->text();
+    foreach (PhotoItem* item, _selected)
+    {
+        Photo* photo = item->getPhoto();
+        if (checked)
+            photo->addPeople(_library->getPeople(name));
+        else
+            photo->removePeople(name);
+        photo->save();
+    }
+}
+
+NewItemMenu* PhotoView::createTagMenu()
+{
+    NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), this);
+    tagMenu->setIcon(QIcon(":/Images/Tag.png"));
+    tagMenu->setTitle("Tags");
+    connect(tagMenu, SIGNAL(newItemAdded(QString)), this, SIGNAL(newTag(QString)));
 
     QSet<QString> commonTags = _library->getAllTags().keys().toSet();
     foreach (PhotoItem* item, _selected)
@@ -171,6 +189,28 @@ TagMenu* PhotoView::createTagMenu()
         tagMenu->addAction(action);
     }
     return tagMenu;
+}
+
+NewItemMenu* PhotoView::createPeopleMenu()
+{
+    NewItemMenu* peopleMenu = new NewItemMenu(tr("New people"), this);
+    peopleMenu->setIcon(QIcon(":/Images/People.png"));
+    peopleMenu->setTitle("People");
+    connect(peopleMenu, SIGNAL(newItemAdded(QString)), this, SIGNAL(newPeople(QString)));
+
+    QSet<QString> commonPeople = _library->getAllPeople().keys().toSet();
+    foreach (PhotoItem* item, _selected)
+        commonPeople = commonPeople.intersect(item->getPhoto()->getPeopleNames());
+
+    foreach (const QString& name, _library->getAllPeople().keys())
+    {
+        QAction* action = new QAction(name, this);
+        action->setCheckable(true);
+        action->setChecked(commonPeople.contains(name));
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(onPeopleChecked(bool)));
+        peopleMenu->addAction(action);
+    }
+    return peopleMenu;
 }
 
 void PhotoView::clear() {

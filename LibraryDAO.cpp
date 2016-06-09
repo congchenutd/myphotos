@@ -24,9 +24,6 @@ void LibraryDAO::load(Library* library)
 {
     // objects
     QSqlQuery query;
-    query.exec("select ID from Photos Order By ID");
-    while (query.next())
-        library->addPhoto(PhotoDAO::getInstance()->load(query.value(0).toInt()));
 
     query.exec("select ID from People Order By ID");
     while (query.next())
@@ -44,43 +41,10 @@ void LibraryDAO::load(Library* library)
     while (query.next())
         library->addThumbnail(ThumbnailDAO::getInstance()->load(query.value(0).toInt()));
 
-    // relationships
-    query.exec(tr("select FilePath, People.Name from Photos, Peple, PhotoPeople \
-                   where Photos.ID = PhotoID and Peole.ID = PeopleID"));
+    // Load photos the last to ensure that their relationships are already loaded
+    query.exec("select ID from Photos Order By ID");
     while (query.next())
-    {
-        QString filePath    = query.value(0).toString();
-        QString peopleName  = query.value(1).toString();
-        library->getPhoto(filePath)->addPeople(library->getPeople(peopleName));
-    }
-
-    query.exec(tr("select FilePath, Tags.Name from Photos, Tags, PhotoTag \
-                   where Photos.ID = PhotoID and Tags.ID = TagID"));
-    while (query.next())
-    {
-        QString filePath    = query.value(0).toString();
-        QString tagName     = query.value(1).toString();
-        library->getPhoto(filePath)->addTag(library->getTag(tagName));
-    }
-
-    query.exec(tr("select FilePath, Events.Name from Photos, Events, PhotoEvent \
-                   where Photos.ID = PhotoID and Events.ID = EventID"));
-    while (query.next())
-    {
-        QString filePath    = query.value(0).toString();
-        QString eventName   = query.value(1).toString();
-        library->getPhoto(filePath)->setEvent(library->getEvent(eventName));
-    }
-
-    query.exec(tr("select Photos.FilePath, Thumbnails.FilePath \
-                   from Photos, Thumbnails, PhotoThumbnail \
-                   where Photos.ID = PhotoID and Thumbnails.ID = ThumbnailID"));
-    while (query.next())
-    {
-        QString photoPath       = query.value(0).toString();
-        QString thumbnailPath   = query.value(1).toString();
-        library->getPhoto(photoPath)->setThumbnail(library->getThumbnail(thumbnailPath));
-    }
+        library->addPhoto(PhotoDAO::getInstance()->load(query.value(0).toInt()));
 }
 
 void LibraryDAO::save(Library* library)
@@ -107,7 +71,7 @@ void LibraryDAO::clean()
 }
 
 /**
- * @brief Clean up unused tags
+ * Clean up unused tags
  */
 void LibraryDAO::removeUnusedTags()
 {

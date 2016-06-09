@@ -27,39 +27,12 @@ void Library::setMonitoredFolders(const QStringList& list) {
     Settings::getInstance()->setMonitoredFolders(list);
 }
 
-int Library::preScan()
-{
-    QStringList folders = Settings::getInstance()->getMonitoredFolders();
-    for (const QString& folder: folders)
-    {
-        QDir dir(folder);
-        dir.setFilter(QDir::Files | QDir::NoSymLinks);
-        dir.setSorting(QDir::Time | QDir::Reversed);
-        dir.setNameFilters(Settings::getInstance()->getMonitoredFileTypes().split(";"));
-        for (const QFileInfo& info: dir.entryInfoList())
-            if (getPhoto(info.filePath()) == 0)
-                _tobeAdded.enqueue(info);
-    }
-    return _tobeAdded.length();
+Library::Library() {
+    _dao = LibraryDAO::getInstance();
 }
 
-void Library::scan()
-{
-    while (!_tobeAdded.isEmpty())
-    {
-        QFileInfo fileInfo = _tobeAdded.dequeue();
-        Photo* photo = new Photo(Photo::getNextID(),
-                                 fileInfo.baseName(),
-                                 fileInfo.filePath(),
-                                 fileInfo.lastModified());
-        addPhoto(photo);
-
-        ThumbnailThread* thread = new ThumbnailThread(photo);
-        connect(thread, SIGNAL(finished(Photo*)), this, SLOT(onThumbnailCreated(Photo*)));
-        thread->start();
-    }
-
-    save();
+void Library::load() {
+    _dao->load(this);
 }
 
 void Library::save() {
@@ -117,14 +90,6 @@ void Library::addPhoto(Photo* photo) {
     }
 }
 
-void Library::onThumbnailCreated(Photo* photo)
-{
-    addThumbnail(photo->getThumbnail());
-    photo->getThumbnail()->save();
-    photo->save();
-    emit photoAdded(photo);
-}
-
 void Library::addEvent(Event* event) {
     if (event != 0)
         _events.insert(event->getName(), event);
@@ -139,12 +104,6 @@ void Library::removePhoto(Photo* photo)
 {
     _photos.remove(photo->getFilePath());
     photo->destroy();
-}
-
-Library::Library()
-{
-    _dao = LibraryDAO::getInstance();
-    _dao->load(this);
 }
 
 QList<Photo*> Library::filterPhotosByTags(const QSet<QString>& tags, bool AND)

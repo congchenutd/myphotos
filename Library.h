@@ -23,8 +23,7 @@ public:
     QStringList getMonitoredFolders() const;
     void setMonitoredFolders(const QStringList &list);
 
-    int preScan();
-    void scan();
+    void load();
     void save();
     void clean();
 
@@ -52,12 +51,6 @@ public:
 private:
     Library();
     ~Library() {}
-
-private slots:
-    void onThumbnailCreated(Photo* photo);
-
-signals:
-    void photoAdded(Photo*);
 
 private:
     LibraryDAO*                 _dao;

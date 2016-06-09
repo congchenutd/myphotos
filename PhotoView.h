@@ -10,7 +10,7 @@ class Photo;
 class PhotoItem;
 class QLayoutItem;
 class FlowLayout;
-class TagMenu;
+class NewItemMenu;
 
 class PhotoView : public QWidget
 {
@@ -32,12 +32,14 @@ public slots:
 
 private slots:
     void onNewTag(const QString& tagValue);
-    void onTagChecked(bool checked);
+    void onTagChecked   (bool checked);
+    void onPeopleChecked(bool checked);
 
 signals:
     void photoSelected(Photo*);
-    void newTag(const QString& tag);
     void selectionChanged(const QList<PhotoItem*>&);
+    void newTag     (const QString& name);
+    void newPeople  (const QString& name);
 
 protected:
     void mousePressEvent    (QMouseEvent* event);
@@ -47,7 +49,8 @@ protected:
 private:
     void updateSelection();
     PhotoItem* getClickedItem(const QPoint& point);
-    TagMenu* createTagMenu();
+    NewItemMenu* createTagMenu();
+    NewItemMenu* createPeopleMenu();
 
 private slots:
     void onItemSelected(bool selected);
@@ -63,7 +66,7 @@ private:
     bool                _ascending;
 };
 
-
+// Comparators
 struct PhotoItemLessTitle {
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 };

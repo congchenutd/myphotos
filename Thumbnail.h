@@ -21,27 +21,5 @@ private:
     QString _filePath;
 };
 
-class ThumbnailThread: public QThread
-{
-    Q_OBJECT
-
-public:
-    ThumbnailThread(Photo* photo);
-    void run();
-
-private slots:
-    void onFinished();
-
-signals:
-    void finished(Photo* photo);
-
-private:
-    QString createThumbnailFileName(const QString& filePath);
-
-private:
-    Photo*  _photo;
-    QString _filePath;
-};
-
 
 #endif // THUMBNAIL_H

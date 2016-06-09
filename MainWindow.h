@@ -5,6 +5,7 @@
 
 class Photo;
 class QProgressBar;
+class Scanner;
 
 class MainWindow : public QMainWindow
 {
@@ -29,19 +30,21 @@ private slots:
     void onPhotoAdded(Photo* photo);
     void onSortingOrder();
     void sort();
-    void onPhotoSelected(const QList<PhotoItem*> &selected);
+    void onPhotoSelected(const QList<PhotoItem*>& selected);
     void onRename();
     void onRemove();
     void onDelete();
     void onThumbnailSize(int size);
     void onFilterByTags(const QStringList& tags, bool AND);
-    void onNewTag(const QString& tagValue);
+    void onNewTag   (const QString& tagValue);
+    void onNewPeople(const QString& name);
 
 private:
     Ui::MainWindow ui;
-    QProgressBar*       _progressBar;
-    bool                _ascending;
-    Library*            _library;
+    QProgressBar*   _progressBar;
+    bool            _ascending;
+    Library*        _library;
+    Scanner*        _scanner;
 
     static MainWindow*  _instance;
 };

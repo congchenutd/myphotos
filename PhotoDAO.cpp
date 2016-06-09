@@ -5,6 +5,7 @@
 #include "EventDAO.h"
 #include "Tag.h"
 #include "Thumbnail.h"
+#include "Library.h"
 #include <QDateTime>
 #include <QSqlQuery>
 #include <QVariant>
@@ -22,20 +23,55 @@ Photo* PhotoDAO::load(int id) const
     if (query.next() == 0)
         return 0;
 
-    return new Photo(id,
-                     query.value(0).toString(),
-                     query.value(1).toString(),
-                     QDateTime::fromString(query.value(2).toString(), Qt::ISODate));
+    // load the photo itself
+    Photo* photo = new Photo(id,
+                             query.value(0).toString(),
+                             query.value(1).toString(),
+                             QDateTime::fromString(query.value(2).toString(), Qt::ISODate));
+
+    // load its relationships
+    Library* library = Library::getInstance();
+    query.exec(tr("select People.Name \
+                   from Photos, Peple, PhotoPeople \
+                   where Photos.ID = %1 and Peole.ID = PeopleID").arg(id));
+    while (query.next())
+    {
+        QString peopleName  = query.value(0).toString();
+        photo->addPeople(library->getPeople(peopleName));
+    }
+
+    query.exec(tr("select Tags.Name \
+                   from Photos, Tags, PhotoTag \
+                   where PhotoID = %1 and Photos.ID = PhotoID and Tags.ID = TagID").arg(id));
+    while (query.next())
+        photo->addTag(library->getTag(query.value(0).toString()));
+
+    query.exec(tr("select Events.Name \
+                   from Photos, Events, PhotoEvent \
+                   where PhotoID = %1 and Photos.ID = PhotoID and Events.ID = EventID").arg(id));
+    if (query.next())
+        photo->setEvent(library->getEvent(query.value(0).toString()));
+
+    query.exec(tr("select Thumbnails.FilePath \
+                   from Photos, Thumbnails, PhotoThumbnail \
+                   where PhotoID = %1 and Photos.ID = PhotoID and Thumbnails.ID = ThumbnailID").arg(id));
+    if (query.next())
+        photo->setThumbnail(library->getThumbnail(query.value(0).toString()));
+
+    return photo;
 }
 
 void PhotoDAO::remove(Persistable* persistable)
 {
+    // remove thumbnail
     Photo* photo = static_cast<Photo*>(persistable);
     if (Thumbnail* thumbnail = photo->getThumbnail())
     {
         thumbnail->destroy();
         photo->setThumbnail(0);
     }
+
+    // remove itself and relationships
     DAO::remove(persistable);
 }
 

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += core gui sql testlib widgets
+QT += core gui sql testlib widgets concurrent
 
 TARGET = MyPhotos
 TEMPLATE = app
@@ -36,7 +36,8 @@ SOURCES += \
     EditableLabel.cpp \
     ExifView.cpp \
     TagsView.cpp \
-    TagMenu.cpp
+    NewItemMenu.cpp \
+    Scanner.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -63,7 +64,8 @@ HEADERS += \
     ExifView.h \
     TagDAO.h \
     TagsView.h \
-    TagMenu.h
+    NewItemMenu.h \
+    Scanner.h
 
 FORMS += \
 	MainWindow.ui \

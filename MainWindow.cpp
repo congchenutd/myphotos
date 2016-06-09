@@ -5,6 +5,8 @@
 #include "PhotoItem.h"
 #include "Tag.h"
 #include "Photo.h"
+#include "Scanner.h"
+#include "TagDAO.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
@@ -19,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
  {
     _instance = this;
     _library = Library::getInstance();
+    _library->load();
 
     ui.setupUi(this);
     _progressBar = new QProgressBar(this);
@@ -42,13 +45,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui.actionScan,          SIGNAL(triggered(bool)),    this, SLOT(onScan()));
     connect(ui.actionOptions,       SIGNAL(triggered(bool)),    this, SLOT(onOptions()));
-    connect(_library, SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
     connect(ui.actionSortByTitle,   SIGNAL(triggered()),        this, SLOT(sort()));
     connect(ui.actionSortByTime,    SIGNAL(triggered()),        this, SLOT(sort()));
     connect(ui.actionOrder,         SIGNAL(triggered()),        this, SLOT(onSortingOrder()));
     connect(ui.photoView, SIGNAL(selectionChanged(QList<PhotoItem*>)),
             this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
-    connect(ui.photoView, SIGNAL(newTag(QString)), this, SLOT(onNewTag(QString)));
+    connect(ui.photoView, SIGNAL(newTag     (QString)), this, SLOT(onNewTag     (QString)));
+    connect(ui.photoView, SIGNAL(newPeople  (QString)), this, SLOT(onNewPeople  (QString)));
     connect(ui.actionRemove,    SIGNAL(triggered(bool)),    this, SLOT(onRemove()));
     connect(ui.actionDelete,    SIGNAL(triggered(bool)),    this, SLOT(onDelete()));
     connect(ui.actionRename,    SIGNAL(triggered(bool)),    this, SLOT(onRename()));
@@ -61,6 +64,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.pageTags->setTags(_library->getAllTags().keys());
     connect(ui.pageTags,    SIGNAL(filterByTags(QStringList, bool)),
             this,           SLOT(onFilterByTags(QStringList, bool)));
+
+    _scanner = new Scanner;
+    connect(_scanner, SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }
@@ -77,9 +83,8 @@ void MainWindow::closeEvent(QCloseEvent*) {
 
 void MainWindow::onScan()
 {
-    if (int nPhotos = _library->preScan())
+    if (int nPhotos = _scanner->scan())
     {
-        _library->scan();
         _progressBar->show();
         _progressBar->setRange(0, nPhotos);
         _progressBar->setValue(0);
@@ -100,13 +105,12 @@ void MainWindow::onPhotoAdded(Photo* photo)
     {
         _progressBar->hide();
         ui.statusBar->showMessage(tr("%1 photo(s) imported").arg(_progressBar->maximum()), 2000);
+        sort();
     }
     else
-        ui.statusBar->showMessage(tr("Importing %1 out of %2")
+        ui.statusBar->showMessage(tr("Importing %1 of %2")
                                   .arg(_progressBar->value())
                                   .arg(_progressBar->maximum()));
-    qApp->processEvents();
-    sort();
 }
 
 void MainWindow::onSortingOrder()
@@ -182,7 +186,7 @@ void MainWindow::onFilterByTags(const QStringList& tags, bool AND)
 
 void MainWindow::onNewTag(const QString& tagValue)
 {
-    Tag* tag = new Tag(Tag::getNextID(), tagValue);
+    Tag* tag = new Tag(TagDAO::getInstance()->getNextID(), tagValue);
     _library->addTag(tag);
     tag->save();
 
@@ -194,4 +198,9 @@ void MainWindow::onNewTag(const QString& tagValue)
     }
 
     ui.pageTags->setTags(_library->getAllTags().keys());
+}
+
+void MainWindow::onNewPeople(const QString& name)
+{
+
 }

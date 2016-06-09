@@ -1,4 +1,5 @@
 #include "Event.h"
+#include "People.h"
 #include "Photo.h"
 #include "PhotoDAO.h"
 #include "Tag.h"
@@ -12,21 +13,13 @@ Photo::Photo(int id, const QString& title, const QString& path, const QDateTime&
       _thumbnail(0)
 {}
 
-QString Photo::getTitle() const {
-    return _title;
-}
-
-QString Photo::getFilePath() const {
-    return _filePath;
-}
-
-QDateTime Photo::getTimeTaken() const {
-    return _time;
-}
-
-QList<Tag*> Photo::getTags() const {
-    return _tags;
-}
+QString         Photo::getTitle()       const { return _title;      }
+QString         Photo::getFilePath()    const { return _filePath;   }
+QDateTime       Photo::getTimeTaken()   const { return _time;       }
+QList<Tag*>     Photo::getTags()        const { return _tags.values();      }
+QList<People*>  Photo::getPeople()      const { return _people.values();    }
+Event*          Photo::getEvent()       const { return _event;      }
+Thumbnail*      Photo::getThumbnail()   const { return _thumbnail;  }
 
 QSet<QString> Photo::getTagValues() const
 {
@@ -36,16 +29,12 @@ QSet<QString> Photo::getTagValues() const
     return result;
 }
 
-QList<People*> Photo::getPeople() const {
-    return _people;
-}
-
-Event* Photo::getEvent() const {
-    return _event;
-}
-
-Thumbnail* Photo::getThumbnail() const {
-    return _thumbnail;
+QSet<QString> Photo::getPeopleNames() const
+{
+    QSet<QString> result;
+    foreach (People* people, _people)
+        result.insert(people->getName());
+    return result;
 }
 
 void Photo::setTitle(const QString& title)  {
@@ -62,13 +51,11 @@ void Photo::setTimeTaken(const QDateTime& time) {
 }
 
 void Photo::addTag(Tag* tag) {
-    if (!_tags.contains(tag))
-        _tags.append(tag);
+    _tags.insert(tag->getName(), tag);
 }
 
 void Photo::addPeople(People* people) {
-    if (!_people.contains(people))
-        _people.append(people);
+    _people.insert(people->getName(), people);
 }
 
 void Photo::setEvent(Event* event)
@@ -81,9 +68,10 @@ void Photo::setThumbnail(Thumbnail* thumbnail) {
     _thumbnail = thumbnail;
 }
 
-void Photo::removeTag(const QString& tagValue)
-{
-    for (int i = 0; i < _tags.count(); ++i)
-        if (_tags.at(i)->getName() == tagValue)
-            _tags.removeAt(i);
+void Photo::removeTag(const QString& tagValue) {
+    _tags.remove(tagValue);
+}
+
+void Photo::removePeople(const QString& name) {
+    _people.remove(name);
 }

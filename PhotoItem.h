@@ -7,6 +7,9 @@ class Photo;
 class QLabel;
 class EditableLabel;
 
+/**
+ * A widget in the PhotoView representing a Photo
+ */
 class PhotoItem : public QWidget
 {
     Q_OBJECT

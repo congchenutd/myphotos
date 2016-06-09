@@ -17,14 +17,6 @@ Event* EventDAO::load(int id) const
     return query.next() ? new Event(id, query.value(0).toString(),
                                     QDate::fromString(query.value(1).toString(), Qt::ISODate))
                         : 0;
-
-//    // load relationships
-//    query.exec(tr("select PhotoID from PhotoEvent where EventID = %1").arg(id));
-//    while (query.next())
-//    {
-//        int photoID = query.value(0).toInt();
-//        result->addPhoto(PhotoDAO::getInstance()->load(photoID));
-//    }
 }
 
 EventDAO::EventDAO(): DAO("Events") {}
