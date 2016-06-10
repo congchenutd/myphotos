@@ -47,7 +47,8 @@ void Photo::addPeople(People* people) {
 void Photo::setEvent(Event* event)
 {
     _event = event;
-    _event->addPhoto(this);
+    if (_event != 0)
+        _event->addPhoto(this);
 }
 
 void Photo::setThumbnail(Thumbnail* thumbnail) {

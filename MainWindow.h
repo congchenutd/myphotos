@@ -37,6 +37,7 @@ private slots:
     void onThumbnailSize(int size);
     void onNewTag   (const QString& tagValue);
     void onNewPeople(const QString& name);
+    void onNewEvent (const QString& name);
     void onFilterByTags     (const QStringList& tags,   bool AND);
     void onFilterByPeople   (const QStringList& people, bool AND);
 

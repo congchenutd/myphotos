@@ -34,12 +34,14 @@ private slots:
     void onNewTag(const QString& tagValue);
     void onTagChecked   (bool checked);
     void onPeopleChecked(bool checked);
+    void onEventChecked (bool checked);
 
 signals:
     void photoSelected(Photo*);
     void selectionChanged(const QList<PhotoItem*>&);
     void newTag     (const QString& name);
     void newPeople  (const QString& name);
+    void newEvent   (const QString& name);
 
 protected:
     void mousePressEvent    (QMouseEvent* event);
@@ -51,6 +53,7 @@ private:
     PhotoItem* getClickedItem(const QPoint& point);
     NewItemMenu* createTagMenu();
     NewItemMenu* createPeopleMenu();
+    NewItemMenu* createEventMenu();
 
 private slots:
     void onItemSelected(bool selected);

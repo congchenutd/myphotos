@@ -8,6 +8,8 @@
 #include "Scanner.h"
 #include "TagDAO.h"
 #include "PeopleDAO.h"
+#include "Event.h"
+#include "EventDAO.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
@@ -53,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
     connect(ui.photoView, SIGNAL(newTag     (QString)), this, SLOT(onNewTag     (QString)));
     connect(ui.photoView, SIGNAL(newPeople  (QString)), this, SLOT(onNewPeople  (QString)));
+    connect(ui.photoView, SIGNAL(newEvent   (QString)), this, SLOT(onNewEvent   (QString)));
     connect(ui.actionRemove,    SIGNAL(triggered(bool)),    this, SLOT(onRemove()));
     connect(ui.actionDelete,    SIGNAL(triggered(bool)),    this, SLOT(onDelete()));
     connect(ui.actionRename,    SIGNAL(triggered(bool)),    this, SLOT(onRename()));
@@ -219,6 +222,22 @@ void MainWindow::onNewPeople(const QString& name)
     }
 
     ui.pagePeople->setTags(_library->getAllPeople().keys());
+}
+
+void MainWindow::onNewEvent(const QString& name)
+{
+    Event* event = new Event(EventDAO::getInstance()->getNextID(), name, QDate::currentDate());
+    _library->addEvent(event);
+    event->save();
+
+    foreach(PhotoItem* item, ui.photoView->getSelectedItems())
+    {
+        Photo* photo = item->getPhoto();
+        photo->setEvent(event);
+        photo->save();
+    }
+
+//    ui.pagePeople->setTags(_library->getAllPeople().keys());
 }
 
 void MainWindow::onFilterByPeople(const QStringList& people, bool AND)

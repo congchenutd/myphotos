@@ -8,6 +8,7 @@
 #include "NewItemMenu.h"
 #include "Tag.h"
 #include "TagDAO.h"
+#include "Event.h"
 
 #include <QFileSystemModel>
 #include <QLabel>
@@ -121,6 +122,8 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
             menu.addAction(mainWindow->getRemoveAction());
             menu.addAction(mainWindow->getDeleteAction());
 
+            menu.addSeparator();
+            menu.addMenu(createEventMenu());
             menu.addMenu(createTagMenu());
             menu.addMenu(createPeopleMenu());
         }
@@ -169,6 +172,17 @@ void PhotoView::onPeopleChecked(bool checked)
     }
 }
 
+void PhotoView::onEventChecked(bool checked)
+{
+    QString name = ((QAction*) sender())->text();
+    foreach (PhotoItem* item, _selected)
+    {
+        Photo* photo = item->getPhoto();
+        photo->setEvent(checked ? _library->getEvent(name) : 0);
+        photo->save();
+    }
+}
+
 NewItemMenu* PhotoView::createTagMenu()
 {
     NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), this);
@@ -213,8 +227,40 @@ NewItemMenu* PhotoView::createPeopleMenu()
     return peopleMenu;
 }
 
-void PhotoView::clear() {
+NewItemMenu* PhotoView::createEventMenu()
+{
+    NewItemMenu* eventMenu = new NewItemMenu(tr("New event"), this);
+    eventMenu->setIcon(QIcon(":/Images/Events.png"));
+    eventMenu->setTitle("Events");
+    connect(eventMenu, SIGNAL(newItemAdded(QString)), this, SIGNAL(newEvent(QString)));
+
+    QSet<QString> commonEvents = _library->getAllEvents().keys().toSet();
+    foreach (PhotoItem* item, _selected)
+    {
+        if (Event* event = item->getPhoto()->getEvent())
+            commonEvents = commonEvents.intersect(QSet<QString>() << event->getName());
+        else
+        {
+            commonEvents.clear();
+            break;
+        }
+    }
+
+    foreach (const QString& name, _library->getAllEvents().keys())
+    {
+        QAction* action = new QAction(name, this);
+        action->setCheckable(true);
+        action->setChecked(commonEvents.contains(name));
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(onEventChecked(bool)));
+        eventMenu->addAction(action);
+    }
+    return eventMenu;
+}
+
+void PhotoView::clear()
+{
     _layout->clear();
+    _selected.clear();
 }
 
 void PhotoView::mouseMoveEvent(QMouseEvent* event)
