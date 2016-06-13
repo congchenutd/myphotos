@@ -1,20 +1,23 @@
 #ifndef TAGSVIEW_H
 #define TAGSVIEW_H
 
+#include "FilterPage.h"
+
 #include <QWidget>
 
 class QVBoxLayout;
 class QHBoxLayout;
 class QPushButton;
 class QRadioButton;
+class ItemModel;
 
-class TagsView : public QWidget
+class TagPage : public FilterPage
 {
     Q_OBJECT
 
 public:
-    explicit TagsView(QWidget* parent = 0);
-    void setTags(const QStringList& tags);
+    explicit TagPage(QWidget* parent = 0);
+    void update();
 
 private slots:
     void onTagChecked();

@@ -35,9 +35,18 @@ SOURCES += \
     PhotoItem.cpp \
     EditableLabel.cpp \
     ExifView.cpp \
-    TagsView.cpp \
     NewItemMenu.cpp \
-    Scanner.cpp
+    Scanner.cpp \
+    NewMenuItemDlg.cpp \
+    NewTagDlg.cpp \
+    NewEventDlg.cpp \
+    EventPage.cpp \
+    ItemModel.cpp \
+    PeopleModel.cpp \
+    FilterPage.cpp \
+    EventModel.cpp \
+    TagModel.cpp \
+    TagPage.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -63,9 +72,18 @@ HEADERS += \
     EditableLabel.h \
     ExifView.h \
     TagDAO.h \
-    TagsView.h \
     NewItemMenu.h \
-    Scanner.h
+    Scanner.h \
+    NewMenuItemDlg.h \
+    NewTagDlg.h \
+    NewEventDlg.h \
+    EventPage.h \
+    ItemModel.h \
+    PeopleModel.h \
+    FilterPage.h \
+    EventModel.h \
+    TagModel.h \
+    TagPage.h
 
 FORMS += \
 	MainWindow.ui \
@@ -73,7 +91,10 @@ FORMS += \
     MonitoredFoldersDlg.ui \
     PhotoView.ui \
     ExifView.ui \
-    TagsView.ui
+    TagsView.ui \
+    NewTagDlg.ui \
+    NewEventDlg.ui \
+    EventPage.ui
 
 RESOURCES += \
     Resources.qrc

@@ -1,11 +1,12 @@
 #include "NewItemMenu.h"
+#include "NewMenuItemDlg.h"
 #include <QAction>
 #include <QInputDialog>
 
-NewItemMenu::NewItemMenu(const QString& newItemText, QWidget* parent)
+NewItemMenu::NewItemMenu(const QString& newItemText, NewMenuItemDlg* dlg, QWidget* parent)
     : QMenu(parent),
       _newItemText(newItemText),
-      _separator(0)
+      _dlg(dlg)
 {
     _separator = addSeparator();
 
@@ -20,7 +21,11 @@ void NewItemMenu::addAction(QAction* action) {
 
 void NewItemMenu::onNewItem()
 {
-    QString tag = QInputDialog::getText(this, _newItemText, _newItemText);
-    if (!tag.isEmpty())
-        emit newItemAdded(tag);
+    if (_dlg->exec() == QDialog::Accepted)
+    {
+        QString tag = _dlg->getText();
+        if (!tag.isEmpty())
+            emit newItemAdded(tag, _dlg->getDate(), _dlg->getImage());
+    }
+
 }

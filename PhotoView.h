@@ -41,7 +41,7 @@ signals:
     void selectionChanged(const QList<PhotoItem*>&);
     void newTag     (const QString& name);
     void newPeople  (const QString& name);
-    void newEvent   (const QString& name);
+    void newEvent   (const QString& name, const QDate& date);
 
 protected:
     void mousePressEvent    (QMouseEvent* event);

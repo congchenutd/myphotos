@@ -9,6 +9,8 @@
 #include "Tag.h"
 #include "TagDAO.h"
 #include "Event.h"
+#include "NewTagDlg.h"
+#include "NewEventDlg.h"
 
 #include <QFileSystemModel>
 #include <QLabel>
@@ -185,10 +187,10 @@ void PhotoView::onEventChecked(bool checked)
 
 NewItemMenu* PhotoView::createTagMenu()
 {
-    NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), this);
+    NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), new NewTagDlg(this), this);
     tagMenu->setIcon(QIcon(":/Images/Tag.png"));
     tagMenu->setTitle("Tags");
-    connect(tagMenu, SIGNAL(newItemAdded(QString)), this, SIGNAL(newTag(QString)));
+    connect(tagMenu, SIGNAL(newItemAdded(QString, QDate, QString)), this, SIGNAL(newTag(QString)));
 
     QSet<QString> commonTags = _library->getAllTags().keys().toSet();
     foreach (PhotoItem* item, _selected)
@@ -207,10 +209,10 @@ NewItemMenu* PhotoView::createTagMenu()
 
 NewItemMenu* PhotoView::createPeopleMenu()
 {
-    NewItemMenu* peopleMenu = new NewItemMenu(tr("New people"), this);
+    NewItemMenu* peopleMenu = new NewItemMenu(tr("New people"), new NewTagDlg(this), this);
     peopleMenu->setIcon(QIcon(":/Images/People.png"));
     peopleMenu->setTitle("People");
-    connect(peopleMenu, SIGNAL(newItemAdded(QString)), this, SIGNAL(newPeople(QString)));
+    connect(peopleMenu, SIGNAL(newItemAdded(QString, QDate, QString)), this, SIGNAL(newPeople(QString)));
 
     QSet<QString> commonPeople = _library->getAllPeople().keys().toSet();
     foreach (PhotoItem* item, _selected)
@@ -229,10 +231,10 @@ NewItemMenu* PhotoView::createPeopleMenu()
 
 NewItemMenu* PhotoView::createEventMenu()
 {
-    NewItemMenu* eventMenu = new NewItemMenu(tr("New event"), this);
+    NewItemMenu* eventMenu = new NewItemMenu(tr("New event"), new NewEventDlg(this), this);
     eventMenu->setIcon(QIcon(":/Images/Events.png"));
     eventMenu->setTitle("Events");
-    connect(eventMenu, SIGNAL(newItemAdded(QString)), this, SIGNAL(newEvent(QString)));
+    connect(eventMenu, SIGNAL(newItemAdded(QString, QDate, QString)), this, SIGNAL(newEvent(QString, QDate)));
 
     QSet<QString> commonEvents = _library->getAllEvents().keys().toSet();
     foreach (PhotoItem* item, _selected)

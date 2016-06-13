@@ -1,4 +1,5 @@
-#include "TagsView.h"
+#include "TagPage.h"
+#include "ItemModel.h"
 
 #include <QButtonGroup>
 #include <QCheckBox>
@@ -7,8 +8,8 @@
 #include <QVBoxLayout>
 #include <QButtonGroup>
 
-TagsView::TagsView(QWidget* parent) :
-    QWidget(parent)
+TagPage::TagPage(QWidget* parent) :
+    FilterPage(parent)
 {
     _layoutTop = new QVBoxLayout(this);
 
@@ -29,19 +30,20 @@ TagsView::TagsView(QWidget* parent) :
     _layoutTop->addLayout(_layoutAnd);
     _layoutTop->addLayout(_layoutTags);
 
-    connect(_btShowAll, SIGNAL(clicked()), this, SLOT(onShowAll()));
-    connect(_radioAnd,  SIGNAL(clicked()), this, SLOT(onTagChecked()));
-    connect(_radioOr,   SIGNAL(clicked()), this, SLOT(onTagChecked()));
+    connect(_btShowAll, SIGNAL(clicked()), SLOT(onShowAll()));
+    connect(_radioAnd,  SIGNAL(clicked()), SLOT(onTagChecked()));
+    connect(_radioOr,   SIGNAL(clicked()), SLOT(onTagChecked()));
 }
 
-void TagsView::setTags(const QStringList& tags)
+void TagPage::update()
 {
     QLayoutItem* item;
     while ((item = _layoutTags->takeAt(0)))
         delete item->widget();
 
-    foreach (const QString& tag, tags)
+    for (int i = 0; i < getModel()->rowCount(); ++i)
     {
+        QString tag = getModel()->data(getModel()->index(i, 0)).toString();
         QCheckBox* checkBox = new QCheckBox(tag, this);
         connect(checkBox, SIGNAL(clicked(bool)), this, SLOT(onTagChecked()));
         _layoutTags->addWidget(checkBox);
@@ -49,7 +51,7 @@ void TagsView::setTags(const QStringList& tags)
     _layoutTags->addStretch(10);
 }
 
-void TagsView::onTagChecked()
+void TagPage::onTagChecked()
 {
     QStringList tags;
     for (int i = 0; i < _layoutTags->count(); ++i)
@@ -62,7 +64,7 @@ void TagsView::onTagChecked()
     emit filterByTags(tags, _radioAnd->isChecked());
 }
 
-void TagsView::onShowAll()
+void TagPage::onShowAll()
 {
     for (int i = 0; i < _layoutTags->count(); ++i)
     {

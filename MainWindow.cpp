@@ -10,6 +10,9 @@
 #include "PeopleDAO.h"
 #include "Event.h"
 #include "EventDAO.h"
+#include "TagModel.h"
+#include "PeopleModel.h"
+#include "EventModel.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
@@ -55,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
     connect(ui.photoView, SIGNAL(newTag     (QString)), this, SLOT(onNewTag     (QString)));
     connect(ui.photoView, SIGNAL(newPeople  (QString)), this, SLOT(onNewPeople  (QString)));
-    connect(ui.photoView, SIGNAL(newEvent   (QString)), this, SLOT(onNewEvent   (QString)));
+    connect(ui.photoView, SIGNAL(newEvent   (QString, QDate)), this, SLOT(onNewEvent(QString, QDate)));
     connect(ui.actionRemove,    SIGNAL(triggered(bool)),    this, SLOT(onRemove()));
     connect(ui.actionDelete,    SIGNAL(triggered(bool)),    this, SLOT(onDelete()));
     connect(ui.actionRename,    SIGNAL(triggered(bool)),    this, SLOT(onRename()));
@@ -65,13 +68,12 @@ MainWindow::MainWindow(QWidget *parent) :
     sort();
     onPhotoSelected(QList<PhotoItem*>());
 
-    ui.pageTags->setTags(_library->getAllTags().keys());
-    connect(ui.pageTags,    SIGNAL(filterByTags(QStringList, bool)),
-            this,           SLOT(onFilterByTags(QStringList, bool)));
-
-    ui.pagePeople->setTags(_library->getAllPeople().keys());
-    connect(ui.pagePeople,  SIGNAL(filterByTags(QStringList, bool)),
-            this,           SLOT(onFilterByPeople(QStringList, bool)));
+    ui.pageTags     ->setModel(new TagModel     (this));
+    ui.pagePeople   ->setModel(new PeopleModel  (this));
+    ui.pageEvents   ->setModel(new EventModel   (this));
+    connect(ui.pageTags,    SIGNAL(filterByTags(QStringList, bool)),    SLOT(onFilterByTags     (QStringList, bool)));
+    connect(ui.pagePeople,  SIGNAL(filterByTags(QStringList, bool)),    SLOT(onFilterByPeople   (QStringList, bool)));
+    connect(ui.pageEvents,  SIGNAL(filter(QString)),                    SLOT(onFilterByEvent    (QString)));
 
     _scanner = new Scanner;
     connect(_scanner, SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
@@ -205,7 +207,7 @@ void MainWindow::onNewTag(const QString& tagValue)
         photo->save();
     }
 
-    ui.pageTags->setTags(_library->getAllTags().keys());
+    ui.pageTags->update();
 }
 
 void MainWindow::onNewPeople(const QString& name)
@@ -221,12 +223,12 @@ void MainWindow::onNewPeople(const QString& name)
         photo->save();
     }
 
-    ui.pagePeople->setTags(_library->getAllPeople().keys());
+    ui.pagePeople->update();
 }
 
-void MainWindow::onNewEvent(const QString& name)
+void MainWindow::onNewEvent(const QString& name, const QDate& date)
 {
-    Event* event = new Event(EventDAO::getInstance()->getNextID(), name, QDate::currentDate());
+    Event* event = new Event(EventDAO::getInstance()->getNextID(), name, date);
     _library->addEvent(event);
     event->save();
 
@@ -237,7 +239,7 @@ void MainWindow::onNewEvent(const QString& name)
         photo->save();
     }
 
-//    ui.pagePeople->setTags(_library->getAllPeople().keys());
+    ui.pageEvents->update();
 }
 
 void MainWindow::onFilterByPeople(const QStringList& people, bool AND)
@@ -252,4 +254,9 @@ void MainWindow::onFilterByPeople(const QStringList& people, bool AND)
         ui.photoView->load(photos);
     }
     sort();
+}
+
+void MainWindow::onFilterByEvent(const QString& eventName)
+{
+
 }

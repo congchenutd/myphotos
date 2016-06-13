@@ -123,9 +123,9 @@
      <item>
       <widget class="QToolBox" name="sidebar">
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
-       <widget class="QWidget" name="pageEvents">
+       <widget class="EventPage" name="pageEvents">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -138,7 +138,7 @@
          <string>Events</string>
         </attribute>
        </widget>
-       <widget class="TagsView" name="pagePeople">
+       <widget class="TagPage" name="pagePeople">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -151,7 +151,7 @@
          <string>People</string>
         </attribute>
        </widget>
-       <widget class="TagsView" name="pageTags">
+       <widget class="TagPage" name="pageTags">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -164,7 +164,7 @@
          <string>Tags</string>
         </attribute>
        </widget>
-       <widget class="ExifView" name="pageInfo">
+       <widget class="QWidget" name="pageInfo">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -306,15 +306,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ExifView</class>
+   <class>TagPage</class>
    <extends>QWidget</extends>
-   <header>ExifView.h</header>
+   <header>TagPage.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>TagsView</class>
+   <class>EventPage</class>
    <extends>QWidget</extends>
-   <header>TagsView.h</header>
+   <header>EventPage.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
