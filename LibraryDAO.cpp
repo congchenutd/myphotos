@@ -22,7 +22,6 @@ LibraryDAO* LibraryDAO::getInstance()
 
 void LibraryDAO::load(Library* library)
 {
-    // objects
     QSqlQuery query;
 
     query.exec("select ID from People Order By ID");
@@ -41,7 +40,7 @@ void LibraryDAO::load(Library* library)
     while (query.next())
         library->addThumbnail(ThumbnailDAO::getInstance()->load(query.value(0).toInt()));
 
-    // Load photos the last to ensure that their relationships are already loaded
+    // NOTE: Load photos the last to ensure that their relationships are already loaded
     query.exec("select ID from Photos Order By ID");
     while (query.next())
         library->addPhoto(PhotoDAO::getInstance()->load(query.value(0).toInt()));
@@ -59,6 +58,8 @@ void LibraryDAO::save(Library* library)
             event->save();
         for (Thumbnail* thumbnail: library->getAllThumbnails())
             thumbnail->save();
+
+        // NOTE: always save photos the last, because the related objects need to be persisted first
         for (Photo* photo: library->getAllPhotos())
             photo->save();
         QSqlDatabase::database().commit();
@@ -68,6 +69,8 @@ void LibraryDAO::save(Library* library)
 void LibraryDAO::clean()
 {
     removeUnusedTags();
+    removeUnusedEvents();
+    removeUnusedPeople();
 }
 
 /**
@@ -77,17 +80,25 @@ void LibraryDAO::removeUnusedTags()
 {
     QSqlQuery query;
     query.exec(tr("delete from Tags where ID in (select ID from Tags \
-                   where ID not in (select TagID from PhotoTag))"));
+                  where ID not in (select TagID from PhotoTag))"));
+}
+
+void LibraryDAO::removeUnusedEvents()
+{
+    QSqlQuery query;
+    query.exec(tr("delete from Events where ID in (select ID from Events \
+                  where ID not in (select EventID from PhotoEvent))"));
+}
+
+void LibraryDAO::removeUnusedPeople()
+{
+    QSqlQuery query;
+    query.exec(tr("delete from People where ID in (select ID from People \
+                  where ID not in (select PeopleID from PhotoPeople))"));
 }
 
 LibraryDAO::LibraryDAO()
 {
-    QDir dir = QDir::current();
-    dir.mkdir("Thumbnails");
-    dir.cd("Thumbnails");
-    Settings::getInstance()->setThumbnailCacheLocation(dir.absolutePath());
-    Settings::getInstance()->setThumbnailSize(QSize(200, 200));
-
     createTables();
 }
 

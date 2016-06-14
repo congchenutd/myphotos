@@ -24,17 +24,30 @@ PhotoView::PhotoView(QWidget *parent) :
     QWidget(parent),
     _rubberBand(0),
     _sortBy("Time"),
-    _ascending(true)
+    _ascending(false)
 {
     ui.setupUi(this);
-    _layout = new FlowLayout(this);
-    _library = Library::getInstance();
+    _layout     = new FlowLayout(this);
+    _library    = Library::getInstance();
 }
 
+/**
+ * Delete all the PhotoItems
+ */
+void PhotoView::clear()
+{
+    _layout->clear();
+    _selected.clear();
+}
+
+/**
+ * Load photos into the view
+ */
 void PhotoView::load(const QList<Photo*>& photos)
 {
     for (Photo* photo: photos)
         addPhoto(photo);
+    resizeThumbnails(_thumbnailSize);
 }
 
 void PhotoView::sort(const QString& byWhat, bool ascending)
@@ -57,21 +70,20 @@ void PhotoView::sort() {
 }
 
 QList<PhotoItem*> PhotoView::getSelectedItems() const {
-    return _selected;
+    return _selected.toList();
 }
 
-void PhotoView::removeItem(PhotoItem* item) {
+void PhotoView::removeItem(PhotoItem* item)
+{
     _layout->removeWidget(item);
     item->deleteLater();
 }
 
 void PhotoView::resizeThumbnails(int size)
 {
-    for (int i = 0; i < _layout->count(); ++i)
-    {
-        PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
+    _thumbnailSize = size;
+    foreach (PhotoItem* item, getAllPhotoItems())
         item->resizeThumbnail(size);
-    }
 }
 
 void PhotoView::addPhoto(Photo* photo)
@@ -83,32 +95,40 @@ void PhotoView::addPhoto(Photo* photo)
 
 void PhotoView::mousePressEvent(QMouseEvent* event)
 {
+    static QPoint lastClickedPosition;
+
     // show the selection rubber band
-    _selectionStart = event->pos();
+    _clickedPosition = event->pos();
     if (!_rubberBand)
         _rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
-    _rubberBand->setGeometry(QRect(_selectionStart, QSize()));
+    _rubberBand->setGeometry(QRect(_clickedPosition, QSize()));
     _rubberBand->show();
 
-    // single click will clear the selection
-    if (event->button() == Qt::LeftButton && event->modifiers() != Qt::ShiftModifier)
+    PhotoItem* clickedItem = getClickedItem(_clickedPosition);
+    if (clickedItem == 0)
         _selected.clear();
 
-    // add clicked item to selection
-    PhotoItem* clickedItem = getClickedItem(_selectionStart);
-    if (clickedItem != 0)
-        _selected << clickedItem;
+    else if (event->button() == Qt::LeftButton)
+    {
+        // add clicked item to selection
+        if (event->modifiers() == Qt::ShiftModifier)
+            _selected += getClickedItems(lastClickedPosition, _clickedPosition);
+        else if (event->modifiers() == Qt::ControlModifier)
+            toggleSelection(clickedItem);
+        else
+            _selected = QSet<PhotoItem*>() << clickedItem;
+    }
 
     // show the selection
     updateSelection();
+    lastClickedPosition = _clickedPosition;
 
     // context menu
     if (event->button() == Qt::RightButton)
     {
-        // right click on empty space will clear the selection
-        if (clickedItem == 0)
+        if (clickedItem != 0 && !_selected.contains(clickedItem))
         {
-            _selected.clear();
+            _selected = QSet<PhotoItem*>() << clickedItem;
             updateSelection();
         }
 
@@ -133,22 +153,94 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
     }
 }
 
-void PhotoView::onNewTag(const QString& tagValue)
+/**
+ * Draw a selection rectangle and add selected photo items to _selected
+ */
+void PhotoView::mouseMoveEvent(QMouseEvent* event)
 {
-    Tag* tag = new Tag(TagDAO::getInstance()->getNextID(), tagValue);
-    _library->addTag(tag);
-    tag->save();
-    foreach(PhotoItem* item, _selected)
-    {
-        Photo* photo = item->getPhoto();
-        photo->addTag(tag);
-        photo->save();
+    if (_rubberBand == 0)
+        return;
+
+    _rubberBand->setGeometry(QRect(_clickedPosition, event->pos()).normalized());
+    QRect rubberBandRect = _rubberBand->geometry();
+
+    _selected.clear();
+    foreach (PhotoItem* item, getAllPhotoItems()) {
+        if (rubberBandRect.contains  (item->geometry()) ||
+            rubberBandRect.intersects(item->geometry()))
+            _selected << item;
     }
+    updateSelection();
 }
 
+void PhotoView::mouseReleaseEvent(QMouseEvent* event) {
+    if (event->button() == Qt::LeftButton && _rubberBand != 0)
+        _rubberBand->hide();
+}
+
+/**
+ * Highlight selected items
+ */
+void PhotoView::updateSelection()
+{
+    foreach (PhotoItem* item, getAllPhotoItems())
+        item->setSelected(_selected.contains(item));
+    emit selectionChanged(_selected.toList());
+}
+
+/**
+ * @return  index of the photo item being clicked on
+ */
+int PhotoView::getClickedItemIndex(const QPoint& point) const
+{
+    for (int i = 0; i < _layout->count(); ++i)
+    {
+        PhotoItem* item = getItemAt(i);
+        if (item->geometry().contains(point))
+            return i;
+    }
+    return -1;
+}
+
+/**
+ * @return  pointer to the photo item being clicked on
+ */
+PhotoItem* PhotoView::getClickedItem(const QPoint& point) const
+{
+    int index = getClickedItemIndex(point);
+    return index > -1 ? getItemAt(index) : 0;
+}
+
+/**
+ * @return  a set of items between the 2 clicked positions
+ */
+QSet<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& end) const
+{
+    int idx1 = getClickedItemIndex(start);
+    int idx2 = getClickedItemIndex(end);
+    int startIdx = qMax(0, qMin(idx1, idx2));
+    int endIdx   = qMax(idx1, idx2);
+    QSet<PhotoItem*> result;
+    for (int i = startIdx; i <= endIdx; ++i)
+        result << getItemAt(i);
+    return result;
+}
+
+/**
+ * Toggle the selection of a photo item
+ */
+void PhotoView::toggleSelection(PhotoItem* clicked)
+{
+    if (_selected.contains(clicked))
+        _selected.remove(clicked);
+    else
+        _selected << clicked;
+}
+
+// Toggle tag assignment
 void PhotoView::onTagChecked(bool checked)
 {
-    QString tagValue = ((QAction*) sender())->text();
+    QString tagValue = static_cast<QAction*>(sender())->text();
     foreach (PhotoItem* item, _selected)
     {
         Photo* photo = item->getPhoto();
@@ -160,9 +252,10 @@ void PhotoView::onTagChecked(bool checked)
     }
 }
 
+// Toggle people assignment
 void PhotoView::onPeopleChecked(bool checked)
 {
-    QString name = ((QAction*) sender())->text();
+    QString name = static_cast<QAction*>(sender())->text();
     foreach (PhotoItem* item, _selected)
     {
         Photo* photo = item->getPhoto();
@@ -174,9 +267,10 @@ void PhotoView::onPeopleChecked(bool checked)
     }
 }
 
+// Toggle event assignment
 void PhotoView::onEventChecked(bool checked)
 {
-    QString name = ((QAction*) sender())->text();
+    QString name = static_cast<QAction*>(sender())->text();
     foreach (PhotoItem* item, _selected)
     {
         Photo* photo = item->getPhoto();
@@ -187,15 +281,17 @@ void PhotoView::onEventChecked(bool checked)
 
 NewItemMenu* PhotoView::createTagMenu()
 {
-    NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), new NewTagDlg(this), this);
+    NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), new NewTagDlg(tr("New Tag"), this), this);
     tagMenu->setIcon(QIcon(":/Images/Tag.png"));
     tagMenu->setTitle("Tags");
     connect(tagMenu, SIGNAL(newItemAdded(QString, QDate, QString)), this, SIGNAL(newTag(QString)));
 
+    // Find tags common to all the selected photos
     QSet<QString> commonTags = _library->getAllTags().keys().toSet();
     foreach (PhotoItem* item, _selected)
         commonTags = commonTags.intersect(item->getPhoto()->getTagNames());
 
+    // Check common tag menu items
     foreach (const QString& tag, _library->getAllTags().keys())
     {
         QAction* action = new QAction(tag, this);
@@ -209,15 +305,17 @@ NewItemMenu* PhotoView::createTagMenu()
 
 NewItemMenu* PhotoView::createPeopleMenu()
 {
-    NewItemMenu* peopleMenu = new NewItemMenu(tr("New people"), new NewTagDlg(this), this);
+    NewItemMenu* peopleMenu = new NewItemMenu(tr("New people"), new NewTagDlg(tr("New People"), this), this);
     peopleMenu->setIcon(QIcon(":/Images/People.png"));
     peopleMenu->setTitle("People");
     connect(peopleMenu, SIGNAL(newItemAdded(QString, QDate, QString)), this, SIGNAL(newPeople(QString)));
 
+    // Find people common to all selected photos
     QSet<QString> commonPeople = _library->getAllPeople().keys().toSet();
     foreach (PhotoItem* item, _selected)
         commonPeople = commonPeople.intersect(item->getPhoto()->getPeopleNames());
 
+    // Check common people menu items
     foreach (const QString& name, _library->getAllPeople().keys())
     {
         QAction* action = new QAction(name, this);
@@ -236,6 +334,7 @@ NewItemMenu* PhotoView::createEventMenu()
     eventMenu->setTitle("Events");
     connect(eventMenu, SIGNAL(newItemAdded(QString, QDate, QString)), this, SIGNAL(newEvent(QString, QDate)));
 
+    // Find events common to all selected photos
     QSet<QString> commonEvents = _library->getAllEvents().keys().toSet();
     foreach (PhotoItem* item, _selected)
     {
@@ -248,6 +347,7 @@ NewItemMenu* PhotoView::createEventMenu()
         }
     }
 
+    // Check common event menu items
     foreach (const QString& name, _library->getAllEvents().keys())
     {
         QAction* action = new QAction(name, this);
@@ -259,82 +359,37 @@ NewItemMenu* PhotoView::createEventMenu()
     return eventMenu;
 }
 
-void PhotoView::clear()
+QList<PhotoItem*> PhotoView::getAllPhotoItems() const
 {
-    _layout->clear();
-    _selected.clear();
-}
-
-void PhotoView::mouseMoveEvent(QMouseEvent* event)
-{
-    _rubberBand->setGeometry(QRect(_selectionStart, event->pos()).normalized());
-    QRect rubberBandRect = _rubberBand->geometry();
-
-    _selected.clear();
+    QList<PhotoItem*> result;
     for (int i = 0; i < _layout->count(); ++i)
-    {
-        PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
-        if (rubberBandRect.contains  (item->geometry()) ||
-            rubberBandRect.intersects(item->geometry()))
-            _selected << item;
-    }
-    updateSelection();
+        result << getItemAt(i);
+    return result;
 }
 
-void PhotoView::updateSelection()
-{
-    for (int i = 0; i < _layout->count(); ++i)
-    {
-        PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
-        item->setSelected(_selected.contains(item));
-    }
-    emit selectionChanged(_selected);
-}
-
-PhotoItem* PhotoView::getClickedItem(const QPoint& point)
-{
-    for (int i = 0; i < _layout->count(); ++i)
-    {
-        PhotoItem* item = (PhotoItem*) _layout->itemAt(i)->widget();
-        if (item->geometry().contains(point))
-            return item;
-    }
-    return 0;
-}
-
-void PhotoView::onItemSelected(bool selected)
-{
-    PhotoItem* item = (PhotoItem*) sender();
-    if (selected)
-        _selected << item;
-    else
-        _selected.removeAt(_selected.indexOf(item));
-}
-
-void PhotoView::mouseReleaseEvent(QMouseEvent* event) {
-    if (event->button() == Qt::LeftButton && _rubberBand != 0)
-        _rubberBand->hide();
+PhotoItem* PhotoView::getItemAt(int index) const {
+    return static_cast<PhotoItem*>(_layout->itemAt(index)->widget());
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
-    return  ((PhotoItem*) lhs->widget())->getPhoto()->getTitle() <
-            ((PhotoItem*) rhs->widget())->getPhoto()->getTitle();
+    return  static_cast<PhotoItem*>(lhs->widget())->getPhoto()->getTitle() <
+            static_cast<PhotoItem*>(rhs->widget())->getPhoto()->getTitle();
 }
 
 bool PhotoItemGreaterTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
-    return  ((PhotoItem*) lhs->widget())->getPhoto()->getTitle() >
-            ((PhotoItem*) rhs->widget())->getPhoto()->getTitle();
+    return  static_cast<PhotoItem*>(lhs->widget())->getPhoto()->getTitle() >
+            static_cast<PhotoItem*>(rhs->widget())->getPhoto()->getTitle();
 }
 
 bool PhotoItemLessTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
-    return  ((PhotoItem*) lhs->widget())->getPhoto()->getTimeTaken() <
-            ((PhotoItem*) rhs->widget())->getPhoto()->getTimeTaken();
+    return  static_cast<PhotoItem*>(lhs->widget())->getPhoto()->getTimeTaken() <
+            static_cast<PhotoItem*>(rhs->widget())->getPhoto()->getTimeTaken();
 }
 
 bool PhotoItemGreaterTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
-    return  ((PhotoItem*) lhs->widget())->getPhoto()->getTimeTaken() >
-            ((PhotoItem*) rhs->widget())->getPhoto()->getTimeTaken();
+    return  static_cast<PhotoItem*>(lhs->widget())->getPhoto()->getTimeTaken() >
+            static_cast<PhotoItem*>(rhs->widget())->getPhoto()->getTimeTaken();
 }
 

@@ -5,6 +5,10 @@
 
 class QLineEdit;
 
+/**
+ * A Label that can be edited by double click
+ * A QLineEdit is used as the editor
+ */
 class EditableLabel : public QLabel
 {
     Q_OBJECT

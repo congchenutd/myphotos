@@ -3,6 +3,9 @@
 
 #include "ItemModel.h"
 
+/**
+ * Model for PeoplePage
+ */
 class PeopleModel : public ItemModel
 {
 public:

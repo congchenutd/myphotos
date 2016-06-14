@@ -6,6 +6,7 @@
 class Photo;
 class QProgressBar;
 class Scanner;
+class QSlider;
 
 class MainWindow : public QMainWindow
 {
@@ -43,8 +44,12 @@ private slots:
     void onFilterByEvent    (const QString& eventName);
 
 private:
+    void resetPhotos();
+
+private:
     Ui::MainWindow ui;
     QProgressBar*   _progressBar;
+    QSlider*        _slider;
     bool            _ascending;
     Library*        _library;
     Scanner*        _scanner;

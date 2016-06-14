@@ -55,7 +55,8 @@ void EditableLabel::finishEditing()
     emit editingFinished(_lineEdit->text());
 }
 
-void EditableLabel::cancelEditing() {
+void EditableLabel::cancelEditing()
+{
     _lineEdit->setText(text());
     _lineEdit->hide();
 }

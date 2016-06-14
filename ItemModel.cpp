@@ -7,10 +7,12 @@ ItemModel::ItemModel(QObject* parent) : QAbstractItemModel(parent)
 }
 
 QModelIndex ItemModel::index(int row, int column, const QModelIndex& parent) const {
+    Q_UNUSED(parent)
     return createIndex(row, column);
 }
 
 QModelIndex ItemModel::parent(const QModelIndex& index) const {
+    Q_UNUSED(index)
     return QModelIndex();
 }
 

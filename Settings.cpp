@@ -1,5 +1,6 @@
 #include "Settings.h"
 
+#include <QDir>
 #include <QSize>
 
 Settings *Settings::getInstance()
@@ -28,6 +29,14 @@ void Settings::setMonitoredFileTypes(const QString& list)
     setValue("MonitoredFileTypes", unsorted.join(";"));
 }
 
+QSize Settings::getNewThumbnailSize() const {
+    return value("NewThumbnailSize").toSize();
+}
+
+void Settings::setNewThumbnailSize(const QSize& size) {
+    setValue("NewThumbnailSize", size);
+}
+
 QSize Settings::getThumbnailSize() const {
     return value("ThumbnailSize").toSize();
 }
@@ -41,10 +50,15 @@ Settings::Settings(const QString& fileName)
 
 Settings* Settings::_instance = 0;
 
-QString Settings::getThumbnailCacheLocation() const {
-    return value("ThumbnailCacheLocation").toString();
+QString Settings::getThumbnailCacheLocation() const
+{
+    QDir dir = QDir::current();
+    dir.mkdir("Thumbnails");
+    dir.cd("Thumbnails");
+    return dir.absolutePath();
 }
 
-void Settings::setThumbnailCacheLocation(const QString& path) {
-    setValue("ThumbnailCacheLocation", path);
+QString Settings::getTrashLocation() const {
+    QDir::current().mkdir("Trash");
+    return QString("./Trash");
 }

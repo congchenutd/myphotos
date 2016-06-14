@@ -12,6 +12,9 @@ class QLayoutItem;
 class FlowLayout;
 class NewItemMenu;
 
+/**
+ * A view widget for photos
+ */
 class PhotoView : public QWidget
 {
     Q_OBJECT
@@ -25,13 +28,12 @@ public:
     QList<PhotoItem*> getSelectedItems() const;
     void removeItem(PhotoItem* item);
     void resizeThumbnails(int size);
+    void addPhoto(Photo* photo);
 
 public slots:
-    void addPhoto(Photo* photo);
     void sort();
 
 private slots:
-    void onNewTag(const QString& tagValue);
     void onTagChecked   (bool checked);
     void onPeopleChecked(bool checked);
     void onEventChecked (bool checked);
@@ -50,26 +52,30 @@ protected:
 
 private:
     void updateSelection();
-    PhotoItem* getClickedItem(const QPoint& point);
+    int                 getClickedItemIndex (const QPoint& point) const;
+    PhotoItem*          getClickedItem      (const QPoint& point) const;
+    QSet<PhotoItem *>   getClickedItems     (const QPoint& start, const QPoint& end) const;
+    void toggleSelection(PhotoItem* clicked);
     NewItemMenu* createTagMenu();
     NewItemMenu* createPeopleMenu();
     NewItemMenu* createEventMenu();
 
-private slots:
-    void onItemSelected(bool selected);
+    QList<PhotoItem*> getAllPhotoItems() const;
+    PhotoItem* getItemAt(int index) const;
 
 private:
     Ui::PhotoView ui;
     FlowLayout*         _layout;
     Library*            _library;
-    QPoint              _selectionStart;
+    QPoint              _clickedPosition;
     QRubberBand*        _rubberBand;
-    QList<PhotoItem*>   _selected;
+    QSet<PhotoItem*>    _selected;
     QString             _sortBy;
     bool                _ascending;
+    int                 _thumbnailSize;
 };
 
-// Comparators
+// Comparators for sorting
 struct PhotoItemLessTitle {
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 };

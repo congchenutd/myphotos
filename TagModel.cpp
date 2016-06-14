@@ -5,10 +5,12 @@ TagModel::TagModel(QObject* parent)
     : ItemModel(parent) {}
 
 int TagModel::rowCount(const QModelIndex& parent) const {
+    Q_UNUSED(parent)
     return _library->getAllTags().count();
 }
 
 int TagModel::columnCount(const QModelIndex& parent) const {
+    Q_UNUSED(parent)
     return 1;
 }
 

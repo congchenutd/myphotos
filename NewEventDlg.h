@@ -4,10 +4,11 @@
 #include "NewMenuItemDlg.h"
 #include "ui_NewEventDlg.h"
 
+/**
+ * Dialog for creating new event
+ */
 class NewEventDlg : public NewMenuItemDlg
 {
-    Q_OBJECT
-
 public:
     explicit NewEventDlg(QWidget* parent = 0);
 

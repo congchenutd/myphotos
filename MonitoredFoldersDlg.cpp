@@ -10,8 +10,8 @@ MonitoredFoldersDlg::MonitoredFoldersDlg(QWidget *parent) :
     _model.setStringList(Settings::getInstance()->getMonitoredFolders());
     ui.listView->setModel(&_model);
 
-    connect(ui.btAdd,       SIGNAL(clicked(bool)), this, SLOT(onAdd()));
-    connect(ui.btRemove,    SIGNAL(clicked(bool)), this, SLOT(onRemove()));
+    connect(ui.btAdd,       SIGNAL(clicked(bool)), SLOT(onAdd()));
+    connect(ui.btRemove,    SIGNAL(clicked(bool)), SLOT(onRemove()));
 }
 
 void MonitoredFoldersDlg::accept()
@@ -23,7 +23,7 @@ void MonitoredFoldersDlg::accept()
 void MonitoredFoldersDlg::onAdd()
 {
     QString dir = QFileDialog::getExistingDirectory(
-                this, tr("Open Folder"), ".",
+                this, tr("Add Monitored Folder"), ".",
                 QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if (!dir.isEmpty())
     {
@@ -41,7 +41,6 @@ void MonitoredFoldersDlg::onRemove()
 
     if (QMessageBox::warning(this, tr("Warning"),
                              tr("Are you sure to remove this folder?"),
-                             QMessageBox::Yes |
-                             QMessageBox::No) == QMessageBox::Yes)
+                             QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         _model.removeRow(rows.front().row());
 }

@@ -66,11 +66,6 @@ Qt::ItemFlags EventModel::flags(const QModelIndex& index) const
     if (!index.isValid())
         return Qt::NoItemFlags;
 
+    // make it editable
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
-}
-
-void EventModel::update()
-{
-    // TODO: better method to update the view?
-    endResetModel();
 }

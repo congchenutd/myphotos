@@ -5,10 +5,12 @@ PeopleModel::PeopleModel(QObject* parent)
     : ItemModel(parent) {}
 
 int PeopleModel::rowCount(const QModelIndex& parent) const {
+    Q_UNUSED(parent)
     return _library->getAllPeople().count();
 }
 
 int PeopleModel::columnCount(const QModelIndex& parent) const {
+    Q_UNUSED(parent)
     return 1;
 }
 

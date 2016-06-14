@@ -31,6 +31,8 @@ PhotoItem::PhotoItem(Photo* photo)
 
     setFocusPolicy(Qt::StrongFocus);
     _backgroundColor = palette().background().color();
+
+    setAutoFillBackground(true);
 }
 
 void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
@@ -45,23 +47,16 @@ void PhotoItem::onTitleEdited(const QString& title)
     emit titleEdited(title);
 }
 
+/**
+ * Update selection status
+ */
 void PhotoItem::setSelected(bool selected)
 {
     _selected = selected;
-    if (selected)
-    {
-        QPalette palette(this->palette());
-        palette.setColor(QPalette::Background, palette.highlight().color());
-        setAutoFillBackground(true);
-        setPalette(palette);
-    }
-    else
-    {
-        QPalette palette(this->palette());
-        palette.setColor(QPalette::Background, _backgroundColor);
-        setAutoFillBackground(true);
-        setPalette(palette);
-    }
+    QPalette palette(this->palette());
+    palette.setColor(QPalette::Background,
+                     selected ? palette.highlight().color() : _backgroundColor);
+    setPalette(palette);
 }
 
 Photo* PhotoItem::getPhoto() {
@@ -75,7 +70,7 @@ void PhotoItem::rename() {
 void PhotoItem::resizeThumbnail(int size)
 {
     QPixmap pixmap = QPixmap(_photo->getThumbnail()->getFilePath());
-    _thumbnail->setPixmap(pixmap.scaled(size, size, Qt::KeepAspectRatio));
+    _thumbnail->setPixmap(pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 

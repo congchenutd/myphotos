@@ -4,6 +4,9 @@
 #include <QDate>
 #include <QDialog>
 
+/**
+ * Base for dialogs for creating new menu items
+ */
 class NewMenuItemDlg : public QDialog
 {
 public:

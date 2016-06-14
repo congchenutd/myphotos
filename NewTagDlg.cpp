@@ -1,9 +1,10 @@
 #include "NewTagDlg.h"
 
-NewTagDlg::NewTagDlg(QWidget* parent) :
+NewTagDlg::NewTagDlg(const QString &title, QWidget* parent) :
     NewMenuItemDlg(parent)
 {
     ui.setupUi(this);
+    setWindowTitle(title);
 }
 
 QString NewTagDlg::getText() const {

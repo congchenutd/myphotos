@@ -4,12 +4,13 @@
 #include "ui_NewTagDlg.h"
 #include "NewMenuItemDlg.h"
 
+/**
+ * Dialog for creating new tag/people
+ */
 class NewTagDlg : public NewMenuItemDlg
 {
-    Q_OBJECT
-
 public:
-    explicit NewTagDlg(QWidget* parent = 0);
+    explicit NewTagDlg(const QString& title, QWidget* parent = 0);
 
     QString getText() const;
 

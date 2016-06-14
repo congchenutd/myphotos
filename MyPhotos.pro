@@ -9,6 +9,13 @@ QT += core gui sql testlib widgets concurrent
 TARGET = MyPhotos
 TEMPLATE = app
 
+win32 {
+	RC_FILE = Resources.rc
+}
+macx {
+	ICON = Images/Photos.icns
+}
+
 SOURCES += \
 	MainWindow.cpp \
     Main.cpp \
@@ -46,7 +53,8 @@ SOURCES += \
     FilterPage.cpp \
     EventModel.cpp \
     TagModel.cpp \
-    TagPage.cpp
+    TagPage.cpp \
+    SliderWithToolTip.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -83,7 +91,8 @@ HEADERS += \
     FilterPage.h \
     EventModel.h \
     TagModel.h \
-    TagPage.h
+    TagPage.h \
+    SliderWithToolTip.h
 
 FORMS += \
 	MainWindow.ui \

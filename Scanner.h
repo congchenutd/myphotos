@@ -12,6 +12,9 @@
 class Photo;
 class Library;
 
+/**
+ * A Scanner scans monitored folders and create Photos and their thumbnails
+ */
 class Scanner: public QObject
 {
     Q_OBJECT
@@ -28,7 +31,7 @@ signals:
 
 private:
     QList<Photo*>           _photos;
-    QFutureWatcher<QImage>* _scalingWatcher;
+    QFutureWatcher<QImage>* _scalingWatcher;    // future watcher
     Library*                _library;
 };
 

@@ -19,14 +19,6 @@ Library* Library::getInstance()
     return &instance;
 }
 
-QStringList Library::getMonitoredFolders() const {
-    return Settings::getInstance()->getMonitoredFolders();
-}
-
-void Library::setMonitoredFolders(const QStringList& list) {
-    Settings::getInstance()->setMonitoredFolders(list);
-}
-
 Library::Library() {
     _dao = LibraryDAO::getInstance();
 }
@@ -44,25 +36,11 @@ void Library::clean() {
     _dao->clean();
 }
 
-QMap<QString, People*> Library::getAllPeople() const {
-    return _people;
-}
-
-QMap<QString, Tag*> Library::getAllTags() const {
-    return _tags;
-}
-
-QMap<QString, Event*> Library::getAllEvents() const {
-    return _events;
-}
-
-QMap<QString, Thumbnail *> Library::getAllThumbnails() const {
-    return _thumbnails;
-}
-
-QMap<QString, Photo*> Library::getAllPhotos() const {
-    return _photos;
-}
+QMap<QString, People*>      Library::getAllPeople()     const { return _people;     }
+QMap<QString, Tag*>         Library::getAllTags()       const { return _tags;       }
+QMap<QString, Event*>       Library::getAllEvents()     const { return _events;     }
+QMap<QString, Thumbnail *>  Library::getAllThumbnails() const { return _thumbnails; }
+QMap<QString, Photo*>       Library::getAllPhotos()     const { return _photos;     }
 
 People* Library::getPeople(const QString& name) {
     return _people.contains(name) ? _people[name] : 0;
@@ -85,9 +63,8 @@ Photo* Library::getPhoto(const QString& filePath) {
 }
 
 void Library::addPhoto(Photo* photo) {
-    if (photo != 0) {
+    if (photo != 0)
         _photos.insert(photo->getFilePath(), photo);
-    }
 }
 
 void Library::addEvent(Event* event) {
@@ -100,6 +77,20 @@ void Library::addThumbnail(Thumbnail* thumbnail) {
         _thumbnails.insert(thumbnail->getFilePath(), thumbnail);
 }
 
+void Library::addPeople(People* people) {
+    if (people != 0)
+        _people.insert(people->getName(), people);
+}
+
+void Library::addTag(Tag* tag) {
+    if (tag != 0)
+        _tags.insert(tag->getName(), tag);
+}
+
+/**
+ * Remove a photo object from the library
+ * WARNING: the photo object is destroyed by this method, DO NOT use it afterwards
+ */
 void Library::removePhoto(Photo* photo)
 {
     _photos.remove(photo->getFilePath());
@@ -140,12 +131,12 @@ QList<Photo *> Library::filterPhotosByPeople(const QSet<QString>& people, bool A
     return result;
 }
 
-void Library::addPeople(People* people) {
-    if (people != 0)
-        _people.insert(people->getName(), people);
-}
-
-void Library::addTag(Tag* tag) {
-    if (tag != 0)
-        _tags.insert(tag->getName(), tag);
+QList<Photo *> Library::filterPhotosByEvent(const QString& eventName)
+{
+    QList<Photo*> result;
+    foreach (Photo* photo, _photos)
+        if (Event* event = photo->getEvent())
+            if(event->getName() == eventName)
+                result << photo;
+    return result;
 }

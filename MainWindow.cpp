@@ -13,17 +13,19 @@
 #include "TagModel.h"
 #include "PeopleModel.h"
 #include "EventModel.h"
+#include "SliderWithToolTip.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
 #include <QMessageBox>
 #include <QDebug>
+#include <QDir>
 
 MainWindow* MainWindow::_instance = 0;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    _ascending(true)
+    _ascending(false)
  {
     _instance = this;
     _library = Library::getInstance();
@@ -41,28 +43,29 @@ MainWindow::MainWindow(QWidget *parent) :
     actionGroup->addAction(ui.actionSortByTime);
     ui.actionSortByTime->setChecked(true);
 
-    QSlider* slider = new QSlider(Qt::Horizontal, this);
-    slider->setMinimumWidth(150);
-    slider->setMaximumWidth(150);
-    slider->setRange(100, 200);
-    slider->setValue(200);
-    ui.statusBar->addPermanentWidget(slider);
+    _slider = new SliderWithToolTip(this);
+    _slider->setOrientation(Qt::Horizontal);
+    _slider->setMinimumWidth(150);
+    _slider->setMaximumWidth(150);
+    _slider->setRange(100, 500);
+    _slider->setValue(200);
+    ui.statusBar->addPermanentWidget(_slider);
     ui.statusBar->addPermanentWidget(new QLabel("  "));
 
-    connect(ui.actionScan,          SIGNAL(triggered(bool)),    this, SLOT(onScan()));
-    connect(ui.actionOptions,       SIGNAL(triggered(bool)),    this, SLOT(onOptions()));
-    connect(ui.actionSortByTitle,   SIGNAL(triggered()),        this, SLOT(sort()));
-    connect(ui.actionSortByTime,    SIGNAL(triggered()),        this, SLOT(sort()));
-    connect(ui.actionOrder,         SIGNAL(triggered()),        this, SLOT(onSortingOrder()));
+    connect(ui.actionScan,          SIGNAL(triggered(bool)),    SLOT(onScan()));
+    connect(ui.actionOptions,       SIGNAL(triggered(bool)),    SLOT(onOptions()));
+    connect(ui.actionSortByTitle,   SIGNAL(triggered()),        SLOT(sort()));
+    connect(ui.actionSortByTime,    SIGNAL(triggered()),        SLOT(sort()));
+    connect(ui.actionOrder,         SIGNAL(triggered()),        SLOT(onSortingOrder()));
     connect(ui.photoView, SIGNAL(selectionChanged(QList<PhotoItem*>)),
             this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
-    connect(ui.photoView, SIGNAL(newTag     (QString)), this, SLOT(onNewTag     (QString)));
-    connect(ui.photoView, SIGNAL(newPeople  (QString)), this, SLOT(onNewPeople  (QString)));
-    connect(ui.photoView, SIGNAL(newEvent   (QString, QDate)), this, SLOT(onNewEvent(QString, QDate)));
-    connect(ui.actionRemove,    SIGNAL(triggered(bool)),    this, SLOT(onRemove()));
-    connect(ui.actionDelete,    SIGNAL(triggered(bool)),    this, SLOT(onDelete()));
-    connect(ui.actionRename,    SIGNAL(triggered(bool)),    this, SLOT(onRename()));
-    connect(slider,             SIGNAL(valueChanged(int)),  this, SLOT(onThumbnailSize(int)));
+    connect(ui.photoView, SIGNAL(newTag     (QString)), SLOT(onNewTag     (QString)));
+    connect(ui.photoView, SIGNAL(newPeople  (QString)), SLOT(onNewPeople  (QString)));
+    connect(ui.photoView, SIGNAL(newEvent   (QString, QDate)), SLOT(onNewEvent(QString, QDate)));
+    connect(ui.actionRemove,    SIGNAL(triggered(bool)),    SLOT(onRemove()));
+    connect(ui.actionDelete,    SIGNAL(triggered(bool)),    SLOT(onDelete()));
+    connect(ui.actionRename,    SIGNAL(triggered(bool)),    SLOT(onRename()));
+    connect(_slider,            SIGNAL(valueChanged(int)),  SLOT(onThumbnailSize(int)));
 
     ui.photoView->load(_library->getAllPhotos().values());
     sort();
@@ -77,6 +80,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _scanner = new Scanner;
     connect(_scanner, SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
+
+    _slider->setValue(Settings::getInstance()->getThumbnailSize().width());
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }
@@ -155,7 +160,7 @@ void MainWindow::onRename() {
 void MainWindow::onRemove()
 {
     if (QMessageBox::warning(this, tr("Remove"),
-                             tr("Are you sure to remove the selected photo(s) from the library?"),
+                             tr("Are you sure to remove the selected photo(s) from the library, not physically from the computer?"),
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         for (PhotoItem* item: ui.photoView->getSelectedItems())
@@ -169,29 +174,26 @@ void MainWindow::onRemove()
 void MainWindow::onDelete()
 {
     if (QMessageBox::warning(this, tr("Delete"),
-                             tr("Are you sure to permanently delete the selected photo(s) from the computer?"),
+                             tr("Are you sure to PHYSICALLY delete the selected photo(s) from the computer?"),
                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
+        for (PhotoItem* item: ui.photoView->getSelectedItems())
+        {
+            _library->removePhoto(item->getPhoto());
+            ui.photoView->removeItem(item);
 
+            QFileInfo fileInfo(item->getPhoto()->getFilePath());
+            QString newPath = Settings::getInstance()->getTrashLocation() + QDir::separator() + fileInfo.fileName();
+            QFile file(fileInfo.filePath());
+            file.rename(newPath);
+        }
     }
 }
 
-void MainWindow::onThumbnailSize(int size) {
-    ui.photoView->resizeThumbnails(size);
-}
-
-void MainWindow::onFilterByTags(const QStringList& tags, bool AND)
+void MainWindow::onThumbnailSize(int size)
 {
-    ui.photoView->clear();
-    if (tags.isEmpty()) {
-        ui.photoView->load(_library->getAllPhotos().values());
-    }
-    else
-    {
-        QList<Photo*> photos = _library->filterPhotosByTags(tags.toSet(), AND);
-        ui.photoView->load(photos);
-    }
-    sort();
+    ui.photoView->resizeThumbnails(size);
+    Settings::getInstance()->setThumbnailSize(QSize(size, size));
 }
 
 void MainWindow::onNewTag(const QString& tagValue)
@@ -242,21 +244,36 @@ void MainWindow::onNewEvent(const QString& name, const QDate& date)
     ui.pageEvents->update();
 }
 
+void MainWindow::onFilterByTags(const QStringList& tags, bool AND)
+{
+    ui.photoView->clear();
+    if (tags.isEmpty())
+        resetPhotos();
+    else
+        ui.photoView->load(_library->filterPhotosByTags(tags.toSet(), AND));
+    sort();
+}
+
 void MainWindow::onFilterByPeople(const QStringList& people, bool AND)
 {
     ui.photoView->clear();
-    if (people.isEmpty()) {
-        ui.photoView->load(_library->getAllPhotos().values());
-    }
+    if (people.isEmpty())
+        resetPhotos();
     else
-    {
-        QList<Photo*> photos = _library->filterPhotosByPeople(people.toSet(), AND);
-        ui.photoView->load(photos);
-    }
+        ui.photoView->load(_library->filterPhotosByPeople(people.toSet(), AND));
     sort();
 }
 
 void MainWindow::onFilterByEvent(const QString& eventName)
 {
+    ui.photoView->clear();
+    if (eventName.isEmpty())
+        resetPhotos();
+    else
+        ui.photoView->load(_library->filterPhotosByEvent(eventName));
+    sort();
+}
 
+void MainWindow::resetPhotos() {
+    ui.photoView->load(_library->getAllPhotos().values());
 }

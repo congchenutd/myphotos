@@ -3,6 +3,8 @@
 
 #include "ui_SettingsDlg.h"
 
+class Settings;
+
 class SettingsDlg : public QDialog
 {
     Q_OBJECT
@@ -16,6 +18,7 @@ private slots:
 
 private:
     Ui::SettingsDlg ui;
+    Settings*   _settings;
 };
 
 #endif // SETTINGSDLG_H

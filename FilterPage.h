@@ -5,6 +5,9 @@
 
 class ItemModel;
 
+/**
+ * A page on the sidebar for filtering photos by event, tag, or people
+ */
 class FilterPage : public QWidget
 {
     Q_OBJECT
@@ -15,7 +18,7 @@ public:
     ItemModel* getModel();
     virtual void update() = 0;
 
-protected:
+private:
     ItemModel* _model;
 };
 

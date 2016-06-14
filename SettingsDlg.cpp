@@ -2,19 +2,26 @@
 #include "Settings.h"
 #include "SettingsDlg.h"
 
+#include <QToolTip>
+
 SettingsDlg::SettingsDlg(QWidget *parent) :
     QDialog(parent)
 {
     ui.setupUi(this);
     connect(ui.btMonitoredFolders, SIGNAL(clicked(bool)), this, SLOT(onMonitoredFolders()));
 
-    Settings* settings = Settings::getInstance();
-    ui.leMonitoredFileTypes->setText(settings->getMonitoredFileTypes());
+    _settings = Settings::getInstance();
+    ui.leMonitoredFileTypes->setText(_settings->getMonitoredFileTypes());
+    ui.sliderThumbnailSize->setValue(_settings->getNewThumbnailSize().width());
 }
 
 void SettingsDlg::accept()
 {
-    Settings::getInstance()->setMonitoredFileTypes(ui.leMonitoredFileTypes->text());
+    _settings->setMonitoredFileTypes(ui.leMonitoredFileTypes->text());
+
+    int width = ui.sliderThumbnailSize->value();
+    _settings->setNewThumbnailSize(QSize(width, width));
+
     QDialog::accept();
 }
 

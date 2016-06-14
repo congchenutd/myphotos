@@ -6,6 +6,9 @@
 
 class Library;
 
+/**
+ * Model for sidebar pages
+ */
 class ItemModel : public QAbstractItemModel
 {
 public:

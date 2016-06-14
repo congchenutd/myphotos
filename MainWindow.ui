@@ -29,7 +29,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>335</width>
+         <width>315</width>
          <height>275</height>
         </rect>
        </property>
@@ -89,9 +89,9 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionQuit"/>
    <addaction name="actionScan"/>
    <addaction name="actionOptions"/>
-   <addaction name="actionQuit"/>
    <addaction name="separator"/>
    <addaction name="actionSortByTitle"/>
    <addaction name="actionSortByTime"/>
@@ -105,7 +105,7 @@
   <widget class="QDockWidget" name="dockWidget">
    <property name="minimumSize">
     <size>
-     <width>200</width>
+     <width>220</width>
      <height>258</height>
     </size>
    </property>
@@ -123,17 +123,21 @@
      <item>
       <widget class="QToolBox" name="sidebar">
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="EventPage" name="pageEvents">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>176</width>
+          <width>196</width>
           <height>119</height>
          </rect>
         </property>
+        <attribute name="icon">
+         <iconset resource="Resources.qrc">
+          <normaloff>:/Images/Events.png</normaloff>:/Images/Events.png</iconset>
+        </attribute>
         <attribute name="label">
          <string>Events</string>
         </attribute>
@@ -143,10 +147,14 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>176</width>
+          <width>196</width>
           <height>119</height>
          </rect>
         </property>
+        <attribute name="icon">
+         <iconset resource="Resources.qrc">
+          <normaloff>:/Images/People.png</normaloff>:/Images/People.png</iconset>
+        </attribute>
         <attribute name="label">
          <string>People</string>
         </attribute>
@@ -156,10 +164,14 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>176</width>
+          <width>196</width>
           <height>119</height>
          </rect>
         </property>
+        <attribute name="icon">
+         <iconset resource="Resources.qrc">
+          <normaloff>:/Images/Tag.png</normaloff>:/Images/Tag.png</iconset>
+        </attribute>
         <attribute name="label">
          <string>Tags</string>
         </attribute>
@@ -169,10 +181,14 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>176</width>
+          <width>196</width>
           <height>119</height>
          </rect>
         </property>
+        <attribute name="icon">
+         <iconset resource="Resources.qrc">
+          <normaloff>:/Images/Photos.png</normaloff>:/Images/Photos.png</iconset>
+        </attribute>
         <attribute name="label">
          <string>Information</string>
         </attribute>
@@ -245,7 +261,7 @@
   <action name="actionOrder">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/Images/Up.png</normaloff>:/Images/Up.png</iconset>
+     <normaloff>:/Images/Down.png</normaloff>:/Images/Down.png</iconset>
    </property>
    <property name="text">
     <string>Ascending</string>

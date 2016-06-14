@@ -4,6 +4,8 @@
 #include "FilterPage.h"
 #include "ui_EventPage.h"
 
+#include <QStyledItemDelegate>
+
 class ItemModel;
 
 class EventPage : public FilterPage
@@ -24,6 +26,16 @@ signals:
 
 private:
     Ui::EventPage ui;
+};
+
+/**
+ * An item delegate to support customized date format
+ */
+class DateItemDelegate: public QStyledItemDelegate
+{
+public:
+    QString displayText(const QVariant& value, const QLocale& locale) const;
+    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex&index) const;
 };
 
 #endif // EVENTPAGE_H

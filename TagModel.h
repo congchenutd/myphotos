@@ -3,6 +3,9 @@
 
 #include "ItemModel.h"
 
+/**
+ * Model for Tags on the TagPage
+ */
 class TagModel : public ItemModel
 {
 public:

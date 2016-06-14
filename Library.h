@@ -4,7 +4,6 @@
 #include <QFileInfo>
 #include <QMap>
 #include <QObject>
-#include <QQueue>
 
 class Photo;
 class Event;
@@ -13,15 +12,15 @@ class Tag;
 class LibraryDAO;
 class Thumbnail;
 
+/**
+ * A Library of all other objects
+ */
 class Library: public QObject
 {
     Q_OBJECT
 
 public:
     static Library* getInstance();
-
-    QStringList getMonitoredFolders() const;
-    void setMonitoredFolders(const QStringList &list);
 
     void load();
     void save();
@@ -48,6 +47,7 @@ public:
     void removePhoto(Photo* photo);
     QList<Photo*> filterPhotosByTags    (const QSet<QString>& tags,     bool AND);
     QList<Photo*> filterPhotosByPeople  (const QSet<QString>& people,   bool AND);
+    QList<Photo*> filterPhotosByEvent   (const QString& eventName);
 
 private:
     Library();
@@ -60,7 +60,6 @@ private:
     QMap<QString, Tag*>         _tags;
     QMap<QString, Event*>       _events;
     QMap<QString, Thumbnail*>   _thumbnails;
-    QQueue<QFileInfo>           _tobeAdded;
 };
 
 #endif // LIBRARY_H

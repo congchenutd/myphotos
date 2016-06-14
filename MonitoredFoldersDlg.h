@@ -5,6 +5,9 @@
 
 #include <QStringListModel>
 
+/**
+ * A dialog for editing monitored folders
+ */
 class MonitoredFoldersDlg : public QDialog
 {
     Q_OBJECT

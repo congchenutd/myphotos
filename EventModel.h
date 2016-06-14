@@ -3,6 +3,9 @@
 
 #include "ItemModel.h"
 
+/**
+ * An ItemModel for Events, used by EventPage
+ */
 class EventModel : public ItemModel
 {
     Q_OBJECT
@@ -16,8 +19,6 @@ public:
     bool setData(const QModelIndex& idx, const QVariant &value, int role = Qt::EditRole);
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
-
-    void update();
 
 public:
     enum {COL_NAME, COL_DATE};
