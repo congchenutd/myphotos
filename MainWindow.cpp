@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.statusBar->addPermanentWidget(_slider);
     ui.statusBar->addPermanentWidget(new QLabel("  "));
 
+    connect(ui.actionAboutQt,       SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(ui.actionAbout,         SIGNAL(triggered()), this, SLOT(onAbout()));
     connect(ui.actionScan,          SIGNAL(triggered(bool)),    SLOT(onScan()));
     connect(ui.actionOptions,       SIGNAL(triggered(bool)),    SLOT(onOptions()));
     connect(ui.actionSortByTitle,   SIGNAL(triggered()),        SLOT(sort()));
@@ -272,6 +274,13 @@ void MainWindow::onFilterByEvent(const QString& eventName)
     else
         ui.photoView->load(_library->filterPhotosByEvent(eventName));
     sort();
+}
+
+void MainWindow::onAbout()
+{
+    QMessageBox::about(this, "About",
+        tr("<h3><b>MyPhotos: A Simple Photo Manager</b></h3>"
+           "<p>Cong Chen &lt;<a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a>&gt;</p>"));
 }
 
 void MainWindow::resetPhotos() {

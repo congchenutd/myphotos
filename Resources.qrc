@@ -21,5 +21,6 @@
         <file>Images/ZoomOut.png</file>
         <file>Images/Rename.png</file>
         <file>Images/Events.png</file>
+        <file>Images/About.png</file>
     </qresource>
 </RCC>
