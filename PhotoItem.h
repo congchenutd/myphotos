@@ -37,6 +37,7 @@ private:
     EditableLabel*  _title;
     QColor          _backgroundColor;
     bool            _selected;
+    QLabel*         _video;
 };
 
 

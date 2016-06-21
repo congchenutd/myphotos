@@ -31,7 +31,6 @@ signals:
 
 private:
     QList<Photo*>           _photos;
-//    QFutureWatcher<QImage>* _scalingWatcher;    // future watcher
     Library*                _library;
 };
 

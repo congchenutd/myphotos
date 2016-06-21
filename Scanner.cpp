@@ -28,8 +28,6 @@ QImage scale(Photo* photo)
 Scanner::Scanner()
 {
     _library = Library::getInstance();
-//    _scalingWatcher = new QFutureWatcher<QImage>(this);
-//    connect(_scalingWatcher, SIGNAL(resultReadyAt(int)), SLOT(onThumbnailCreated(int)));
 }
 
 /**
@@ -60,11 +58,14 @@ int Scanner::scan()
                 photo->save();
                 _photos << photo;
 
-                ThumbnailGenerator* generator = new VideoThumbnailGenerator(photo, Settings::getInstance()->getNewThumbnailSize());
-                generator->setAutoDelete(false);
-                connect(generator, SIGNAL(finished(QImage)), SLOT(onThumbnailCreated(QImage)));
-                QThreadPool::globalInstance()->setMaxThreadCount(10);
-                QThreadPool::globalInstance()->start(generator);
+                QSize size = Settings::getInstance()->getNewThumbnailSize();
+                if (ThumbnailGenerator* generator = ThumbnailGenerator::getGenerator(photo, size))
+                {
+                    generator->setAutoDelete(false);
+                    connect(generator, SIGNAL(finished(QImage)), SLOT(onThumbnailCreated(QImage)));
+                    QThreadPool::globalInstance()->setMaxThreadCount(5);
+                    QThreadPool::globalInstance()->start(generator);
+                }
             }
     }
 
@@ -96,5 +97,5 @@ void Scanner::onThumbnailCreated(const QImage& image)
     photo->save();
 
     emit photoAdded(photo);
-//    delete sender();
+    delete sender();
 }

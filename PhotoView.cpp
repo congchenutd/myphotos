@@ -46,8 +46,7 @@ void PhotoView::clear()
 void PhotoView::load(const QList<Photo*>& photos)
 {
     for (Photo* photo: photos)
-        addPhoto(photo);
-    resizeThumbnails(_thumbnailSize);
+        addPhoto(photo, _thumbnailSize);
 }
 
 void PhotoView::sort(const QString& byWhat, bool ascending)
@@ -86,9 +85,10 @@ void PhotoView::resizeThumbnails(int size)
         item->resizeThumbnail(size);
 }
 
-void PhotoView::addPhoto(Photo* photo)
+void PhotoView::addPhoto(Photo* photo, int thumbnailSize)
 {
     PhotoItem* photoItem = new PhotoItem(photo);
+    photoItem->resizeThumbnail(thumbnailSize);
     connect(photoItem, SIGNAL(titleEdited(QString)), this, SLOT(sort()));
     _layout->addWidget(photoItem);
 }

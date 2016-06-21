@@ -28,7 +28,7 @@ public:
     QList<PhotoItem*> getSelectedItems() const;
     void removeItem(PhotoItem* item);
     void resizeThumbnails(int size);
-    void addPhoto(Photo* photo);
+    void addPhoto(Photo* photo, int thumbnailSize);
 
 public slots:
     void sort();

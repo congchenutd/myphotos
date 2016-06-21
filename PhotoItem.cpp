@@ -13,7 +13,8 @@
 
 PhotoItem::PhotoItem(Photo* photo)
     : _photo(photo),
-      _selected(false)
+      _selected(false),
+      _video(0)
 {
     _thumbnail = new QLabel(this);
     if (photo->getThumbnail() != 0)
@@ -31,8 +32,15 @@ PhotoItem::PhotoItem(Photo* photo)
 
     setFocusPolicy(Qt::StrongFocus);
     _backgroundColor = palette().background().color();
-
     setAutoFillBackground(true);
+
+    if (photo->isVideo())
+    {
+        _video = new QLabel(this);
+        _video->setPixmap(QPixmap(":/Images/Video.png"));
+        _video->show();
+        _video->move(16, 10);
+    }
 }
 
 void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)

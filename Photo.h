@@ -35,6 +35,8 @@ public:
     QSet<QString>           getTagNames()       const;
     QSet<QString>           getPeopleNames()    const;
 
+    bool isVideo() const;
+
     void setTitle       (const QString& title);
     void setFilePath    (const QString& filePath);
     void setTimeTaken   (const QDateTime& time);

@@ -4,6 +4,8 @@
 #include "PhotoDAO.h"
 #include "Tag.h"
 
+#include <QFileInfo>
+
 Photo::Photo(int id, const QString& title, const QString& path, const QDateTime& time)
     : Persistable(id, PhotoDAO::getInstance()),
       _title(title),
@@ -22,6 +24,14 @@ QMap<QString, Tag*>     Photo::getTags()        const { return _tags;   }
 QMap<QString, People*>  Photo::getPeople()      const { return _people; }
 QSet<QString>           Photo::getTagNames()    const { return getTags()  .keys().toSet(); }
 QSet<QString>           Photo::getPeopleNames() const { return getPeople().keys().toSet(); }
+
+bool Photo::isVideo() const
+{
+    QStringList videos;
+    videos << "mp4" << "avi" << "mpg" << "mov";
+    QString extension = QFileInfo(getFilePath()).suffix().toLower();
+    return videos.contains(extension);
+}
 
 void Photo::setTitle(const QString& title)  {
     _title = title;

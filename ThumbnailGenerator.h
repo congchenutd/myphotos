@@ -17,6 +17,8 @@ public:
     ThumbnailGenerator(Photo* photo, const QSize& size);
     Photo* getPhoto() const;
 
+    static ThumbnailGenerator* getGenerator(Photo* photo, const QSize& size);
+
 signals:
     void finished(const QImage& image);
 

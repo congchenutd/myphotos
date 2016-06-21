@@ -23,5 +23,6 @@
         <file>Images/Events.png</file>
         <file>Images/About.png</file>
         <file>CompileDate.txt</file>
+        <file>Images/Video.png</file>
     </qresource>
 </RCC>

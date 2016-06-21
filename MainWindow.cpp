@@ -116,7 +116,7 @@ void MainWindow::onOptions()
 
 void MainWindow::onPhotoAdded(Photo* photo)
 {
-    ui.photoView->addPhoto(photo);
+    ui.photoView->addPhoto(photo, _slider->value());
     _progressBar->setValue(_progressBar->value() + 1);
     if (_progressBar->value() == _progressBar->maximum())
     {
