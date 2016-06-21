@@ -63,19 +63,22 @@ void VideoThumbnailGenerator::run()
     using namespace cv;
 
     // WORKAROUND: rename the file, because opencv can't open file path containing Chinese
-    QString tempFilePath = QFileInfo(_photo->getFilePath()).path() +
-            QDir::separator() + QUuid::createUuid().toString() + ".tmp";
+    QFileInfo fileInfo(_photo->getFilePath());
+    QString tempFilePath = fileInfo.path() + QDir::separator() +
+            QUuid::createUuid().toString() + "." + fileInfo.suffix();
     QFile::rename(_photo->getFilePath(), tempFilePath);
 
     VideoCapture cap(tempFilePath.toStdString());
-    if (!cap.isOpened())
-        return;
 
-    cap.set(CV_CAP_PROP_POS_FRAMES, 1);
-    Mat frame;
-    cap >> frame;
-    emit finished(Mat2QImage(frame).scaled(_size,
-                               Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    if (cap.isOpened())
+    {
+        cap.set(CV_CAP_PROP_POS_FRAMES, 1);
+        Mat frame;
+        cap >> frame;
+        emit finished(Mat2QImage(frame).scaled(_size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+    else
+        emit finished(QImage());
 
     // Restore the file name
     QFile::rename(tempFilePath, _photo->getFilePath());

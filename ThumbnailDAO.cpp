@@ -25,7 +25,8 @@ Thumbnail* ThumbnailDAO::load(int id) const
 void ThumbnailDAO::remove(Persistable* persistable)
 {
     Thumbnail* thumbnail = static_cast<Thumbnail*>(persistable);
-    QFile(thumbnail->getFilePath()).remove();
+    QFile(thumbnail->getFilePath()).remove();   // delete thumbnail file
+    DAO::remove(persistable);                   // delete thumbnail from db
 }
 
 void ThumbnailDAO::update(Persistable* persistable)
