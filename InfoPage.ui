@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ExifView</class>
- <widget class="QWidget" name="ExifView">
+ <class>InfoPage</class>
+ <widget class="QWidget" name="InfoPage">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -28,12 +28,15 @@
    </property>
    <item>
     <widget class="QTableView" name="tableView">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
     </widget>
    </item>
   </layout>

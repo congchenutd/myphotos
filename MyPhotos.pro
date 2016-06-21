@@ -51,7 +51,6 @@ SOURCES += \
     ThumbnailDAO.cpp \
     PhotoItem.cpp \
     EditableLabel.cpp \
-    ExifView.cpp \
     NewItemMenu.cpp \
     Scanner.cpp \
     NewMenuItemDlg.cpp \
@@ -65,8 +64,8 @@ SOURCES += \
     TagModel.cpp \
     TagPage.cpp \
     SliderWithToolTip.cpp \
-    FrameExtractor.cpp \
-    ThumbnailGenerator.cpp
+    ThumbnailGenerator.cpp \
+    InfoPage.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -90,7 +89,6 @@ HEADERS += \
     ThumbnailDAO.h \
     PhotoItem.h \
     EditableLabel.h \
-    ExifView.h \
     TagDAO.h \
     NewItemMenu.h \
     Scanner.h \
@@ -105,19 +103,19 @@ HEADERS += \
     TagModel.h \
     TagPage.h \
     SliderWithToolTip.h \
-    FrameExtractor.h \
-    ThumbnailGenerator.h
+    ThumbnailGenerator.h \
+    InfoPage.h
 
 FORMS += \
 	MainWindow.ui \
     SettingsDlg.ui \
     MonitoredFoldersDlg.ui \
     PhotoView.ui \
-    ExifView.ui \
     TagsView.ui \
     NewTagDlg.ui \
     NewEventDlg.ui \
-    EventPage.ui
+    EventPage.ui \
+    InfoPage.ui
 
 RESOURCES += \
     Resources.qrc

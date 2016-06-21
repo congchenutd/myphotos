@@ -153,6 +153,8 @@ void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
     ui.actionRemove ->setEnabled(hasSelection);
     ui.actionDelete ->setEnabled(hasSelection);
     ui.actionRename ->setEnabled(hasSelection);
+
+    ui.pageInfo->setCurrentPhoto(selected.isEmpty() ? 0 : selected.front()->getPhoto());
 }
 
 void MainWindow::onRename() {

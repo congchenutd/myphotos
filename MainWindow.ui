@@ -126,7 +126,7 @@
      <item>
       <widget class="QToolBox" name="sidebar">
        <property name="currentIndex">
-        <number>0</number>
+        <number>3</number>
        </property>
        <widget class="EventPage" name="pageEvents">
         <property name="geometry">
@@ -179,7 +179,7 @@
          <string>Tags</string>
         </attribute>
        </widget>
-       <widget class="QWidget" name="pageInfo">
+       <widget class="InfoPage" name="pageInfo">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -348,6 +348,12 @@
    <class>EventPage</class>
    <extends>QWidget</extends>
    <header>EventPage.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>InfoPage</class>
+   <extends>QWidget</extends>
+   <header>InfoPage.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
