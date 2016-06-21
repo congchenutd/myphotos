@@ -4,7 +4,7 @@
 #include "ui_InfoPage.h"
 
 class Photo;
-class QStandardItemModel;
+class InfoModel;
 class QProcess;
 
 class InfoPage : public QWidget
@@ -16,14 +16,11 @@ public:
     void setCurrentPhoto(Photo* photo);
 
 private slots:
-    void onReadyRead();
-    void onFinished();
+    void onEditFinished();
 
 private:
     Ui::InfoPage ui;
-    QStandardItemModel* _model;
-    QProcess*           _process;
-    QString             _output;
+    InfoModel*  _model;
 };
 
 #endif // INFOPAGE_H

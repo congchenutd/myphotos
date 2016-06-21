@@ -36,6 +36,7 @@ public:
     QSet<QString>           getPeopleNames()    const;
 
     bool isVideo() const;
+    bool exists () const;
 
     void setTitle       (const QString& title);
     void setFilePath    (const QString& filePath);

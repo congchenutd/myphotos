@@ -65,7 +65,8 @@ SOURCES += \
     TagPage.cpp \
     SliderWithToolTip.cpp \
     ThumbnailGenerator.cpp \
-    InfoPage.cpp
+    InfoPage.cpp \
+    InfoModel.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -104,7 +105,8 @@ HEADERS += \
     TagPage.h \
     SliderWithToolTip.h \
     ThumbnailGenerator.h \
-    InfoPage.h
+    InfoPage.h \
+    InfoModel.h
 
 FORMS += \
 	MainWindow.ui \

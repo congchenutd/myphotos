@@ -17,9 +17,15 @@ PhotoItem::PhotoItem(Photo* photo)
       _video(0)
 {
     _thumbnail = new QLabel(this);
-    if (photo->getThumbnail() != 0)
-        _thumbnail->setPixmap(QPixmap(photo->getThumbnail()->getFilePath()));
     _thumbnail->setAlignment(Qt::AlignCenter);
+
+    if (photo->exists() && photo->isVideo())
+    {
+        _video = new QLabel(this);
+        _video->setPixmap(QPixmap(":/Images/Video.png"));
+        _video->show();
+        _video->move(16, 10);
+    }
 
     _title = new EditableLabel;
     _title->setText(photo->getTitle());
@@ -33,14 +39,6 @@ PhotoItem::PhotoItem(Photo* photo)
     setFocusPolicy(Qt::StrongFocus);
     _backgroundColor = palette().background().color();
     setAutoFillBackground(true);
-
-    if (photo->isVideo())
-    {
-        _video = new QLabel(this);
-        _video->setPixmap(QPixmap(":/Images/Video.png"));
-        _video->show();
-        _video->move(16, 10);
-    }
 }
 
 void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
@@ -77,10 +75,8 @@ void PhotoItem::rename() {
 
 void PhotoItem::resizeThumbnail(int size)
 {
-    if (getPhoto()->getThumbnail() != 0) {
-        QPixmap pixmap = QPixmap(_photo->getThumbnail()->getFilePath());
-        _thumbnail->setPixmap(pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
+    QPixmap pixmap = (getPhoto()->exists() && getPhoto()->getThumbnail() != 0) ?
+                QPixmap(_photo->getThumbnail()->getFilePath()) :
+                QPixmap(":/Images/Error.png");
+    _thumbnail->setPixmap(pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
-
-

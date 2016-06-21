@@ -24,5 +24,7 @@
         <file>Images/About.png</file>
         <file>CompileDate.txt</file>
         <file>Images/Video.png</file>
+        <file>Images/Error.png</file>
+        <file>Images/Information.png</file>
     </qresource>
 </RCC>

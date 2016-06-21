@@ -109,7 +109,7 @@
    <property name="minimumSize">
     <size>
      <width>220</width>
-     <height>258</height>
+     <height>292</height>
     </size>
    </property>
    <property name="allowedAreas">
@@ -190,7 +190,7 @@
         </property>
         <attribute name="icon">
          <iconset resource="Resources.qrc">
-          <normaloff>:/Images/Photos.png</normaloff>:/Images/Photos.png</iconset>
+          <normaloff>:/Images/Information.png</normaloff>:/Images/Information.png</iconset>
         </attribute>
         <attribute name="label">
          <string>Information</string>

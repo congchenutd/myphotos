@@ -33,6 +33,10 @@ bool Photo::isVideo() const
     return videos.contains(extension);
 }
 
+bool Photo::exists() const {
+    return QFile::exists(getFilePath());
+}
+
 void Photo::setTitle(const QString& title)  {
     _title = title;
 }

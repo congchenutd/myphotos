@@ -1,4 +1,3 @@
-#include "FrameExtractor.h"
 #include "Photo.h"
 #include "ThumbnailGenerator.h"
 

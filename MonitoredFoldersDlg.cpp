@@ -36,11 +36,6 @@ void MonitoredFoldersDlg::onAdd()
 void MonitoredFoldersDlg::onRemove()
 {
     QModelIndexList rows = ui.listView->selectionModel()->selectedRows();
-    if (rows.isEmpty())
-        return;
-
-    if (QMessageBox::warning(this, tr("Warning"),
-                             tr("Are you sure to remove this folder?"),
-                             QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    if (!rows.isEmpty())
         _model.removeRow(rows.front().row());
 }
