@@ -23,6 +23,8 @@ public:
     QString getThumbnailCacheLocation() const;
     QString getTrashLocation() const;
 
+    QString getCompileDate() const;
+
 private:
     Settings(const QString& fileName);
 

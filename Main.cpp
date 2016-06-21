@@ -3,6 +3,10 @@
 #include <QMessageBox>
 #include <QSqlError>
 #include <QDir>
+#include <QMediaPlayer>
+#include <QVideoWidget>
+#include <QLabel>
+#include <QTextCodec>
 
 // workaround for a bug on mac > Mavericks
 // Finder returns / as the working path of an app bundle
@@ -41,6 +45,7 @@ int main(int argc, char *argv[])
     if (!openDB("MyPhotos.db"))
         return 1;
 
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     MainWindow window;
     window.showMaximized();
 

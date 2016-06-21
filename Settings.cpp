@@ -1,6 +1,7 @@
 #include "Settings.h"
 
 #include <QDir>
+#include <QResource>
 #include <QSize>
 
 Settings *Settings::getInstance()
@@ -61,4 +62,12 @@ QString Settings::getThumbnailCacheLocation() const
 QString Settings::getTrashLocation() const {
     QDir::current().mkdir("Trash");
     return QString("./Trash");
+}
+
+QString Settings::getCompileDate() const
+{
+    // CompileData.txt records the date of the build
+    QResource resource(":/CompileDate.txt");
+    QString result = (char*) resource.data();
+    return result.isEmpty() ? "Unknown date" : result;
 }

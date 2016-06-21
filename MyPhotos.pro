@@ -1,13 +1,23 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2016-05-15T00:48:17
-#
-#-------------------------------------------------
-
-QT += core gui sql testlib widgets concurrent
+QT += core gui sql testlib widgets concurrent multimedia multimediawidgets
 
 TARGET = MyPhotos
 TEMPLATE = app
+
+#QMAKE_CXXFLAGS += -F/Users/Cong/Program/MyPhotos/VLC-Qt_1.0.1_osx/lib
+#QMAKE_LFLAGS += -F/Users/Cong/Program/MyPhotos/VLC-Qt_1.0.1_osx/lib
+#LIBS += -framework VLCQtCore
+
+OPENCV_LOCATION = /usr/local/opt/opencv3
+INCLUDEPATH += $$OPENCV_LOCATION/include
+
+mac {
+LIBS += -L$$OPENCV_LOCATION/lib \
+	-lopencv_core \
+	-lopencv_highgui \
+	-lopencv_imgproc \
+	-lopencv_video \
+	-lopencv_videoio
+}
 
 win32 {
 	RC_FILE = Resources.rc
@@ -54,7 +64,9 @@ SOURCES += \
     EventModel.cpp \
     TagModel.cpp \
     TagPage.cpp \
-    SliderWithToolTip.cpp
+    SliderWithToolTip.cpp \
+    FrameExtractor.cpp \
+    ThumbnailGenerator.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -92,7 +104,9 @@ HEADERS += \
     EventModel.h \
     TagModel.h \
     TagPage.h \
-    SliderWithToolTip.h
+    SliderWithToolTip.h \
+    FrameExtractor.h \
+    ThumbnailGenerator.h
 
 FORMS += \
 	MainWindow.ui \

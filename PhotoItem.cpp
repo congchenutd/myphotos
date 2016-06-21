@@ -69,8 +69,10 @@ void PhotoItem::rename() {
 
 void PhotoItem::resizeThumbnail(int size)
 {
-    QPixmap pixmap = QPixmap(_photo->getThumbnail()->getFilePath());
-    _thumbnail->setPixmap(pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    if (getPhoto()->getThumbnail() != 0) {
+        QPixmap pixmap = QPixmap(_photo->getThumbnail()->getFilePath());
+        _thumbnail->setPixmap(pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
 }
 
 

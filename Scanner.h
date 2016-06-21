@@ -24,14 +24,14 @@ public:
     int scan();
 
 private slots:
-    void onThumbnailCreated(int index);
+    void onThumbnailCreated(const QImage& image);
 
 signals:
     void photoAdded(Photo* photo);
 
 private:
     QList<Photo*>           _photos;
-    QFutureWatcher<QImage>* _scalingWatcher;    // future watcher
+//    QFutureWatcher<QImage>* _scalingWatcher;    // future watcher
     Library*                _library;
 };
 

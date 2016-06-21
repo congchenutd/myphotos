@@ -5,9 +5,14 @@
 #include "Thumbnail.h"
 #include "PhotoDAO.h"
 #include "ThumbnailDAO.h"
+#include "ThumbnailGenerator.h"
 #include <QDir>
 #include <QImageReader>
 #include <QtConcurrent>
+#include <QThreadPool>
+#include <QMediaPlayer>
+#include <QVideoWidget>
+#include <QLabel>
 
 /**
  * The Map function
@@ -23,8 +28,8 @@ QImage scale(Photo* photo)
 Scanner::Scanner()
 {
     _library = Library::getInstance();
-    _scalingWatcher = new QFutureWatcher<QImage>(this);
-    connect(_scalingWatcher, SIGNAL(resultReadyAt(int)), SLOT(onThumbnailCreated(int)));
+//    _scalingWatcher = new QFutureWatcher<QImage>(this);
+//    connect(_scalingWatcher, SIGNAL(resultReadyAt(int)), SLOT(onThumbnailCreated(int)));
 }
 
 /**
@@ -54,20 +59,24 @@ int Scanner::scan()
                                          info.lastModified());
                 photo->save();
                 _photos << photo;
+
+                ThumbnailGenerator* generator = new VideoThumbnailGenerator(photo, Settings::getInstance()->getNewThumbnailSize());
+                generator->setAutoDelete(false);
+                connect(generator, SIGNAL(finished(QImage)), SLOT(onThumbnailCreated(QImage)));
+                QThreadPool::globalInstance()->setMaxThreadCount(10);
+                QThreadPool::globalInstance()->start(generator);
             }
     }
 
-    // Map photos to thumbnails
-    _scalingWatcher->setFuture(QtConcurrent::mapped(_photos, scale));
     return _photos.length();
 }
 
-void Scanner::onThumbnailCreated(int index)
+void Scanner::onThumbnailCreated(const QImage& image)
 {
-    Photo* photo = _photos.at(index);
+    Photo* photo = static_cast<ThumbnailGenerator*>(sender())->getPhoto();
 
     // thumbnail file name is the path of the photo
-    QString fileName = photo->getFilePath();
+    QString fileName = photo->getFilePath() + ".png";
     fileName.replace(QDir::separator(), '-');
 
     // generate thumbnail file path
@@ -75,7 +84,6 @@ void Scanner::onThumbnailCreated(int index)
     QString filePath = location + QDir::separator() + fileName;
 
     // save thumbnail file
-    QImage image = _scalingWatcher->resultAt(index);
     image.save(filePath);
 
     // create thumbnail object
@@ -88,4 +96,5 @@ void Scanner::onThumbnailCreated(int index)
     photo->save();
 
     emit photoAdded(photo);
+//    delete sender();
 }

@@ -280,7 +280,9 @@ void MainWindow::onAbout()
 {
     QMessageBox::about(this, "About",
         tr("<h3><b>MyPhotos: A Simple Photo Manager</b></h3>"
-           "<p>Cong Chen &lt;<a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a>&gt;</p>"));
+           "<p>Built on %1</p>"
+           "<p>Cong Chen &lt;<a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a>&gt;</p>")
+                       .arg(Settings::getInstance()->getCompileDate()));
 }
 
 void MainWindow::resetPhotos() {
