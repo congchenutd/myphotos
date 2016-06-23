@@ -18,9 +18,13 @@ public:
 private slots:
     void onEditFinished();
 
+signals:
+    void infoChanged(Photo*);
+
 private:
     Ui::InfoPage ui;
     InfoModel*  _model;
+    Photo*      _photo;
 };
 
 #endif // INFOPAGE_H

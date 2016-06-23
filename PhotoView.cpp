@@ -38,6 +38,7 @@ void PhotoView::clear()
 {
     _layout->clear();
     _selected.clear();
+    _photos.clear();
 }
 
 /**
@@ -76,6 +77,8 @@ void PhotoView::removeItem(PhotoItem* item)
 {
     _layout->removeWidget(item);
     item->deleteLater();
+    _selected.remove(item);
+    _photos.remove(item->getPhoto());
 }
 
 void PhotoView::resizeThumbnails(int size)
@@ -89,8 +92,13 @@ void PhotoView::addPhoto(Photo* photo, int thumbnailSize)
 {
     PhotoItem* photoItem = new PhotoItem(photo);
     photoItem->resizeThumbnail(thumbnailSize);
-    connect(photoItem, SIGNAL(titleEdited(QString)), this, SLOT(sort()));
+    connect(photoItem, SIGNAL(titleChanged(QString)), this, SLOT(sort()));
     _layout->addWidget(photoItem);
+    _photos.insert(photo, photoItem);
+}
+
+PhotoItem* PhotoView::getItem(Photo* photo) const {
+    return _photos.contains(photo) ? _photos[photo] : 0;
 }
 
 void PhotoView::mousePressEvent(QMouseEvent* event)

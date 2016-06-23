@@ -22,7 +22,7 @@ private:
 
 private:
     LibraryDAO();
-    ~LibraryDAO() {}
+    ~LibraryDAO();
 
     void createTables();
 };

@@ -5,6 +5,8 @@
 #include "Tag.h"
 
 #include <QFileInfo>
+#include <QProcess>
+#include <QFile>
 
 Photo::Photo(int id, const QString& title, const QString& path, const QDateTime& time)
     : Persistable(id, PhotoDAO::getInstance()),
@@ -42,12 +44,17 @@ void Photo::setTitle(const QString& title)  {
 }
 
 void Photo::setFilePath(const QString& filePath) {
+    QFile::rename(_filePath, filePath);
     _filePath = filePath;
-    // TODO
 }
 
-void Photo::setTimeTaken(const QDateTime& time) {
+void Photo::setTimeTaken(const QDateTime& time)
+{
     _time = time;
+
+    // modify date and time of the physical file
+    QProcess::execute("touch",
+                      QStringList() << "-t" << time.toString("yyyyMMddhhmm") << getFilePath());
 }
 
 void Photo::addTag(Tag* tag) {

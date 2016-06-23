@@ -49,7 +49,7 @@ int DAO::getNextID() const
 }
 
 /**
- * Update the relations of a persistable
+ * Update the relationships of a persistable
  */
 void DAO::updateRelationships(Persistable* persistable)
 {

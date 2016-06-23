@@ -68,10 +68,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionDelete,    SIGNAL(triggered(bool)),    SLOT(onDelete()));
     connect(ui.actionRename,    SIGNAL(triggered(bool)),    SLOT(onRename()));
     connect(_slider,            SIGNAL(valueChanged(int)),  SLOT(onThumbnailSize(int)));
+    connect(ui.pageInfo, SIGNAL(infoChanged(Photo*)), SLOT(onInfoChanged(Photo*)));
 
+    _slider->setValue(Settings::getInstance()->getThumbnailSize().width());
     ui.photoView->load(_library->getAllPhotos().values());
     sort();
-    onPhotoSelected(QList<PhotoItem*>());
+    onPhotoSelected(QList<PhotoItem*>());   // clear selection
 
     ui.pageTags     ->setModel(new TagModel     (this));
     ui.pagePeople   ->setModel(new PeopleModel  (this));
@@ -82,8 +84,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _scanner = new Scanner;
     connect(_scanner, SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
-
-    _slider->setValue(Settings::getInstance()->getThumbnailSize().width());
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }
@@ -285,6 +285,15 @@ void MainWindow::onAbout()
            "<p>Built on %1</p>"
            "<p>Cong Chen &lt;<a href=mailto:CongChenUTD@Gmail.com>CongChenUTD@Gmail.com</a>&gt;</p>")
                        .arg(Settings::getInstance()->getCompileDate()));
+}
+
+void MainWindow::onInfoChanged(Photo* photo)
+{
+    if (PhotoItem* item = ui.photoView->getItem(photo))
+    {
+        item->setPhoto(photo);
+        sort();
+    }
 }
 
 void MainWindow::resetPhotos() {

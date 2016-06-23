@@ -19,10 +19,13 @@ InfoPage::InfoPage(QWidget *parent) :
             SLOT(onEditFinished()));
 }
 
-void InfoPage::setCurrentPhoto(Photo* photo) {
+void InfoPage::setCurrentPhoto(Photo* photo)
+{
+    _photo = photo;
     _model->setPhoto(photo);
 }
 
 void InfoPage::onEditFinished() {
     _model->save();
+    emit infoChanged(_photo);
 }

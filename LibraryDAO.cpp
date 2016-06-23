@@ -97,10 +97,11 @@ void LibraryDAO::removeUnusedPeople()
                   where ID not in (select PeopleID from PhotoPeople))"));
 }
 
-LibraryDAO::LibraryDAO()
-{
+LibraryDAO::LibraryDAO() {
     createTables();
 }
+
+LibraryDAO::~LibraryDAO() {}
 
 void LibraryDAO::createTables()
 {

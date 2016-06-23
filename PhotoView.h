@@ -29,6 +29,7 @@ public:
     void removeItem(PhotoItem* item);
     void resizeThumbnails(int size);
     void addPhoto(Photo* photo, int thumbnailSize);
+    PhotoItem* getItem(Photo* photo) const;
 
 public slots:
     void sort();
@@ -73,6 +74,7 @@ private:
     QString             _sortBy;
     bool                _ascending;
     int                 _thumbnailSize;
+    QMap<Photo*, PhotoItem*> _photos;
 };
 
 // Comparators for sorting

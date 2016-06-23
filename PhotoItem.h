@@ -16,6 +16,7 @@ class PhotoItem : public QWidget
 
 public:
     PhotoItem(Photo* photo);
+    void setPhoto(Photo* photo);
     void setSelected(bool selected);
     Photo* getPhoto();
     void rename();
@@ -28,8 +29,7 @@ private slots:
     void onTitleEdited(const QString& title);
 
 signals:
-    void selectionChanged(bool selected);
-    void titleEdited(const QString&);
+    void titleChanged(const QString&);
 
 private:
     Photo*          _photo;
@@ -37,7 +37,8 @@ private:
     EditableLabel*  _title;
     QColor          _backgroundColor;
     bool            _selected;
-    QLabel*         _video;
+    QLabel*         _videoLabel;
+    int             _thumbnailSize;
 };
 
 

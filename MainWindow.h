@@ -43,6 +43,7 @@ private slots:
     void onFilterByPeople   (const QStringList& people, bool AND);
     void onFilterByEvent    (const QString& eventName);
     void onAbout();
+    void onInfoChanged(Photo* photo);
 
 private:
     void resetPhotos();

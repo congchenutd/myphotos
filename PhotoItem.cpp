@@ -12,23 +12,14 @@
 #include <QDesktopServices>
 
 PhotoItem::PhotoItem(Photo* photo)
-    : _photo(photo),
-      _selected(false),
-      _video(0)
+    : _selected(false),
+      _videoLabel(0),
+      _thumbnailSize(100)
 {
-    _thumbnail = new QLabel(this);
+    _thumbnail  = new QLabel(this);
     _thumbnail->setAlignment(Qt::AlignCenter);
 
-    if (photo->exists() && photo->isVideo())
-    {
-        _video = new QLabel(this);
-        _video->setPixmap(QPixmap(":/Images/Video.png"));
-        _video->show();
-        _video->move(16, 10);
-    }
-
     _title = new EditableLabel;
-    _title->setText(photo->getTitle());
     _title->setAlignment(Qt::AlignCenter);
     connect(_title, SIGNAL(editingFinished(QString)), this, SLOT(onTitleEdited(QString)));
 
@@ -36,9 +27,31 @@ PhotoItem::PhotoItem(Photo* photo)
     layout->addWidget(_thumbnail);
     layout->addWidget(_title);
 
-    setFocusPolicy(Qt::StrongFocus);
     _backgroundColor = palette().background().color();
     setAutoFillBackground(true);
+
+    _videoLabel = new QLabel(this);
+    setPhoto(photo);
+}
+
+void PhotoItem::setPhoto(Photo* photo)
+{
+    if (photo == 0)
+        return;
+
+    _photo = photo;
+    _title->setText(photo->getTitle());
+    resizeThumbnail(_thumbnailSize);
+
+    if (photo->exists() && photo->isVideo())
+    {
+        _videoLabel->setPixmap(QPixmap(":/Images/Video.png"));
+        _videoLabel->show();
+        _videoLabel->move(16, 10);
+    }
+    else {
+        _videoLabel->hide();
+    }
 }
 
 void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
@@ -50,7 +63,7 @@ void PhotoItem::onTitleEdited(const QString& title)
 {
     _photo->setTitle(title);
     _photo->save();
-    emit titleEdited(title);
+    emit titleChanged(title);
 }
 
 /**
@@ -75,6 +88,7 @@ void PhotoItem::rename() {
 
 void PhotoItem::resizeThumbnail(int size)
 {
+    _thumbnailSize = size;
     QPixmap pixmap = (getPhoto()->exists() && getPhoto()->getThumbnail() != 0) ?
                 QPixmap(_photo->getThumbnail()->getFilePath()) :
                 QPixmap(":/Images/Error.png");
