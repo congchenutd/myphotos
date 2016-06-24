@@ -81,6 +81,7 @@ void PhotoView::removeItem(PhotoItem* item)
     _photos.remove(item->getPhoto());
 }
 
+// TODO: improve performance, maybe using multi-threading
 void PhotoView::resizeThumbnails(int size)
 {
     _thumbnailSize = size;

@@ -1,5 +1,6 @@
 #include "InfoModel.h"
 #include "Photo.h"
+#include "PhotoInfo.h"
 
 #include <QProcess>
 
@@ -15,25 +16,15 @@ void InfoModel::setPhoto(Photo* photo)
     if (photo == 0)
         return;
 
-    QProcess* process = new QProcess(this);
-    process->start("/usr/local/bin/exiftool", QStringList() << photo->getFilePath());
-    process->waitForFinished();
-
-    QStringList list = QString(process->readAllStandardOutput()).split("\n");
-    foreach (QString line, list)
+    QMap<QString, QString> data = photo->getInfo()->getData();
+    for (QMap<QString, QString>::const_iterator it = data.begin(); it != data.end(); ++it)
     {
-        int indexColon = line.indexOf(':');
-        if (indexColon > 0)
-        {
-            QString property    = line.left(indexColon).simplified();
-            QString value       = line.right(line.length() - indexColon - 1).simplified();
-            int lastRow = rowCount();
-            insertRow(lastRow);
-            setData(index(lastRow, 0), property);
-            setData(index(lastRow, 1), value);
-        }
+        int lastRow = rowCount();
+        insertRow(lastRow);
+        setData(index(lastRow, 0), it.key());
+        setData(index(lastRow, 1), it.value());
     }
-    sort(0);
+    sort(COL_PROPERTY);
 
     // top 3 rows are reserved for basic photo info
     if (photo != 0)
@@ -57,5 +48,9 @@ void InfoModel::save()
     _photo->setTitle    (data(index(ROW_TITLE,  COL_VALUE)).toString());
     _photo->setFilePath (data(index(ROW_PATH,   COL_VALUE)).toString());
     _photo->setTimeTaken(data(index(ROW_TIME,   COL_VALUE)).toDateTime());
+
+    PhotoInfo* info = _photo->getInfo();
+    for (int row = ROW_TIME + 1; row < rowCount(); ++row)
+        info->setValue(data(index(row, COL_PROPERTY)).toString(), data(index(row, COL_VALUE)).toString());
 }
 

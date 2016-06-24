@@ -1,3 +1,4 @@
+#include "Geocoder.h"
 #include "MainWindow.h"
 #include <QSqlDatabase>
 #include <QMessageBox>

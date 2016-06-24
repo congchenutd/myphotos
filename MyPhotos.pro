@@ -66,7 +66,9 @@ SOURCES += \
     SliderWithToolTip.cpp \
     ThumbnailGenerator.cpp \
     InfoPage.cpp \
-    InfoModel.cpp
+    InfoModel.cpp \
+    Geocoder.cpp \
+    PhotoInfo.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -106,7 +108,9 @@ HEADERS += \
     SliderWithToolTip.h \
     ThumbnailGenerator.h \
     InfoPage.h \
-    InfoModel.h
+    InfoModel.h \
+    Geocoder.h \
+    PhotoInfo.h
 
 FORMS += \
 	MainWindow.ui \

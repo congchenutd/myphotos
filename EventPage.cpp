@@ -47,7 +47,7 @@ void EventPage::onShowAll()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-QString DateItemDelegate::displayText(const QVariant& value, const QLocale& locale) const {
+QString DateItemDelegate::displayText(const QVariant& value, const QLocale&) const {
     return value.toDate().toString("yyyy-MM-dd");
 }
 

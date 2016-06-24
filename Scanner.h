@@ -11,6 +11,8 @@
 
 class Photo;
 class Library;
+class Thumbnail;
+class PhotoInfo;
 
 /**
  * A Scanner scans monitored folders and create Photos and their thumbnails
@@ -24,7 +26,8 @@ public:
     int scan();
 
 private slots:
-    void onThumbnailCreated(const QImage& image);
+    void onThumbnailCreated     (int index);
+    void onPhotoInfoExtracted   (int index);
 
 signals:
     void photoAdded(Photo* photo);
@@ -32,6 +35,8 @@ signals:
 private:
     QList<Photo*>           _photos;
     Library*                _library;
+    QFutureWatcher<Thumbnail*>* _thumbnailFutureWatcher;
+    QFutureWatcher<PhotoInfo*>* _infoFutureWatcher;
 };
 
 #endif // SCANNER_H

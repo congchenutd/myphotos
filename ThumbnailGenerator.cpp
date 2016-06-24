@@ -1,5 +1,7 @@
 #include "Photo.h"
 #include "ThumbnailGenerator.h"
+#include "Settings.h"
+#include "ThumbnailDAO.H"
 
 #include <QDir>
 #include <QFileInfo>
@@ -8,35 +10,6 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
-ThumbnailGenerator::ThumbnailGenerator(Photo* photo, const QSize& size)
-    : _photo(photo),
-      _size(size) {}
-
-Photo *ThumbnailGenerator::getPhoto() const {
-    return _photo;
-}
-
-ThumbnailGenerator* ThumbnailGenerator::getGenerator(Photo* photo, const QSize& size) {
-    if (photo->isVideo())
-        return new VideoThumbnailGenerator(photo, size);
-    else
-        return new ImageThumbnailGenerator(photo, size);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////
-ImageThumbnailGenerator::ImageThumbnailGenerator(Photo* photo, const QSize& size)
-    : ThumbnailGenerator(photo, size) {}
-
-void ImageThumbnailGenerator::run()
-{
-    QImageReader reader(_photo->getFilePath());
-    reader.setAutoTransform(true);
-    emit finished(reader.read().scaled(_size,
-                                Qt::KeepAspectRatio, Qt::SmoothTransformation));
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////
 QImage Mat2QImage(cv::Mat const& mat)
 {
      cv::Mat temp;
@@ -54,31 +27,49 @@ cv::Mat QImage2Mat(QImage const& image)
      return mat;
 }
 
-VideoThumbnailGenerator::VideoThumbnailGenerator(Photo* photo, const QSize& size)
-    : ThumbnailGenerator(photo, size) {}
-
-void VideoThumbnailGenerator::run()
+Thumbnail* generateThumbnail(Photo* photo)
 {
-    using namespace cv;
-
-    // WORKAROUND: rename the file, because opencv can't open file path containing Chinese
-    QFileInfo fileInfo(_photo->getFilePath());
-    QString tempFilePath = fileInfo.path() + QDir::separator() +
-            QUuid::createUuid().toString() + "." + fileInfo.suffix();
-    QFile::rename(_photo->getFilePath(), tempFilePath);
-
-    VideoCapture cap(tempFilePath.toStdString());
-
-    if (cap.isOpened())
+    QSize size = Settings::getInstance()->getNewThumbnailSize();
+    QImage image;
+    if (photo->isVideo())
     {
-        cap.set(CV_CAP_PROP_POS_FRAMES, 1);
-        Mat frame;
-        cap >> frame;
-        emit finished(Mat2QImage(frame).scaled(_size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        using namespace cv;
+
+        // WORKAROUND: rename the file, because opencv can't open file path containing Chinese
+        QFileInfo fileInfo(photo->getFilePath());
+        QString tempFilePath = fileInfo.path() + QDir::separator() +
+                QUuid::createUuid().toString() + "." + fileInfo.suffix();
+        QFile::rename(photo->getFilePath(), tempFilePath);
+
+        VideoCapture cap(tempFilePath.toStdString());
+
+        if (cap.isOpened())
+        {
+            cap.set(CV_CAP_PROP_POS_FRAMES, 1); // capture the 1st frame
+            Mat frame;
+            cap >> frame;
+            image = Mat2QImage(frame).scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
+        // Restore the file name
+        QFile::rename(tempFilePath, photo->getFilePath());
     }
     else
-        emit finished(QImage());
+    {
+        QImageReader reader(photo->getFilePath());
+        reader.setAutoTransform(true);
+        image = reader.read().scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
 
-    // Restore the file name
-    QFile::rename(tempFilePath, _photo->getFilePath());
+    // thumbnail file name is the path of the photo
+    QString fileName = photo->getFilePath() + ".png";
+    fileName.replace(QDir::separator(), '-');
+
+    // generate thumbnail file path
+    QString location = Settings::getInstance()->getThumbnailCacheLocation();
+    QString filePath = location + QDir::separator() + fileName;
+
+    // save thumbnail file
+    image.save(filePath);
+
+    return new Thumbnail(ThumbnailDAO::getInstance()->getNextID(), filePath);
 }

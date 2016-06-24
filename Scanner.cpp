@@ -6,6 +6,7 @@
 #include "PhotoDAO.h"
 #include "ThumbnailDAO.h"
 #include "ThumbnailGenerator.h"
+#include "PhotoInfo.h"
 #include <QDir>
 #include <QImageReader>
 #include <QtConcurrent>
@@ -28,6 +29,10 @@ QImage scale(Photo* photo)
 Scanner::Scanner()
 {
     _library = Library::getInstance();
+    _thumbnailFutureWatcher = new QFutureWatcher<Thumbnail*>(this);
+    _infoFutureWatcher      = new QFutureWatcher<PhotoInfo*>(this);
+    connect(_thumbnailFutureWatcher,    SIGNAL(resultReadyAt(int)), SLOT(onThumbnailCreated(int)));
+    connect(_infoFutureWatcher,         SIGNAL(resultReadyAt(int)), SLOT(onPhotoInfoExtracted(int)));
 }
 
 /**
@@ -57,38 +62,20 @@ int Scanner::scan()
                                          info.lastModified());
                 photo->save();
                 _photos << photo;
-
-                QSize size = Settings::getInstance()->getNewThumbnailSize();
-                if (ThumbnailGenerator* generator = ThumbnailGenerator::getGenerator(photo, size))
-                {
-                    generator->setAutoDelete(false);
-                    connect(generator, SIGNAL(finished(QImage)), SLOT(onThumbnailCreated(QImage)));
-                    QThreadPool::globalInstance()->setMaxThreadCount(5);
-                    QThreadPool::globalInstance()->start(generator);
-                }
             }
     }
 
+    qDebug() << QDateTime::currentDateTime();
+
+    _thumbnailFutureWatcher->setFuture(QtConcurrent::mapped(_photos, generateThumbnail));
+    _infoFutureWatcher->setFuture(QtConcurrent::mapped(_photos, extractPhotoInfo));
     return _photos.length();
 }
 
-void Scanner::onThumbnailCreated(const QImage& image)
+void Scanner::onThumbnailCreated(int index)
 {
-    Photo* photo = static_cast<ThumbnailGenerator*>(sender())->getPhoto();
-
-    // thumbnail file name is the path of the photo
-    QString fileName = photo->getFilePath() + ".png";
-    fileName.replace(QDir::separator(), '-');
-
-    // generate thumbnail file path
-    QString location = Settings::getInstance()->getThumbnailCacheLocation();
-    QString filePath = location + QDir::separator() + fileName;
-
-    // save thumbnail file
-    image.save(filePath);
-
-    // create thumbnail object
-    Thumbnail* thumbnail = new Thumbnail(ThumbnailDAO::getInstance()->getNextID(), filePath);
+    Photo* photo = _photos.at(index);
+    Thumbnail* thumbnail = _thumbnailFutureWatcher->resultAt(index);
     photo->setThumbnail(thumbnail);
 
     _library->addPhoto(photo);
@@ -97,5 +84,12 @@ void Scanner::onThumbnailCreated(const QImage& image)
     photo->save();
 
     emit photoAdded(photo);
-    delete sender();
+}
+
+void Scanner::onPhotoInfoExtracted(int index)
+{
+    Photo* photo = _photos.at(index);
+    PhotoInfo* info = _infoFutureWatcher->resultAt(index);
+    photo->setInfo(info);
+    photo->save();
 }

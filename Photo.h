@@ -14,6 +14,7 @@ class Event;
 class Tag;
 class PhotoDAO;
 class Thumbnail;
+class PhotoInfo;
 
 /**
  * A Photo object represents a photo
@@ -34,6 +35,7 @@ public:
     QMap<QString, People*>  getPeople()         const;
     QSet<QString>           getTagNames()       const;
     QSet<QString>           getPeopleNames()    const;
+    PhotoInfo*              getInfo()           const;
 
     bool isVideo() const;
     bool exists () const;
@@ -47,6 +49,7 @@ public:
     void setThumbnail   (Thumbnail* thumbnail);
     void removeTag      (const QString& tagValue);
     void removePeople   (const QString& name);
+    void setInfo        (PhotoInfo* info);
 
 private:
     QString                 _title;
@@ -56,6 +59,7 @@ private:
     QMap<QString, People*>  _people;
     Event*                  _event;
     Thumbnail*              _thumbnail;
+    PhotoInfo*              _info;
 };
 
 #endif // PHOTO_H

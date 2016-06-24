@@ -6,9 +6,12 @@
 #include "Tag.h"
 #include "Thumbnail.h"
 #include "Library.h"
+#include "PhotoInfo.h"
 #include <QDateTime>
 #include <QSqlQuery>
 #include <QVariant>
+#include <QDebug>
+#include <QSqlError>
 
 PhotoDAO* PhotoDAO::getInstance()
 {
@@ -19,7 +22,7 @@ PhotoDAO* PhotoDAO::getInstance()
 Photo* PhotoDAO::load(int id) const
 {
     QSqlQuery query;
-    query.exec(tr("select Title, FilePath, Time from Photos where id = %1").arg(id));
+    query.exec(tr("select Title, FilePath, Time, Info from Photos where id = %1").arg(id));
     if (query.next() == 0)
         return 0;
 
@@ -28,6 +31,7 @@ Photo* PhotoDAO::load(int id) const
                              query.value(0).toString(),
                              query.value(1).toString(),
                              QDateTime::fromString(query.value(2).toString(), Qt::ISODate));
+    photo->setInfo(new PhotoInfo(query.value(3).toString()));
 
     // load its relationships
     Library* library = Library::getInstance();
@@ -81,11 +85,13 @@ void PhotoDAO::update(Persistable* persistable)
 {
     Photo* photo = static_cast<Photo*>(persistable);
     QSqlQuery query;
-    query.exec(tr("update Photos set Title = \"%1\", FilePath = \"%2\", Time = \"%3\" where ID = %4")
-               .arg(photo->getTitle())
-               .arg(photo->getFilePath())
-               .arg(photo->getTimeTaken().toString(Qt::ISODate))
-               .arg(photo->getID()));
+    query.prepare("update Photos set Title = :Title, FilePath = :FilePath, Time = :Time, Info = :Info where ID = :ID");
+    query.bindValue(":Title",       photo->getTitle());
+    query.bindValue(":FilePath",    photo->getFilePath());
+    query.bindValue(":Time",        photo->getTimeTaken().toString(Qt::ISODate));
+    query.bindValue(":Info",        photo->getInfo()->toJson());
+    query.bindValue(":ID",          photo->getID());
+    query.exec();
 
     updateRelationships(photo);
 }
@@ -94,11 +100,12 @@ void PhotoDAO::insert(Persistable* persistable)
 {
     Photo* photo = static_cast<Photo*>(persistable);
     QSqlQuery query;
-    query.exec(tr("insert into Photos values (%1, \"%2\", \"%3\", \"%4\")")
+    query.exec(tr("insert into Photos values (%1, \"%2\", \"%3\", \"%4\", \"%5\")")
                .arg(photo->getID())
                .arg(photo->getTitle())
                .arg(photo->getFilePath())
-               .arg(photo->getTimeTaken().toString(Qt::ISODate)));
+               .arg(photo->getTimeTaken().toString(Qt::ISODate))
+               .arg(photo->getInfo()->toJson()));
 
     insertRelationships(photo);
 }
