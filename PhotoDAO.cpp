@@ -6,7 +6,7 @@
 #include "Tag.h"
 #include "Thumbnail.h"
 #include "Library.h"
-#include "PhotoInfo.h"
+#include "Exif.h"
 #include <QDateTime>
 #include <QSqlQuery>
 #include <QVariant>
@@ -31,7 +31,7 @@ Photo* PhotoDAO::load(int id) const
                              query.value(0).toString(),
                              query.value(1).toString(),
                              QDateTime::fromString(query.value(2).toString(), Qt::ISODate));
-    photo->setInfo(new PhotoInfo(query.value(3).toString()));
+    photo->setExif(Exif(query.value(3).toString()));
 
     // load its relationships
     Library* library = Library::getInstance();
@@ -89,7 +89,7 @@ void PhotoDAO::update(Persistable* persistable)
     query.bindValue(":Title",       photo->getTitle());
     query.bindValue(":FilePath",    photo->getFilePath());
     query.bindValue(":Time",        photo->getTimeTaken().toString(Qt::ISODate));
-    query.bindValue(":Info",        photo->getInfo()->toJson());
+    query.bindValue(":Info",        photo->getExif().toJson());
     query.bindValue(":ID",          photo->getID());
     query.exec();
 
@@ -105,7 +105,7 @@ void PhotoDAO::insert(Persistable* persistable)
                .arg(photo->getTitle())
                .arg(photo->getFilePath())
                .arg(photo->getTimeTaken().toString(Qt::ISODate))
-               .arg(photo->getInfo()->toJson()));
+               .arg(photo->getExif().toJson()));
 
     insertRelationships(photo);
 }

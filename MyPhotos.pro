@@ -68,7 +68,7 @@ SOURCES += \
     InfoPage.cpp \
     InfoModel.cpp \
     Geocoder.cpp \
-    PhotoInfo.cpp
+    Exif.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -110,7 +110,7 @@ HEADERS += \
     InfoPage.h \
     InfoModel.h \
     Geocoder.h \
-    PhotoInfo.h
+    Exif.h
 
 FORMS += \
 	MainWindow.ui \

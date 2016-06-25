@@ -1,6 +1,7 @@
 #include "Geocoder.h"
 
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegularExpression>
 
@@ -12,16 +13,17 @@ Geocoder::Geocoder(QObject* parent)
             this, SLOT(onReady(QNetworkReply*)));
 }
 
-void Geocoder::getLocation(const QString& latitude, const QString& longitude)
+void Geocoder::queryLocation(const QString& latitude, const QString& longitude)
 {
     QString url = tr("https://maps.googleapis.com/maps/api/geocode/json?latlng=%1,%2&key=AIzaSyC3RwR2lIxzy83W8coGG8ZXdwG_rumNR6Q")
             .arg(coordinate2Decimal(latitude)).arg(coordinate2Decimal(longitude));
+    qDebug() << url;
     _networkAccessManager->get(QNetworkRequest(url));
 }
 
 void Geocoder::onReady(QNetworkReply* reply)
 {
-
+    qDebug() << reply->readAll();
 }
 
 // Convert coordinate, e.g., 37 deg 19' 53.28" N to decimal, e.g., 37.331467

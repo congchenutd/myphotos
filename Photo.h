@@ -2,6 +2,7 @@
 #define PHOTO_H
 
 #include "Persistable.h"
+#include "Exif.h"
 
 #include <QDateTime>
 #include <QMap>
@@ -14,7 +15,6 @@ class Event;
 class Tag;
 class PhotoDAO;
 class Thumbnail;
-class PhotoInfo;
 
 /**
  * A Photo object represents a photo
@@ -35,7 +35,7 @@ public:
     QMap<QString, People*>  getPeople()         const;
     QSet<QString>           getTagNames()       const;
     QSet<QString>           getPeopleNames()    const;
-    PhotoInfo*              getInfo()           const;
+    Exif                    getExif()           const;
 
     bool isVideo() const;
     bool exists () const;
@@ -49,7 +49,7 @@ public:
     void setThumbnail   (Thumbnail* thumbnail);
     void removeTag      (const QString& tagValue);
     void removePeople   (const QString& name);
-    void setInfo        (PhotoInfo* info);
+    void setExif        (const Exif& info);
 
 private:
     QString                 _title;
@@ -59,7 +59,7 @@ private:
     QMap<QString, People*>  _people;
     Event*                  _event;
     Thumbnail*              _thumbnail;
-    PhotoInfo*              _info;
+    Exif                    _exif;
 };
 
 #endif // PHOTO_H

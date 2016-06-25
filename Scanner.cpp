@@ -6,7 +6,7 @@
 #include "PhotoDAO.h"
 #include "ThumbnailDAO.h"
 #include "ThumbnailGenerator.h"
-#include "PhotoInfo.h"
+#include "Exif.h"
 #include <QDir>
 #include <QImageReader>
 #include <QtConcurrent>
@@ -26,22 +26,14 @@ QImage scale(Photo* photo)
                                 Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
-Scanner::Scanner()
-{
-    _library = Library::getInstance();
-    _thumbnailFutureWatcher = new QFutureWatcher<Thumbnail*>(this);
-    _infoFutureWatcher      = new QFutureWatcher<PhotoInfo*>(this);
-    connect(_thumbnailFutureWatcher,    SIGNAL(resultReadyAt(int)), SLOT(onThumbnailCreated(int)));
-    connect(_infoFutureWatcher,         SIGNAL(resultReadyAt(int)), SLOT(onPhotoInfoExtracted(int)));
-}
-
 /**
  * Scan monitored folders for photos
  * @return the number of photos
  */
 int Scanner::scan()
 {
-    _photos.clear();
+    QList<Photo*> photos;
+    int count = 0;
 
     // Collect photos
     QStringList folders = Settings::getInstance()->getMonitoredFolders();
@@ -61,35 +53,37 @@ int Scanner::scan()
                                          info.filePath(),
                                          info.lastModified());
                 photo->save();
-                _photos << photo;
+                photos << photo;
+                if (photos.length() == 10)
+                {
+                    ScannerThread* thread = new ScannerThread(QList<Photo*>(photos));
+                    connect(thread, SIGNAL(photoAdded(Photo*)), SIGNAL(photoAdded(Photo*)));
+                    QThreadPool::globalInstance()->start(thread);
+                    photos.clear();
+                }
+                count ++;
             }
     }
 
-    qDebug() << QDateTime::currentDateTime();
-
-    _thumbnailFutureWatcher->setFuture(QtConcurrent::mapped(_photos, generateThumbnail));
-    _infoFutureWatcher->setFuture(QtConcurrent::mapped(_photos, extractPhotoInfo));
-    return _photos.length();
+    return count;
 }
 
-void Scanner::onThumbnailCreated(int index)
+ScannerThread::ScannerThread(const QList<Photo*>& photos)
+    : _photos(photos) {}
+
+void ScannerThread::run()
 {
-    Photo* photo = _photos.at(index);
-    Thumbnail* thumbnail = _thumbnailFutureWatcher->resultAt(index);
-    photo->setThumbnail(thumbnail);
+    Library* library = Library::getInstance();
+    for (Photo* photo: _photos)
+    {
+        Thumbnail* thumbnail = generateThumbnail(photo);
+        photo->setThumbnail(thumbnail);
+        library->addPhoto(photo);
+        library->addThumbnail(thumbnail);
+        thumbnail->save();
 
-    _library->addPhoto(photo);
-    _library->addThumbnail(thumbnail);
-    thumbnail->save();
-    photo->save();
-
-    emit photoAdded(photo);
-}
-
-void Scanner::onPhotoInfoExtracted(int index)
-{
-    Photo* photo = _photos.at(index);
-    PhotoInfo* info = _infoFutureWatcher->resultAt(index);
-    photo->setInfo(info);
-    photo->save();
+        photo->setExif(Exif(photo));
+        photo->save();
+        emit photoAdded(photo);
+    }
 }

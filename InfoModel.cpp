@@ -1,6 +1,6 @@
 #include "InfoModel.h"
 #include "Photo.h"
-#include "PhotoInfo.h"
+#include "Exif.h"
 
 #include <QProcess>
 
@@ -16,7 +16,7 @@ void InfoModel::setPhoto(Photo* photo)
     if (photo == 0)
         return;
 
-    QMap<QString, QString> data = photo->getInfo()->getData();
+    QMap<QString, QString> data = photo->getExif().getData();
     for (QMap<QString, QString>::const_iterator it = data.begin(); it != data.end(); ++it)
     {
         int lastRow = rowCount();
@@ -49,8 +49,8 @@ void InfoModel::save()
     _photo->setFilePath (data(index(ROW_PATH,   COL_VALUE)).toString());
     _photo->setTimeTaken(data(index(ROW_TIME,   COL_VALUE)).toDateTime());
 
-    PhotoInfo* info = _photo->getInfo();
+    Exif exif = _photo->getExif();
     for (int row = ROW_TIME + 1; row < rowCount(); ++row)
-        info->setValue(data(index(row, COL_PROPERTY)).toString(), data(index(row, COL_VALUE)).toString());
+        exif.setValue(data(index(row, COL_PROPERTY)).toString(), data(index(row, COL_VALUE)).toString());
 }
 

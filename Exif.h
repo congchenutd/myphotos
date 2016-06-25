@@ -6,21 +6,24 @@
 
 class Photo;
 
-class PhotoInfo
+class Exif
 {
 public:
-    PhotoInfo(const QString& json = QString());
-    PhotoInfo(Photo* photo);
+    Exif(const QString& json = QString());
+    Exif(Photo* photo);
     QString toJson() const;
     QMap<QString, QString> getData() const;
     QString getValue(const QString& property) const;
     void setValue(const QString& property, const QString& value);
+//    void updateLocation();
 
 private:
     QMap<QString, QString>  _data;
+    QString _address1;
+    QString _address2;
 };
 
 ///////////////////////////////////////////////////////////////////////
-PhotoInfo* extractPhotoInfo(Photo* photo);
+Exif extracExif(Photo* photo);
 
 #endif // PHOTOINFO_H

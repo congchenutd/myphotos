@@ -1,11 +1,12 @@
+#include "Geocoder.h"
 #include "Photo.h"
-#include "PhotoInfo.h"
+#include "Exif.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QProcess>
 
-PhotoInfo::PhotoInfo(const QString& json)
+Exif::Exif(const QString& json)
 {
     if (json.isEmpty())
         return;
@@ -19,7 +20,7 @@ PhotoInfo::PhotoInfo(const QString& json)
     }
 }
 
-PhotoInfo::PhotoInfo(Photo* photo)
+Exif::Exif(Photo* photo)
 {
     if (photo == 0)
         return;
@@ -41,7 +42,7 @@ PhotoInfo::PhotoInfo(Photo* photo)
     }
 }
 
-QString PhotoInfo::toJson() const
+QString Exif::toJson() const
 {
     QJsonObject jsonObj;
     for (QMap<QString, QString>::const_iterator it = _data.begin(); it != _data.end(); ++it)
@@ -54,19 +55,30 @@ QString PhotoInfo::toJson() const
     return QJsonDocument(jsonObj).toJson();
 }
 
-QMap<QString, QString> PhotoInfo::getData() const {
+QMap<QString, QString> Exif::getData() const {
     return _data;
 }
 
-QString PhotoInfo::getValue(const QString& property) const {
+QString Exif::getValue(const QString& property) const {
     return _data.contains(property) ? _data[property] : QString();
 }
 
-void PhotoInfo::setValue(const QString& property, const QString& value) {
+void Exif::setValue(const QString& property, const QString& value) {
     _data[property] = value;
 }
 
+//void Exif::updateLocation()
+//{
+//    QString latitude    = getValue("GPS Latitude");
+//    QString longitude   = getValue("GPS Longitude");
+//    if (latitude.isEmpty() || longitude.isEmpty())
+//        return;
+
+//    Geocoder* geocoder = new Geocoder;
+//    geocoder->queryLocation(latitude, longitude);
+//}
+
 ////////////////////////////////////////////////////////////////////////////////
-PhotoInfo* extractPhotoInfo(Photo* photo) {
-    return new PhotoInfo(photo);
+Exif extracExif(Photo* photo) {
+    return Exif(photo);
 }

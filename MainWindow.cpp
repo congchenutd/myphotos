@@ -120,7 +120,6 @@ void MainWindow::onPhotoAdded(Photo* photo)
     _progressBar->setValue(_progressBar->value() + 1);
     if (_progressBar->value() == _progressBar->maximum())
     {
-        qDebug() << QDateTime::currentDateTime();
         _progressBar->hide();
         ui.statusBar->showMessage(tr("%1 photo(s) imported").arg(_progressBar->maximum()), 2000);
         sort();

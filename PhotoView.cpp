@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <QAction>
 #include <QDebug>
+#include <QSpacerItem>
 
 PhotoView::PhotoView(QWidget *parent) :
     QWidget(parent),
@@ -46,8 +47,15 @@ void PhotoView::clear()
  */
 void PhotoView::load(const QList<Photo*>& photos)
 {
+    int i = 0;
     for (Photo* photo: photos)
+    {
         addPhoto(photo, _thumbnailSize);
+//        if (++i % 10 == 0)
+//        {
+//            _layout->addWidget(new QLabel("Separator"));
+//        }
+    }
 }
 
 void PhotoView::sort(const QString& byWhat, bool ascending)
@@ -203,11 +211,9 @@ void PhotoView::updateSelection()
 int PhotoView::getClickedItemIndex(const QPoint& point) const
 {
     for (int i = 0; i < _layout->count(); ++i)
-    {
-        PhotoItem* item = getItemAt(i);
-        if (item->geometry().contains(point))
-            return i;
-    }
+        if (PhotoItem* item = getItemAt(i))
+            if (item->geometry().contains(point))
+                return i;
     return -1;
 }
 
@@ -231,7 +237,8 @@ QSet<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& e
     int endIdx   = qMax(idx1, idx2);
     QSet<PhotoItem*> result;
     for (int i = startIdx; i <= endIdx; ++i)
-        result << getItemAt(i);
+        if (PhotoItem* item = getItemAt(i))
+            result << item;
     return result;
 }
 
@@ -372,33 +379,50 @@ QList<PhotoItem*> PhotoView::getAllPhotoItems() const
 {
     QList<PhotoItem*> result;
     for (int i = 0; i < _layout->count(); ++i)
-        result << getItemAt(i);
+        if (PhotoItem* item = getItemAt(i))
+            result << item;
     return result;
 }
 
 PhotoItem* PhotoView::getItemAt(int index) const {
-    return static_cast<PhotoItem*>(_layout->itemAt(index)->widget());
+    return dynamic_cast<PhotoItem*>(_layout->itemAt(index)->widget());
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
-    return  static_cast<PhotoItem*>(lhs->widget())->getPhoto()->getTitle() <
-            static_cast<PhotoItem*>(rhs->widget())->getPhoto()->getTitle();
+bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+{
+    PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
+    PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
+    if (item1 != 0 && item2 != 0)
+        return item1->getPhoto()->getTitle() < item2->getPhoto()->getTitle();
+    return false;
 }
 
-bool PhotoItemGreaterTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
-    return  static_cast<PhotoItem*>(lhs->widget())->getPhoto()->getTitle() >
-            static_cast<PhotoItem*>(rhs->widget())->getPhoto()->getTitle();
+bool PhotoItemGreaterTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+{
+    PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
+    PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
+    if (item1 != 0 && item2 != 0)
+        return item1->getPhoto()->getTitle() > item2->getPhoto()->getTitle();
+    return false;
 }
 
-bool PhotoItemLessTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
-    return  static_cast<PhotoItem*>(lhs->widget())->getPhoto()->getTimeTaken() <
-            static_cast<PhotoItem*>(rhs->widget())->getPhoto()->getTimeTaken();
+bool PhotoItemLessTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+{
+    PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
+    PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
+    if (item1 != 0 && item2 != 0)
+        return item1->getPhoto()->getTimeTaken() < item2->getPhoto()->getTimeTaken();
+    return false;
 }
 
-bool PhotoItemGreaterTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const {
-    return  static_cast<PhotoItem*>(lhs->widget())->getPhoto()->getTimeTaken() >
-            static_cast<PhotoItem*>(rhs->widget())->getPhoto()->getTimeTaken();
+bool PhotoItemGreaterTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+{
+    PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
+    PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
+    if (item1 != 0 && item2 != 0)
+        return item1->getPhoto()->getTimeTaken() > item2->getPhoto()->getTimeTaken();
+    return false;
 }
 

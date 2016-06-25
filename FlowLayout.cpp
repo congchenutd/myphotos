@@ -134,7 +134,7 @@ int FlowLayout::doLayout(const QRect& rect, bool testOnly) const
 int FlowLayout::smartSpacing(QStyle::PixelMetric pm) const
 {
     QObject* parent = this->parent();
-    if (!parent)
+    if (parent == 0)
         return -1;
 
     if (parent->isWidgetType())

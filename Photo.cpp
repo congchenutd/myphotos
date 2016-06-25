@@ -3,7 +3,6 @@
 #include "Photo.h"
 #include "PhotoDAO.h"
 #include "Tag.h"
-#include "PhotoInfo.h"
 
 #include <QFileInfo>
 #include <QProcess>
@@ -15,8 +14,7 @@ Photo::Photo(int id, const QString& title, const QString& path, const QDateTime&
       _filePath(path),
       _time(time),
       _event(0),
-      _thumbnail(0),
-      _info(new PhotoInfo)
+      _thumbnail(0)
 {}
 
 QString                 Photo::getTitle()       const { return _title;      }
@@ -28,7 +26,7 @@ QMap<QString, Tag*>     Photo::getTags()        const { return _tags;   }
 QMap<QString, People*>  Photo::getPeople()      const { return _people; }
 QSet<QString>           Photo::getTagNames()    const { return getTags()  .keys().toSet(); }
 QSet<QString>           Photo::getPeopleNames() const { return getPeople().keys().toSet(); }
-PhotoInfo*              Photo::getInfo()        const { return _info;       }
+Exif                    Photo::getExif()        const { return _exif;       }
 
 bool Photo::isVideo() const
 {
@@ -84,6 +82,6 @@ void Photo::removePeople(const QString& name) {
     _people.remove(name);
 }
 
-void Photo::setInfo(PhotoInfo* info) {
-    _info = info;
+void Photo::setExif(const Exif& info) {
+    _exif = info;
 }
