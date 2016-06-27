@@ -2,7 +2,7 @@
 #define PHOTOVIEW_H
 
 #include "ui_PhotoView.h"
-#include <functional>
+#include "Clustering.h"
 #include <QList>
 
 class Library;
@@ -24,6 +24,7 @@ public:
 
     void clear();
     void load(const QList<Photo*>& photos);
+    void load(const QList<Cluster>& clusters);
     void sort(const QString& byWhat, bool ascending);
     QList<PhotoItem*> getSelectedItems() const;
     void removeItem(PhotoItem* item);

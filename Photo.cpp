@@ -27,6 +27,17 @@ QMap<QString, People*>  Photo::getPeople()      const { return _people; }
 QSet<QString>           Photo::getTagNames()    const { return getTags()  .keys().toSet(); }
 QSet<QString>           Photo::getPeopleNames() const { return getPeople().keys().toSet(); }
 Exif                    Photo::getExif()        const { return _exif;       }
+Location                Photo::getLocation()    const { return _location;   }
+
+Coordinates Photo::getCoordinates() const
+{
+    QString latitude    = getExif().getValue("GPS Latitude");
+    QString longitude   = getExif().getValue("GPS Longitude");
+    Coordinates result;
+    result.latitude  = latitude .toDouble();
+    result.longitude = longitude.toDouble();
+    return result;
+}
 
 bool Photo::isVideo() const
 {
@@ -84,4 +95,8 @@ void Photo::removePeople(const QString& name) {
 
 void Photo::setExif(const Exif& info) {
     _exif = info;
+}
+
+void Photo::setLocation(const Location& location) {
+    _location = location;
 }

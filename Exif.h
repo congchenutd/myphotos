@@ -15,7 +15,6 @@ public:
     QMap<QString, QString> getData() const;
     QString getValue(const QString& property) const;
     void setValue(const QString& property, const QString& value);
-//    void updateLocation();
 
 private:
     QMap<QString, QString>  _data;

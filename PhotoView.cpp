@@ -49,13 +49,12 @@ void PhotoView::load(const QList<Photo*>& photos)
 {
     int i = 0;
     for (Photo* photo: photos)
-    {
         addPhoto(photo, _thumbnailSize);
-//        if (++i % 10 == 0)
-//        {
-//            _layout->addWidget(new QLabel("Separator"));
-//        }
-    }
+}
+
+void PhotoView::load(const QList<Cluster>& clusters)
+{
+
 }
 
 void PhotoView::sort(const QString& byWhat, bool ascending)

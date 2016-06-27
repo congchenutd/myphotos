@@ -68,7 +68,8 @@ SOURCES += \
     InfoPage.cpp \
     InfoModel.cpp \
     Geocoder.cpp \
-    Exif.cpp
+    Exif.cpp \
+    Clustering.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -110,7 +111,8 @@ HEADERS += \
     InfoPage.h \
     InfoModel.h \
     Geocoder.h \
-    Exif.h
+    Exif.h \
+    Clustering.h
 
 FORMS += \
 	MainWindow.ui \

@@ -7,6 +7,7 @@
 #include "ThumbnailDAO.h"
 #include "ThumbnailGenerator.h"
 #include "Exif.h"
+#include "Geocoder.h"
 #include <QDir>
 #include <QImageReader>
 #include <QtConcurrent>
@@ -16,24 +17,12 @@
 #include <QLabel>
 
 /**
- * The Map function
- */
-QImage scale(Photo* photo)
-{
-    QImageReader reader(photo->getFilePath());
-    reader.setAutoTransform(true);
-    return reader.read().scaled(Settings::getInstance()->getNewThumbnailSize(),
-                                Qt::KeepAspectRatio, Qt::SmoothTransformation);
-}
-
-/**
  * Scan monitored folders for photos
- * @return the number of photos
+ * @return the photos
  */
-int Scanner::scan()
+QList<Photo*> Scanner::scan()
 {
     QList<Photo*> photos;
-    int count = 0;
 
     // Collect photos
     QStringList folders = Settings::getInstance()->getMonitoredFolders();
@@ -52,22 +41,28 @@ int Scanner::scan()
                                          info.baseName(),
                                          info.filePath(),
                                          info.lastModified());
-                photo->save();
+                photo->save();  // for getNextID() to work correctly
                 photos << photo;
-                if (photos.length() == 10)
-                {
-                    ScannerThread* thread = new ScannerThread(QList<Photo*>(photos));
-                    connect(thread, SIGNAL(photoAdded(Photo*)), SIGNAL(photoAdded(Photo*)));
-                    QThreadPool::globalInstance()->start(thread);
-                    photos.clear();
-                }
-                count ++;
             }
     }
 
-    return count;
+    QList<Photo*> task;
+    for (int i = 0; i < photos.length(); ++i)
+    {
+        task << photos.at(i);
+        if (i % 10 == 0 || i == photos.length() - 1)    // 10 photos each thread
+        {
+            ScannerThread* thread = new ScannerThread(QList<Photo*>(task));
+            connect(thread, SIGNAL(photoAdded(Photo*)), SIGNAL(photoAdded(Photo*)));
+            QThreadPool::globalInstance()->start(thread);
+            task.clear();
+        }
+    }
+
+    return photos;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
 ScannerThread::ScannerThread(const QList<Photo*>& photos)
     : _photos(photos) {}
 
@@ -82,7 +77,8 @@ void ScannerThread::run()
         library->addThumbnail(thumbnail);
         thumbnail->save();
 
-        photo->setExif(Exif(photo));
+        Exif exif(photo);
+        photo->setExif(exif);
         photo->save();
         emit photoAdded(photo);
     }

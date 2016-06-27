@@ -14,6 +14,8 @@
 #include "PeopleModel.h"
 #include "EventModel.h"
 #include "SliderWithToolTip.h"
+#include "Geocoder.h"
+#include "Clustering.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
@@ -83,7 +85,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.pageEvents,  SIGNAL(filter(QString)),                    SLOT(onFilterByEvent    (QString)));
 
     _scanner = new Scanner;
-    connect(_scanner, SIGNAL(photoAdded(Photo*)), this, SLOT(onPhotoAdded(Photo*)));
+    connect(_scanner, SIGNAL(photoAdded(Photo*)), SLOT(onPhotoAdded(Photo*)));
+
+    _geocoder = new Geocoder;
+    connect(_geocoder, SIGNAL(finished()), SLOT(onGeocodingFinished()));
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }
@@ -100,10 +105,11 @@ void MainWindow::closeEvent(QCloseEvent*) {
 
 void MainWindow::onScan()
 {
-    if (int nPhotos = _scanner->scan())
+    _newPhotos = _scanner->scan();
+    if (_newPhotos.length() > 0)
     {
         _progressBar->show();
-        _progressBar->setRange(0, nPhotos);
+        _progressBar->setRange(0, _newPhotos.length());
         _progressBar->setValue(0);
     }
 }
@@ -117,12 +123,14 @@ void MainWindow::onOptions()
 void MainWindow::onPhotoAdded(Photo* photo)
 {
     ui.photoView->addPhoto(photo, _slider->value());
+
     _progressBar->setValue(_progressBar->value() + 1);
     if (_progressBar->value() == _progressBar->maximum())
     {
         _progressBar->hide();
         ui.statusBar->showMessage(tr("%1 photo(s) imported").arg(_progressBar->maximum()), 2000);
         sort();
+        _geocoder->start(_newPhotos);
     }
     else
         ui.statusBar->showMessage(tr("Importing %1 of %2")
@@ -294,6 +302,13 @@ void MainWindow::onInfoChanged(Photo* photo)
         item->setPhoto(photo);
         sort();
     }
+}
+
+void MainWindow::onGeocodingFinished()
+{
+    Clustering clustering;
+    QList<Cluster> clusters = clustering.run(_library->getAllPhotos().values());
+//    ui.photoView->load(clusters);
 }
 
 void MainWindow::resetPhotos() {

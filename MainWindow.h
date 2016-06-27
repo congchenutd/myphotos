@@ -7,6 +7,7 @@ class Photo;
 class QProgressBar;
 class Scanner;
 class QSlider;
+class Geocoder;
 
 class MainWindow : public QMainWindow
 {
@@ -44,6 +45,7 @@ private slots:
     void onFilterByEvent    (const QString& eventName);
     void onAbout();
     void onInfoChanged(Photo* photo);
+    void onGeocodingFinished();
 
 private:
     void resetPhotos();
@@ -54,7 +56,9 @@ private:
     QSlider*        _slider;
     bool            _ascending;
     Library*        _library;
+    QList<Photo*>   _newPhotos;
     Scanner*        _scanner;
+    Geocoder*       _geocoder;
 
     static MainWindow*  _instance;
 };

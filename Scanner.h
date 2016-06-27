@@ -9,6 +9,7 @@ class Photo;
 class Library;
 class Thumbnail;
 class Exif;
+class Geocoder;
 
 /**
  * A Scanner scans monitored folders and create Photos and their thumbnails
@@ -18,7 +19,7 @@ class Scanner: public QObject
     Q_OBJECT
 
 public:
-    int scan();
+    QList<Photo*> scan();
 
 signals:
     void photoAdded(Photo* photo);
@@ -27,6 +28,7 @@ signals:
 class ScannerThread: public QObject, public QRunnable
 {
     Q_OBJECT
+
 public:
     ScannerThread(const QList<Photo*>& photos);
     void run();
@@ -35,7 +37,7 @@ signals:
     void photoAdded(Photo* photo);
 
 private:
-    QList<Photo*> _photos;
+    QList<Photo*>   _photos;
 };
 
 #endif // SCANNER_H

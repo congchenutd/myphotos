@@ -3,6 +3,7 @@
 
 #include "Persistable.h"
 #include "Exif.h"
+#include "Geocoder.h"
 
 #include <QDateTime>
 #include <QMap>
@@ -15,6 +16,12 @@ class Event;
 class Tag;
 class PhotoDAO;
 class Thumbnail;
+
+struct Coordinates
+{
+    double latitude;
+    double longitude;
+};
 
 /**
  * A Photo object represents a photo
@@ -36,6 +43,8 @@ public:
     QSet<QString>           getTagNames()       const;
     QSet<QString>           getPeopleNames()    const;
     Exif                    getExif()           const;
+    Location                getLocation()       const;
+    Coordinates             getCoordinates()    const;
 
     bool isVideo() const;
     bool exists () const;
@@ -50,6 +59,7 @@ public:
     void removeTag      (const QString& tagValue);
     void removePeople   (const QString& name);
     void setExif        (const Exif& info);
+    void setLocation    (const Location& location);
 
 private:
     QString                 _title;
@@ -60,6 +70,7 @@ private:
     Event*                  _event;
     Thumbnail*              _thumbnail;
     Exif                    _exif;
+    Location                _location;
 };
 
 #endif // PHOTO_H
