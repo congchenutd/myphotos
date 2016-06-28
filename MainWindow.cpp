@@ -306,9 +306,10 @@ void MainWindow::onInfoChanged(Photo* photo)
 
 void MainWindow::onGeocodingFinished()
 {
-    Clustering clustering;
-    QList<Cluster> clusters = clustering.run(_library->getAllPhotos().values());
+//    Clustering clustering;
+//    QList<Cluster> clusters = clustering.run(_library->getAllPhotos().values());
 //    ui.photoView->load(clusters);
+    ui.photoView->load(_library->getAllPhotos().values());
 }
 
 void MainWindow::resetPhotos() {

@@ -4,17 +4,17 @@
 #include <QList>
 
 
-class Photo;
+//class Photo;
 
-typedef QList<Photo*> Cluster;
+//typedef QList<Photo*> Cluster;
 
-class Clustering
-{
-public:
-    QList<Cluster> run(const QList<Photo*>& photos);
+//class Clustering
+//{
+//public:
+//    QList<Cluster> run(const QList<Photo*>& photos);
 
-private:
-    QList<Cluster> split(const Cluster& cluster);
-};
+//private:
+//    QList<Cluster> split(const Cluster& cluster);
+//};
 
 #endif // CLUSTERING_H

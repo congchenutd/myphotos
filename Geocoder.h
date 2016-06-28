@@ -8,7 +8,7 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class Photo;
 
-struct Location
+struct Address
 {
     QString streetName;
     QString cityName;
@@ -16,6 +16,15 @@ struct Location
     QString countryName;
 
     QString toString() const;
+};
+
+struct Coordinates
+{
+    double _latitude;
+    double _longitude;
+
+    Coordinates(double latitude, double longitude);
+    double distanceTo(const Coordinates& another) const;
 };
 
 class Geocoder : public QObject
@@ -31,7 +40,7 @@ private slots:
 private:
     void processNext();
     static QString coordinate2Decimal(const QString& coordinates);
-    Location parse(const QByteArray& json);
+    Address parse(const QByteArray& json);
     QString findComponent(const QJsonObject& resultsObj, const QString& typeName) const;
     bool canDecode(Photo* photo) const;
 

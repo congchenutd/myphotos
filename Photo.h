@@ -17,11 +17,6 @@ class Tag;
 class PhotoDAO;
 class Thumbnail;
 
-struct Coordinates
-{
-    double latitude;
-    double longitude;
-};
 
 /**
  * A Photo object represents a photo
@@ -43,11 +38,12 @@ public:
     QSet<QString>           getTagNames()       const;
     QSet<QString>           getPeopleNames()    const;
     Exif                    getExif()           const;
-    Location                getLocation()       const;
+    Address                 getAddress()        const;
     Coordinates             getCoordinates()    const;
 
     bool isVideo() const;
     bool exists () const;
+    bool coloated(const Photo* another) const;
 
     void setTitle       (const QString& title);
     void setFilePath    (const QString& filePath);
@@ -59,7 +55,7 @@ public:
     void removeTag      (const QString& tagValue);
     void removePeople   (const QString& name);
     void setExif        (const Exif& info);
-    void setLocation    (const Location& location);
+    void setAddress    (const Address& address);
 
 private:
     QString                 _title;
@@ -70,7 +66,7 @@ private:
     Event*                  _event;
     Thumbnail*              _thumbnail;
     Exif                    _exif;
-    Location                _location;
+    Address                 _address;
 };
 
 #endif // PHOTO_H

@@ -1,5 +1,6 @@
 #include "Geocoder.h"
 #include "MainWindow.h"
+#include "PhotoView2.h"
 #include <QSqlDatabase>
 #include <QMessageBox>
 #include <QSqlError>
@@ -46,9 +47,11 @@ int main(int argc, char *argv[])
     if (!openDB("MyPhotos.db"))
         return 1;
 
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
     MainWindow window;
     window.showMaximized();
+
+//    PhotoView2 view;
+//    view.show();
 
     return app.exec();
 }

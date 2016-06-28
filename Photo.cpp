@@ -27,16 +27,13 @@ QMap<QString, People*>  Photo::getPeople()      const { return _people; }
 QSet<QString>           Photo::getTagNames()    const { return getTags()  .keys().toSet(); }
 QSet<QString>           Photo::getPeopleNames() const { return getPeople().keys().toSet(); }
 Exif                    Photo::getExif()        const { return _exif;       }
-Location                Photo::getLocation()    const { return _location;   }
+Address                 Photo::getAddress()     const { return _address;    }
 
 Coordinates Photo::getCoordinates() const
 {
     QString latitude    = getExif().getValue("GPS Latitude");
     QString longitude   = getExif().getValue("GPS Longitude");
-    Coordinates result;
-    result.latitude  = latitude .toDouble();
-    result.longitude = longitude.toDouble();
-    return result;
+    return Coordinates(latitude.toDouble(), longitude.toDouble());
 }
 
 bool Photo::isVideo() const
@@ -49,6 +46,10 @@ bool Photo::isVideo() const
 
 bool Photo::exists() const {
     return QFile::exists(getFilePath());
+}
+
+bool Photo::coloated(const Photo* another) const {
+    return getCoordinates().distanceTo(another->getCoordinates()) < 0.1;
 }
 
 void Photo::setTitle(const QString& title)  {
@@ -97,6 +98,6 @@ void Photo::setExif(const Exif& info) {
     _exif = info;
 }
 
-void Photo::setLocation(const Location& location) {
-    _location = location;
+void Photo::setAddress(const Address& address) {
+    _address = address;
 }

@@ -3,6 +3,7 @@
 
 #include "ui_PhotoView.h"
 #include "Clustering.h"
+#include "PhotoClusters.h"
 #include <QList>
 
 class Library;
@@ -11,6 +12,7 @@ class PhotoItem;
 class QLayoutItem;
 class FlowLayout;
 class NewItemMenu;
+class QVBoxLayout;
 
 /**
  * A view widget for photos
@@ -24,7 +26,7 @@ public:
 
     void clear();
     void load(const QList<Photo*>& photos);
-    void load(const QList<Cluster>& clusters);
+//    void load(const QList<Cluster>& clusters);
     void sort(const QString& byWhat, bool ascending);
     QList<PhotoItem*> getSelectedItems() const;
     void removeItem(PhotoItem* item);
@@ -67,7 +69,7 @@ private:
 
 private:
     Ui::PhotoView ui;
-    FlowLayout*         _layout;
+//    FlowLayout*         _layout;
     Library*            _library;
     QPoint              _clickedPosition;
     QRubberBand*        _rubberBand;
@@ -76,6 +78,8 @@ private:
     bool                _ascending;
     int                 _thumbnailSize;
     QMap<Photo*, PhotoItem*> _photos;
+    QVBoxLayout*        _vBoxLayout;
+    PhotoClusters       _photoClusters;
 };
 
 // Comparators for sorting

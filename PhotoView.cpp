@@ -11,6 +11,7 @@
 #include "Event.h"
 #include "NewTagDlg.h"
 #include "NewEventDlg.h"
+#include "ClusterView.h"
 
 #include <QFileSystemModel>
 #include <QLabel>
@@ -20,6 +21,7 @@
 #include <QAction>
 #include <QDebug>
 #include <QSpacerItem>
+#include <QVBoxLayout>
 
 PhotoView::PhotoView(QWidget *parent) :
     QWidget(parent),
@@ -27,9 +29,11 @@ PhotoView::PhotoView(QWidget *parent) :
     _sortBy("Time"),
     _ascending(false)
 {
-    ui.setupUi(this);
-    _layout     = new FlowLayout(this);
+//    ui.setupUi(this);
+//    _layout     = new FlowLayout(this);
     _library    = Library::getInstance();
+    _vBoxLayout = new QVBoxLayout(this);
+    setLayout(_vBoxLayout);
 }
 
 /**
@@ -37,7 +41,7 @@ PhotoView::PhotoView(QWidget *parent) :
  */
 void PhotoView::clear()
 {
-    _layout->clear();
+//    _layout->clear();
     _selected.clear();
     _photos.clear();
 }
@@ -47,29 +51,34 @@ void PhotoView::clear()
  */
 void PhotoView::load(const QList<Photo*>& photos)
 {
-    int i = 0;
     for (Photo* photo: photos)
         addPhoto(photo, _thumbnailSize);
 }
 
-void PhotoView::load(const QList<Cluster>& clusters)
-{
-
-}
+//void PhotoView::load(const QList<Cluster>& clusters)
+//{
+//    foreach (const Cluster& cluster, clusters)
+//    {
+//        Photo* photo = cluster.front();
+//        QString title = photo->getLocation().toString() + " " + photo->getTimeTaken().date().toString("yyyy-MM-dd");
+//        ClusterView* clusterView = new ClusterView(title, cluster, this);
+//        _vBoxLayout->addWidget(clusterView);
+//    }
+//}
 
 void PhotoView::sort(const QString& byWhat, bool ascending)
 {
     _sortBy     = byWhat;
     _ascending  = ascending;
 
-    if (byWhat == "Title") {
-        if (ascending)  _layout->sort(PhotoItemLessTitle());
-        else            _layout->sort(PhotoItemGreaterTitle());
-    }
-    if (byWhat == "Time") {
-        if (ascending)  _layout->sort(PhotoItemLessTime());
-        else            _layout->sort(PhotoItemGreaterTime());
-    }
+//    if (byWhat == "Title") {
+//        if (ascending)  _layout->sort(PhotoItemLessTitle());
+//        else            _layout->sort(PhotoItemGreaterTitle());
+//    }
+//    if (byWhat == "Time") {
+//        if (ascending)  _layout->sort(PhotoItemLessTime());
+//        else            _layout->sort(PhotoItemGreaterTime());
+//    }
 }
 
 void PhotoView::sort() {
@@ -82,7 +91,7 @@ QList<PhotoItem*> PhotoView::getSelectedItems() const {
 
 void PhotoView::removeItem(PhotoItem* item)
 {
-    _layout->removeWidget(item);
+//    _layout->removeWidget(item);
     item->deleteLater();
     _selected.remove(item);
     _photos.remove(item->getPhoto());
@@ -101,8 +110,10 @@ void PhotoView::addPhoto(Photo* photo, int thumbnailSize)
     PhotoItem* photoItem = new PhotoItem(photo);
     photoItem->resizeThumbnail(thumbnailSize);
     connect(photoItem, SIGNAL(titleChanged(QString)), this, SLOT(sort()));
-    _layout->addWidget(photoItem);
+//    _layout->addWidget(photoItem);
     _photos.insert(photo, photoItem);
+
+    _photoClusters.addPhoto(photo);
 }
 
 PhotoItem* PhotoView::getItem(Photo* photo) const {
@@ -209,10 +220,10 @@ void PhotoView::updateSelection()
  */
 int PhotoView::getClickedItemIndex(const QPoint& point) const
 {
-    for (int i = 0; i < _layout->count(); ++i)
-        if (PhotoItem* item = getItemAt(i))
-            if (item->geometry().contains(point))
-                return i;
+//    for (int i = 0; i < _layout->count(); ++i)
+//        if (PhotoItem* item = getItemAt(i))
+//            if (item->geometry().contains(point))
+//                return i;
     return -1;
 }
 
@@ -377,14 +388,15 @@ NewItemMenu* PhotoView::createEventMenu()
 QList<PhotoItem*> PhotoView::getAllPhotoItems() const
 {
     QList<PhotoItem*> result;
-    for (int i = 0; i < _layout->count(); ++i)
-        if (PhotoItem* item = getItemAt(i))
-            result << item;
+//    for (int i = 0; i < _layout->count(); ++i)
+//        if (PhotoItem* item = getItemAt(i))
+//            result << item;
     return result;
 }
 
 PhotoItem* PhotoView::getItemAt(int index) const {
-    return dynamic_cast<PhotoItem*>(_layout->itemAt(index)->widget());
+//    return dynamic_cast<PhotoItem*>(_layout->itemAt(index)->widget());
+    return 0;
 }
 
 

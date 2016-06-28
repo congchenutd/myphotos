@@ -69,7 +69,10 @@ SOURCES += \
     InfoModel.cpp \
     Geocoder.cpp \
     Exif.cpp \
-    Clustering.cpp
+    Clustering.cpp \
+    ClusterView.cpp \
+    PhotoView2.cpp \
+    PhotoClusters.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -112,7 +115,10 @@ HEADERS += \
     InfoModel.h \
     Geocoder.h \
     Exif.h \
-    Clustering.h
+    Clustering.h \
+    ClusterView.h \
+    PhotoView2.h \
+    PhotoClusters.h
 
 FORMS += \
 	MainWindow.ui \
