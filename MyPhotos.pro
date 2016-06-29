@@ -1,4 +1,4 @@
-QT += core gui sql testlib widgets concurrent multimedia multimediawidgets
+QT += core gui sql testlib widgets concurrent multimedia multimediawidgets positioning
 
 TARGET = MyPhotos
 TEMPLATE = app

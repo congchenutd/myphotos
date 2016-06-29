@@ -7,7 +7,7 @@ class SortableVBoxLayout : public QVBoxLayout
 {
 public:
     SortableVBoxLayout(QWidget* parent = 0);
-
+    void clear();
     void sort(std::function<bool (QLayoutItem*, QLayoutItem*)> comparator);
 };
 

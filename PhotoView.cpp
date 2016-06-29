@@ -41,11 +41,9 @@ PhotoView::PhotoView(QWidget *parent) :
  */
 void PhotoView::clear()
 {
-//    _vBoxLayout->clear();
+    _vBoxLayout->clear();
     _selected.clear();
-
-    while (QLayoutItem* item = _vBoxLayout->takeAt(0))
-        item->widget()->deleteLater();
+    _cluster2ClusterView.clear();
 }
 
 /**

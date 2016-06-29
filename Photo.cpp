@@ -30,11 +30,11 @@ Exif                    Photo::getExif()        const { return _exif;       }
 QString                 Photo::getAddress()     const { return _address;    }
 Cluster*                Photo::getCluster()     const { return _cluster;    }
 
-Coordinates Photo::getCoordinates() const
+QGeoCoordinate Photo::getCoordinates() const
 {
     QString latitude    = getExif().getValue("GPS Latitude");
     QString longitude   = getExif().getValue("GPS Longitude");
-    return Coordinates(latitude.toDouble(), longitude.toDouble());
+    return QGeoCoordinate(latitude.toDouble(), longitude.toDouble());
 }
 
 bool Photo::isVideo() const

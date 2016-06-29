@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionAbout,         SIGNAL(triggered()), this, SLOT(onAbout()));
     connect(ui.actionScan,          SIGNAL(triggered(bool)),    SLOT(onScan()));
     connect(ui.actionOptions,       SIGNAL(triggered(bool)),    SLOT(onOptions()));
+    connect(ui.actionSortByAddress, SIGNAL(triggered()),        SLOT(sort()));
     connect(ui.actionSortByTitle,   SIGNAL(triggered()),        SLOT(sort()));
     connect(ui.actionSortByTime,    SIGNAL(triggered()),        SLOT(sort()));
     connect(ui.actionOrder,         SIGNAL(triggered()),        SLOT(onSortingOrder()));
@@ -90,6 +91,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _geocoder = new Geocoder;
     connect(_geocoder, SIGNAL(decoded(Photo*)), ui.photoView, SLOT(onLocationDecoded(Photo*)));
+    _geocoder->start(_library->getAllPhotos().values());
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }

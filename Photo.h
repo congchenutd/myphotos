@@ -10,6 +10,7 @@
 #include <QSet>
 #include <QString>
 #include <QStringList>
+#include <QGeoCoordinate>
 
 class People;
 class Event;
@@ -39,7 +40,7 @@ public:
     QSet<QString>           getPeopleNames()    const;
     Exif                    getExif()           const;
     QString                 getAddress()        const;
-    Coordinates             getCoordinates()    const;
+    QGeoCoordinate          getCoordinates()    const;
     Cluster*                getCluster()        const;
 
     bool isVideo() const;

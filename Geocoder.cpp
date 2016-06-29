@@ -8,9 +8,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegularExpression>
-#include <QtMath>
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 Geocoder::Geocoder(QObject* parent)
     : QObject(parent)
@@ -22,9 +19,8 @@ Geocoder::Geocoder(QObject* parent)
 
 void Geocoder::start(const QList<Photo*>& photos)
 {
-    _photos.clear();
-    for (Photo* photo: photos)
-        if (canDecode(photo))
+    foreach (Photo* photo, photos)
+        if (photo->getAddress().isEmpty() && canDecode(photo))
             _photos << photo;
     processNext();
 }
@@ -257,28 +253,4 @@ QString Address::toString() const
 //    if (!countryName.isEmpty())
 //        result += ", " + countryName;
     return result;
-}
-
-Coordinates::Coordinates(double latitude, double longitude)
-    : _latitude (latitude),
-      _longitude(longitude) {}
-
-double Coordinates::distanceTo(const Coordinates& another) const
-{
-    const double earthRadius = 6378.1370;
-
-    double latitude1  = qDegreesToRadians(_latitude);
-    double longitude1 = qDegreesToRadians(_longitude);
-    double latitude2  = qDegreesToRadians(another._latitude);
-    double longitude2 = qDegreesToRadians(another._longitude);
-
-    double dLatitude  = latitude2  - latitude1;
-    double dLongitude = longitude2 - longitude1;
-
-    double a = qPow(qSin(dLatitude / 2.0), 2) + qCos(latitude1) * qCos(latitude2)
-                    * qPow(qSin(dLongitude / 2.0), 2);
-    double c = 2.0 * qAtan2(qSqrt(a), qSqrt(1.0 - a));
-    double d = earthRadius * c;
-
-    return d;
 }

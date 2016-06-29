@@ -18,15 +18,6 @@ struct Address
     QString toString() const;
 };
 
-struct Coordinates
-{
-    double _latitude;
-    double _longitude;
-
-    Coordinates(double latitude, double longitude);
-    double distanceTo(const Coordinates& another) const;
-};
-
 class Geocoder : public QObject
 {
     Q_OBJECT
