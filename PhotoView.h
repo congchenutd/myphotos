@@ -10,9 +10,9 @@ class Library;
 class Photo;
 class PhotoItem;
 class QLayoutItem;
-class FlowLayout;
 class NewItemMenu;
-class QVBoxLayout;
+class SortableVBoxLayout;
+class ClusterView;
 
 /**
  * A view widget for photos
@@ -26,13 +26,12 @@ public:
 
     void clear();
     void load(const QList<Photo*>& photos);
-//    void load(const QList<Cluster>& clusters);
     void sort(const QString& byWhat, bool ascending);
     QList<PhotoItem*> getSelectedItems() const;
     void removeItem(PhotoItem* item);
-    void resizeThumbnails(int size);
-    void addPhoto(Photo* photo, int thumbnailSize);
-    PhotoItem* getItem(Photo* photo) const;
+    void resizeThumbnails();
+    void addPhoto(Photo* photo);
+//    PhotoItem* getItem(Photo* photo) const;
 
 public slots:
     void sort();
@@ -41,6 +40,7 @@ private slots:
     void onTagChecked   (bool checked);
     void onPeopleChecked(bool checked);
     void onEventChecked (bool checked);
+    void onLocationDecoded(Photo* photo);
 
 signals:
     void photoSelected(Photo*);
@@ -69,35 +69,53 @@ private:
 
 private:
     Ui::PhotoView ui;
-//    FlowLayout*         _layout;
     Library*            _library;
     QPoint              _clickedPosition;
     QRubberBand*        _rubberBand;
     QSet<PhotoItem*>    _selected;
     QString             _sortBy;
     bool                _ascending;
-    int                 _thumbnailSize;
     QMap<Photo*, PhotoItem*> _photos;
-    QVBoxLayout*        _vBoxLayout;
+    SortableVBoxLayout* _vBoxLayout;
     PhotoClusters       _photoClusters;
+    QMap<Cluster*, ClusterView*>    _cluster2ClusterView;
 };
 
 // Comparators for sorting
-struct PhotoItemLessTitle {
+class ClusterViewLessAddress
+{
+public:
+    ClusterViewLessAddress(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
+private:
+    bool _lessThan;
 };
 
-struct PhotoItemGreaterTitle {
+class ClusterViewLessDate
+{
+public:
+    ClusterViewLessDate(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
+private:
+    bool _lessThan;
 };
 
-struct PhotoItemLessTime {
+class PhotoItemLessTime
+{
+public:
+    PhotoItemLessTime(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
+private:
+    bool _lessThan;
 };
 
-struct PhotoItemGreaterTime {
+class PhotoItemLessTitle
+{
+public:
+    PhotoItemLessTitle(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
+private:
+    bool _lessThan;
 };
-
 
 #endif // PHOTOVIEW_H

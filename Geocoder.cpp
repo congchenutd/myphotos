@@ -32,10 +32,7 @@ void Geocoder::start(const QList<Photo*>& photos)
 void Geocoder::processNext()
 {
     if (_photos.isEmpty())
-    {
-        emit finished();
         return;
-    }
 
     Photo* photo = _photos.front();
     QString latitude    = photo->getExif().getValue("GPS Latitude");
@@ -48,7 +45,9 @@ void Geocoder::processNext()
 
 void Geocoder::onReady(QNetworkReply* reply)
 {
-    _photos.dequeue()->setAddress(parse(reply->readAll()));
+    Photo* photo = _photos.dequeue();
+    photo->setAddress(parse(reply->readAll()).toString());
+    emit decoded(photo);
     processNext();
 }
 
@@ -255,8 +254,8 @@ QString Address::toString() const
         result += ", " + cityName;
     if (!stateName.isEmpty())
         result += ", " + stateName;
-    if (!countryName.isEmpty())
-        result += ", " + countryName;
+//    if (!countryName.isEmpty())
+//        result += ", " + countryName;
     return result;
 }
 

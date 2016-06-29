@@ -45,7 +45,6 @@ private slots:
     void onFilterByEvent    (const QString& eventName);
     void onAbout();
     void onInfoChanged(Photo* photo);
-    void onGeocodingFinished();
 
 private:
     void resetPhotos();

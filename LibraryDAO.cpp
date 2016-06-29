@@ -116,7 +116,8 @@ void LibraryDAO::createTables()
                     Title varchar, \
                     FilePath varchar, \
                     Time date, \
-                    Info varchar \
+                    Info varchar, \
+                    Address varchar \
                 )");
     query.exec("create table Events ( \
                     ID int primary key, \

@@ -18,10 +18,8 @@ FlowLayout::~FlowLayout() {
     clear();
 }
 
-void FlowLayout::clear()
-{
-    QLayoutItem* item;
-    while ((item = takeAt(0)))
+void FlowLayout::clear() {
+    while (QLayoutItem* item = takeAt(0))
         item->widget()->deleteLater();
 }
 

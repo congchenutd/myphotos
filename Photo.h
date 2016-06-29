@@ -16,7 +16,7 @@ class Event;
 class Tag;
 class PhotoDAO;
 class Thumbnail;
-
+class Cluster;
 
 /**
  * A Photo object represents a photo
@@ -38,12 +38,13 @@ public:
     QSet<QString>           getTagNames()       const;
     QSet<QString>           getPeopleNames()    const;
     Exif                    getExif()           const;
-    Address                 getAddress()        const;
+    QString                 getAddress()        const;
     Coordinates             getCoordinates()    const;
+    Cluster*                getCluster()        const;
 
     bool isVideo() const;
     bool exists () const;
-    bool coloated(const Photo* another) const;
+    bool colocatedWith(const Photo* another) const;
 
     void setTitle       (const QString& title);
     void setFilePath    (const QString& filePath);
@@ -55,7 +56,8 @@ public:
     void removeTag      (const QString& tagValue);
     void removePeople   (const QString& name);
     void setExif        (const Exif& info);
-    void setAddress    (const Address& address);
+    void setAddress     (const QString& address);
+    void setCluster     (Cluster* cluster);
 
 private:
     QString                 _title;
@@ -66,7 +68,10 @@ private:
     Event*                  _event;
     Thumbnail*              _thumbnail;
     Exif                    _exif;
-    Address                 _address;
+    QString                 _address;
+    Cluster*                _cluster;
+
+    static const int PROXIMITY = 500;
 };
 
 #endif // PHOTO_H

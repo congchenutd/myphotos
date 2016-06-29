@@ -72,7 +72,8 @@ SOURCES += \
     Clustering.cpp \
     ClusterView.cpp \
     PhotoView2.cpp \
-    PhotoClusters.cpp
+    PhotoClusters.cpp \
+    SortableVBoxLayout.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -118,7 +119,8 @@ HEADERS += \
     Clustering.h \
     ClusterView.h \
     PhotoView2.h \
-    PhotoClusters.h
+    PhotoClusters.h \
+    SortableVBoxLayout.h
 
 FORMS += \
 	MainWindow.ui \

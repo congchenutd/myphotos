@@ -20,7 +20,7 @@ public:
     void setSelected(bool selected);
     Photo* getPhoto();
     void rename();
-    void resizeThumbnail(int size);
+    void resizeThumbnail();
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);
@@ -38,7 +38,6 @@ private:
     QColor          _backgroundColor;
     bool            _selected;
     QLabel*         _videoLabel;
-    int             _thumbnailSize;
 };
 
 

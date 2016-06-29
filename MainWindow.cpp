@@ -41,8 +41,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.statusBar->addPermanentWidget(_progressBar);
 
     QActionGroup* actionGroup = new QActionGroup(this);
-    actionGroup->addAction(ui.actionSortByTitle);
     actionGroup->addAction(ui.actionSortByTime);
+    actionGroup->addAction(ui.actionSortByAddress);
+    actionGroup->addAction(ui.actionSortByTitle);
     ui.actionSortByTime->setChecked(true);
 
     _slider = new SliderWithToolTip(this);
@@ -88,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_scanner, SIGNAL(photoAdded(Photo*)), SLOT(onPhotoAdded(Photo*)));
 
     _geocoder = new Geocoder;
-    connect(_geocoder, SIGNAL(finished()), SLOT(onGeocodingFinished()));
+    connect(_geocoder, SIGNAL(decoded(Photo*)), ui.photoView, SLOT(onLocationDecoded(Photo*)));
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }
@@ -122,7 +123,7 @@ void MainWindow::onOptions()
 
 void MainWindow::onPhotoAdded(Photo* photo)
 {
-    ui.photoView->addPhoto(photo, _slider->value());
+    ui.photoView->addPhoto(photo);
 
     _progressBar->setValue(_progressBar->value() + 1);
     if (_progressBar->value() == _progressBar->maximum())
@@ -151,7 +152,11 @@ void MainWindow::onSortingOrder()
 
 void MainWindow::sort()
 {
-    QString sortBy = ui.actionSortByTitle->isChecked() ? "Title" : "Time";
+    QString sortBy = "Time";
+    if (ui.actionSortByAddress->isChecked())
+        sortBy = "Address";
+    else if (ui.actionSortByTitle->isChecked())
+        sortBy = "Title";
     ui.photoView->sort(sortBy, _ascending);
 }
 
@@ -204,8 +209,8 @@ void MainWindow::onDelete()
 
 void MainWindow::onThumbnailSize(int size)
 {
-    ui.photoView->resizeThumbnails(size);
     Settings::getInstance()->setThumbnailSize(QSize(size, size));
+    ui.photoView->resizeThumbnails();
 }
 
 void MainWindow::onNewTag(const QString& tagValue)
@@ -297,19 +302,11 @@ void MainWindow::onAbout()
 
 void MainWindow::onInfoChanged(Photo* photo)
 {
-    if (PhotoItem* item = ui.photoView->getItem(photo))
-    {
-        item->setPhoto(photo);
-        sort();
-    }
-}
-
-void MainWindow::onGeocodingFinished()
-{
-//    Clustering clustering;
-//    QList<Cluster> clusters = clustering.run(_library->getAllPhotos().values());
-//    ui.photoView->load(clusters);
-    ui.photoView->load(_library->getAllPhotos().values());
+//    if (PhotoItem* item = ui.photoView->getItem(photo))
+//    {
+//        item->setPhoto(photo);
+//        sort();
+//    }
 }
 
 void MainWindow::resetPhotos() {

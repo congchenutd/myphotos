@@ -27,7 +27,8 @@ QMap<QString, People*>  Photo::getPeople()      const { return _people; }
 QSet<QString>           Photo::getTagNames()    const { return getTags()  .keys().toSet(); }
 QSet<QString>           Photo::getPeopleNames() const { return getPeople().keys().toSet(); }
 Exif                    Photo::getExif()        const { return _exif;       }
-Address                 Photo::getAddress()     const { return _address;    }
+QString                 Photo::getAddress()     const { return _address;    }
+Cluster*                Photo::getCluster()     const { return _cluster;    }
 
 Coordinates Photo::getCoordinates() const
 {
@@ -48,8 +49,8 @@ bool Photo::exists() const {
     return QFile::exists(getFilePath());
 }
 
-bool Photo::coloated(const Photo* another) const {
-    return getCoordinates().distanceTo(another->getCoordinates()) < 0.1;
+bool Photo::colocatedWith(const Photo* another) const {
+    return getCoordinates().distanceTo(another->getCoordinates()) * 100 < PROXIMITY;
 }
 
 void Photo::setTitle(const QString& title)  {
@@ -98,6 +99,10 @@ void Photo::setExif(const Exif& info) {
     _exif = info;
 }
 
-void Photo::setAddress(const Address& address) {
+void Photo::setAddress(const QString &address) {
     _address = address;
+}
+
+void Photo::setCluster(Cluster* cluster) {
+    _cluster = cluster;
 }

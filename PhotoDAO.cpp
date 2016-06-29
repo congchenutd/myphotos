@@ -22,7 +22,7 @@ PhotoDAO* PhotoDAO::getInstance()
 Photo* PhotoDAO::load(int id) const
 {
     QSqlQuery query;
-    query.exec(tr("select Title, FilePath, Time, Info from Photos where id = %1").arg(id));
+    query.exec(tr("select Title, FilePath, Time, Info, Address from Photos where id = %1").arg(id));
     if (query.next() == 0)
         return 0;
 
@@ -32,6 +32,7 @@ Photo* PhotoDAO::load(int id) const
                              query.value(1).toString(),
                              QDateTime::fromString(query.value(2).toString(), Qt::ISODate));
     photo->setExif(Exif(query.value(3).toString()));
+    photo->setAddress(query.value(4).toString());
 
     // load its relationships
     Library* library = Library::getInstance();
@@ -85,11 +86,13 @@ void PhotoDAO::update(Persistable* persistable)
 {
     Photo* photo = static_cast<Photo*>(persistable);
     QSqlQuery query;
-    query.prepare("update Photos set Title = :Title, FilePath = :FilePath, Time = :Time, Info = :Info where ID = :ID");
+    query.prepare("update Photos set Title = :Title, FilePath = :FilePath, \
+                   Time = :Time, Info = :Info, Address = :Address where ID = :ID");
     query.bindValue(":Title",       photo->getTitle());
     query.bindValue(":FilePath",    photo->getFilePath());
     query.bindValue(":Time",        photo->getTimeTaken().toString(Qt::ISODate));
     query.bindValue(":Info",        photo->getExif().toJson());
+    query.bindValue(":Address",     photo->getAddress());
     query.bindValue(":ID",          photo->getID());
     query.exec();
 
@@ -100,12 +103,13 @@ void PhotoDAO::insert(Persistable* persistable)
 {
     Photo* photo = static_cast<Photo*>(persistable);
     QSqlQuery query;
-    query.exec(tr("insert into Photos values (%1, \"%2\", \"%3\", \"%4\", \"%5\")")
+    query.exec(tr("insert into Photos values (%1, \"%2\", \"%3\", \"%4\", \"%5\", \"%6\")")
                .arg(photo->getID())
                .arg(photo->getTitle())
                .arg(photo->getFilePath())
                .arg(photo->getTimeTaken().toString(Qt::ISODate))
-               .arg(photo->getExif().toJson()));
+               .arg(photo->getExif().toJson())
+               .arg(photo->getAddress()));
 
     insertRelationships(photo);
 }

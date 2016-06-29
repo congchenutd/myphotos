@@ -45,7 +45,7 @@ private:
     bool canDecode(Photo* photo) const;
 
 signals:
-    void finished();
+    void decoded(Photo* photo);
 
 private:
     QNetworkAccessManager*  _networkAccessManager;

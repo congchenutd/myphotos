@@ -12,6 +12,7 @@
 #include "NewTagDlg.h"
 #include "NewEventDlg.h"
 #include "ClusterView.h"
+#include "SortableVBoxLayout.h"
 
 #include <QFileSystemModel>
 #include <QLabel>
@@ -32,7 +33,7 @@ PhotoView::PhotoView(QWidget *parent) :
 //    ui.setupUi(this);
 //    _layout     = new FlowLayout(this);
     _library    = Library::getInstance();
-    _vBoxLayout = new QVBoxLayout(this);
+    _vBoxLayout = new SortableVBoxLayout(this);
     setLayout(_vBoxLayout);
 }
 
@@ -43,7 +44,10 @@ void PhotoView::clear()
 {
 //    _layout->clear();
     _selected.clear();
-    _photos.clear();
+//    _photos.clear();
+
+    while (QLayoutItem* item = _vBoxLayout->takeAt(0))
+        item->widget()->deleteLater();
 }
 
 /**
@@ -52,33 +56,43 @@ void PhotoView::clear()
 void PhotoView::load(const QList<Photo*>& photos)
 {
     for (Photo* photo: photos)
-        addPhoto(photo, _thumbnailSize);
+        addPhoto(photo);
 }
 
-//void PhotoView::load(const QList<Cluster>& clusters)
-//{
-//    foreach (const Cluster& cluster, clusters)
-//    {
-//        Photo* photo = cluster.front();
-//        QString title = photo->getLocation().toString() + " " + photo->getTimeTaken().date().toString("yyyy-MM-dd");
-//        ClusterView* clusterView = new ClusterView(title, cluster, this);
-//        _vBoxLayout->addWidget(clusterView);
-//    }
-//}
+void PhotoView::addPhoto(Photo* photo)
+{
+    Cluster* cluster = _photoClusters.addPhoto(photo);
+    if (!_cluster2ClusterView.contains(cluster))
+    {
+        ClusterView* clusterView = new ClusterView(cluster, this);
+        _cluster2ClusterView.insert(cluster, clusterView);
+        _vBoxLayout->addWidget(clusterView);
+    }
+    else
+    {
+        ClusterView* clusterView = _cluster2ClusterView[cluster];
+        clusterView->addPhoto(photo);
+    }
+}
 
 void PhotoView::sort(const QString& byWhat, bool ascending)
 {
     _sortBy     = byWhat;
     _ascending  = ascending;
 
-//    if (byWhat == "Title") {
-//        if (ascending)  _layout->sort(PhotoItemLessTitle());
-//        else            _layout->sort(PhotoItemGreaterTitle());
-//    }
-//    if (byWhat == "Time") {
-//        if (ascending)  _layout->sort(PhotoItemLessTime());
-//        else            _layout->sort(PhotoItemGreaterTime());
-//    }
+    if (byWhat == "Address")
+        _vBoxLayout->sort(ClusterViewLessAddress(ascending));
+    else if (byWhat == "Time") {
+        _vBoxLayout->sort(ClusterViewLessDate(ascending));
+        foreach (ClusterView* clusterView, _cluster2ClusterView)
+            clusterView->sort(PhotoItemLessTime(ascending));
+    }
+    else if (byWhat == "Title")
+    {
+        _vBoxLayout->sort(ClusterViewLessAddress(ascending));
+        foreach (ClusterView* clusterView, _cluster2ClusterView)
+            clusterView->sort(PhotoItemLessTitle(ascending));
+    }
 }
 
 void PhotoView::sort() {
@@ -94,31 +108,19 @@ void PhotoView::removeItem(PhotoItem* item)
 //    _layout->removeWidget(item);
     item->deleteLater();
     _selected.remove(item);
-    _photos.remove(item->getPhoto());
+//    _photos.remove(item->getPhoto());
 }
 
 // TODO: improve performance, maybe using multi-threading
-void PhotoView::resizeThumbnails(int size)
+void PhotoView::resizeThumbnails()
 {
-    _thumbnailSize = size;
     foreach (PhotoItem* item, getAllPhotoItems())
-        item->resizeThumbnail(size);
+        item->resizeThumbnail();
 }
 
-void PhotoView::addPhoto(Photo* photo, int thumbnailSize)
-{
-    PhotoItem* photoItem = new PhotoItem(photo);
-    photoItem->resizeThumbnail(thumbnailSize);
-    connect(photoItem, SIGNAL(titleChanged(QString)), this, SLOT(sort()));
-//    _layout->addWidget(photoItem);
-    _photos.insert(photo, photoItem);
-
-    _photoClusters.addPhoto(photo);
-}
-
-PhotoItem* PhotoView::getItem(Photo* photo) const {
-    return _photos.contains(photo) ? _photos[photo] : 0;
-}
+//PhotoItem* PhotoView::getItem(Photo* photo) const {
+//    return _photos.contains(photo) ? _photos[photo] : 0;
+//}
 
 void PhotoView::mousePressEvent(QMouseEvent* event)
 {
@@ -305,6 +307,13 @@ void PhotoView::onEventChecked(bool checked)
     }
 }
 
+void PhotoView::onLocationDecoded(Photo* photo)
+{
+    if (Cluster* cluster = photo->getCluster())
+        if (ClusterView* clusterView = _cluster2ClusterView[cluster])
+            clusterView->reloadTitle();
+}
+
 NewItemMenu* PhotoView::createTagMenu()
 {
     NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), new NewTagDlg(tr("New Tag"), this), this);
@@ -400,40 +409,62 @@ PhotoItem* PhotoView::getItemAt(int index) const {
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////
-bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+////////////////////////////////////////////////////////////////////////////////////////
+ClusterViewLessAddress::ClusterViewLessAddress(bool lessThan) : _lessThan(lessThan) {}
+
+bool ClusterViewLessAddress::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
 {
-    PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
-    PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
-    if (item1 != 0 && item2 != 0)
-        return item1->getPhoto()->getTitle() < item2->getPhoto()->getTitle();
+    ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
+    ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
+    if (view1 != 0 && view2 != 0)
+    {
+        bool result = view1->getTitle() < view2->getTitle();
+        return _lessThan ? result : !result;
+    }
     return false;
 }
 
-bool PhotoItemGreaterTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+/////////////////////////////////////////////////////////////////////////////////////////
+ClusterViewLessDate::ClusterViewLessDate(bool lessThan) : _lessThan(lessThan) {}
+
+bool ClusterViewLessDate::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
 {
-    PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
-    PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
-    if (item1 != 0 && item2 != 0)
-        return item1->getPhoto()->getTitle() > item2->getPhoto()->getTitle();
+    ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
+    ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
+    if (view1 != 0 && view2 != 0)
+    {
+        bool result = view1->getDate() < view2->getDate();
+        return _lessThan ? result : !result;
+    }
     return false;
 }
+
+////////////////////////////////////////////////////////////////////////////////////
+PhotoItemLessTime::PhotoItemLessTime(bool lessThan) : _lessThan(lessThan) {}
 
 bool PhotoItemLessTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
 {
     PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
     PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
     if (item1 != 0 && item2 != 0)
-        return item1->getPhoto()->getTimeTaken() < item2->getPhoto()->getTimeTaken();
+    {
+        bool result = item1->getPhoto()->getTimeTaken() < item2->getPhoto()->getTimeTaken();
+        return _lessThan ? result : !result;
+    }
     return false;
 }
 
-bool PhotoItemGreaterTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+//////////////////////////////////////////////////////////////////////////////////////////
+PhotoItemLessTitle::PhotoItemLessTitle(bool lessThan) : _lessThan(lessThan) {}
+
+bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
 {
     PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
     PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
     if (item1 != 0 && item2 != 0)
-        return item1->getPhoto()->getTimeTaken() > item2->getPhoto()->getTimeTaken();
+    {
+        bool result = item1->getPhoto()->getTitle() < item2->getPhoto()->getTitle();
+        return _lessThan ? result : !result;
+    }
     return false;
 }
-

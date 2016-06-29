@@ -4,29 +4,42 @@
 
 #include <QLabel>
 
-//ClusterView::ClusterView(const QString& title, const Cluster& photos, QWidget* parent)
-//    : QWidget(parent),
-//      _thumbnailSize(100)
-//{
-//    QVBoxLayout* vBoxLayout = new QVBoxLayout(this);
-//    setLayout(vBoxLayout);
+ClusterView::ClusterView(Cluster* cluster, QWidget* parent)
+    : QWidget(parent),
+      _cluster(cluster)
+{
+    QVBoxLayout* vBoxLayout = new QVBoxLayout(this);
+    _labelTitle = new QLabel(_cluster->getTitle());
+    vBoxLayout->addWidget(_labelTitle);
 
-//    QLabel* label = new QLabel(title);
-//    vBoxLayout->addWidget(label);
+    _flowLayout = new FlowLayout;
+    vBoxLayout->addLayout(_flowLayout);
+    vBoxLayout->setAlignment(_flowLayout, Qt::AlignLeft);
 
-//    _flowLayout = new FlowLayout;
-//    vBoxLayout->addLayout(_flowLayout);
-//    vBoxLayout->setAlignment(_flowLayout, Qt::AlignLeft);
+    foreach (Photo* photo, _cluster->getAllPhotos())
+        addPhoto(photo);
+}
 
-//    foreach (Photo* photo, photos)
-//        addPhoto(photo, _thumbnailSize);
-//}
+void ClusterView::addPhoto(Photo* photo)
+{
+    PhotoItem* photoItem = new PhotoItem(photo);
+//    connect(photoItem, SIGNAL(titleChanged(QString)), this, SLOT(sort()));
+    _flowLayout->addWidget(photoItem);
+    //    _photos.insert(photo, photoItem);
+}
 
-//void ClusterView::addPhoto(Photo* photo, int thumbnailSize)
-//{
-//    PhotoItem* photoItem = new PhotoItem(photo);
-//    photoItem->resizeThumbnail(200);
-////    connect(photoItem, SIGNAL(titleChanged(QString)), this, SLOT(sort()));
-//    _flowLayout->addWidget(photoItem);
-////    _photos.insert(photo, photoItem);
-//}
+void ClusterView::reloadTitle() {
+    _labelTitle->setText(_cluster->getTitle());
+}
+
+QString ClusterView::getTitle() const {
+    return _cluster->getTitle();
+}
+
+QDate ClusterView::getDate() const {
+    return _cluster->getDate();
+}
+
+void ClusterView::sort(std::function<bool (QLayoutItem *, QLayoutItem *)> comparator) {
+    _flowLayout->sort(comparator);
+}

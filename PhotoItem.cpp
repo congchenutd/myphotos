@@ -3,6 +3,7 @@
 #include "Thumbnail.h"
 #include "EditableLabel.h"
 #include "Library.h"
+#include "Settings.h"
 
 #include <QLabel>
 #include <QPixmap>
@@ -13,8 +14,7 @@
 
 PhotoItem::PhotoItem(Photo* photo)
     : _selected(false),
-      _videoLabel(0),
-      _thumbnailSize(100)
+      _videoLabel(0)
 {
     _thumbnail  = new QLabel(this);
     _thumbnail->setAlignment(Qt::AlignCenter);
@@ -41,7 +41,7 @@ void PhotoItem::setPhoto(Photo* photo)
 
     _photo = photo;
     _title->setText(photo->getTitle());
-    resizeThumbnail(_thumbnailSize);
+    resizeThumbnail();
 
     if (photo->exists() && photo->isVideo())
     {
@@ -52,6 +52,8 @@ void PhotoItem::setPhoto(Photo* photo)
     else {
         _videoLabel->hide();
     }
+
+    resizeThumbnail();
 }
 
 void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
@@ -86,11 +88,11 @@ void PhotoItem::rename() {
     _title->edit();
 }
 
-void PhotoItem::resizeThumbnail(int size)
+void PhotoItem::resizeThumbnail()
 {
-    _thumbnailSize = size;
+    QSize thumbnailSize = Settings::getInstance()->getThumbnailSize();
     QPixmap pixmap = (getPhoto()->exists() && getPhoto()->getThumbnail() != 0) ?
                 QPixmap(_photo->getThumbnail()->getFilePath()) :
                 QPixmap(":/Images/Error.png");
-    _thumbnail->setPixmap(pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    _thumbnail->setPixmap(pixmap.scaled(thumbnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }

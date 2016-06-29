@@ -2,20 +2,26 @@
 #define CLUSTERVIEW_H
 
 #include <QWidget>
-#include <Clustering.h>
+#include "PhotoClusters.h"
 
+class QLabel;
 class FlowLayout;
-class QHBoxLayout;
+class QLayoutItem;
 
-//class ClusterView : public QWidget
-//{
-//public:
-//    explicit ClusterView(const QString& title, const Cluster& photos, QWidget* parent = 0);
-//    void addPhoto(Photo* photo, int thumbnailSize);
+class ClusterView : public QWidget
+{
+public:
+    explicit ClusterView(Cluster* cluster, QWidget* parent = 0);
+    void addPhoto(Photo* photo);
+    void reloadTitle();
+    QString getTitle()  const;
+    QDate   getDate()   const;
+    void sort(std::function<bool (QLayoutItem*, QLayoutItem*)> comparator);
 
-//private:
-//    FlowLayout* _flowLayout;
-//    int         _thumbnailSize;
-//};
+private:
+    QLabel*     _labelTitle;
+    FlowLayout* _flowLayout;
+    Cluster*    _cluster;
+};
 
 #endif // CLUSTERVIEW_H
