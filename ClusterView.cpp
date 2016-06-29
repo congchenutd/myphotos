@@ -22,14 +22,23 @@ ClusterView::ClusterView(Cluster* cluster, QWidget* parent)
 
 void ClusterView::addPhoto(Photo* photo)
 {
-    PhotoItem* photoItem = new PhotoItem(photo);
-//    connect(photoItem, SIGNAL(titleChanged(QString)), this, SLOT(sort()));
+    PhotoItem* photoItem = new PhotoItem(photo, this);
+    connect(photoItem, SIGNAL(titleChanged(QString)), this, SLOT(sort()));
     _layout->addWidget(photoItem);
-    //    _photos.insert(photo, photoItem);
+}
+
+void ClusterView::removePhotoItem(PhotoItem* item)
+{
+    _layout->removeWidget(item);
+    delete item;
 }
 
 void ClusterView::reloadTitle() {
     _labelTitle->setText(_cluster->getTitle());
+}
+
+int ClusterView::getPhotoItemCount() const {
+    return _layout->count();
 }
 
 QString ClusterView::getTitle() const {
@@ -40,15 +49,32 @@ QDate ClusterView::getDate() const {
     return _cluster->getDate();
 }
 
-QList<PhotoItem *> ClusterView::getAllPhotoItems() const
+Cluster* ClusterView::getCluster() const {
+    return _cluster;
+}
+
+QList<PhotoItem*> ClusterView::getAllPhotoItems() const
 {
     QList<PhotoItem*> result;
-    for (int i = 0; i < _layout->count(); ++i)
-        if (PhotoItem* item = dynamic_cast<PhotoItem*>(_layout->itemAt(i)->widget()))
-            result << item;
+    for (int i = 0; i < getPhotoItemCount(); ++i)
+        result << static_cast<PhotoItem*>(_layout->itemAt(i)->widget());
     return result;
 }
 
-void ClusterView::sort(std::function<bool (QLayoutItem *, QLayoutItem *)> comparator) {
+PhotoItem* ClusterView::findPhotoItem(const Photo* photo) const
+{
+    foreach (PhotoItem* item, getAllPhotoItems())
+        if (item->getPhoto() == photo)
+            return item;
+    return 0;
+}
+
+void ClusterView::sort(std::function<bool (QLayoutItem *, QLayoutItem *)> comparator)
+{
+    _comparator = comparator;
     _layout->sort(comparator);
+}
+
+void ClusterView::sort() {
+    sort(_comparator);
 }

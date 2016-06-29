@@ -31,7 +31,7 @@ public:
     void removeItem(PhotoItem* item);
     void resizeThumbnails();
     void addPhoto(Photo* photo);
-//    PhotoItem* getItem(Photo* photo) const;
+    PhotoItem* getItem(Photo* photo) const;
 
 public slots:
     void sort();
@@ -75,7 +75,6 @@ private:
     QSet<PhotoItem*>    _selected;
     QString             _sortBy;
     bool                _ascending;
-    QMap<Photo*, PhotoItem*> _photos;
     SortableVBoxLayout* _vBoxLayout;
     PhotoClusters       _photoClusters;
     QMap<Cluster*, ClusterView*>    _cluster2ClusterView;

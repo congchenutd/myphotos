@@ -31,7 +31,6 @@ PhotoView::PhotoView(QWidget *parent) :
     _ascending(false)
 {
 //    ui.setupUi(this);
-//    _layout     = new FlowLayout(this);
     _library    = Library::getInstance();
     _vBoxLayout = new SortableVBoxLayout(this);
     setLayout(_vBoxLayout);
@@ -42,9 +41,8 @@ PhotoView::PhotoView(QWidget *parent) :
  */
 void PhotoView::clear()
 {
-//    _layout->clear();
+//    _vBoxLayout->clear();
     _selected.clear();
-//    _photos.clear();
 
     while (QLayoutItem* item = _vBoxLayout->takeAt(0))
         item->widget()->deleteLater();
@@ -105,10 +103,17 @@ QList<PhotoItem*> PhotoView::getSelectedItems() const {
 
 void PhotoView::removeItem(PhotoItem* item)
 {
-//    _layout->removeWidget(item);
-    item->deleteLater();
     _selected.remove(item);
-//    _photos.remove(item->getPhoto());
+    Photo* photo = item->getPhoto();
+    ClusterView* clusterView = item->getClusterView();
+    clusterView->removePhotoItem(item);
+    if (clusterView->getPhotoItemCount() == 0)
+    {
+        _vBoxLayout->removeWidget(clusterView);
+        _cluster2ClusterView.remove(clusterView->getCluster());
+        delete clusterView;
+    }
+    _photoClusters.removePhoto(photo);
 }
 
 // TODO: improve performance, maybe using multi-threading
@@ -118,9 +123,12 @@ void PhotoView::resizeThumbnails()
         item->resizeThumbnail();
 }
 
-//PhotoItem* PhotoView::getItem(Photo* photo) const {
-//    return _photos.contains(photo) ? _photos[photo] : 0;
-//}
+PhotoItem* PhotoView::getItem(Photo* photo) const {
+    foreach (ClusterView* clusterView, _cluster2ClusterView)
+        if (PhotoItem* item = clusterView->findPhotoItem(photo))
+            return item;
+    return 0;
+}
 
 void PhotoView::mousePressEvent(QMouseEvent* event)
 {

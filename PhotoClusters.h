@@ -13,12 +13,14 @@ typedef QList<Photo*> PhotoList;
 class Cluster
 {
 public:
-    void addPhoto(Photo* photo);
+    void addPhoto   (Photo* photo);
+    void removePhoto(Photo* photo);
     bool colocatedWith(const Photo* photo) const;
     QString     getAddress()    const;
     QDate       getDate()       const;
     QString     getTitle()      const;
     PhotoList   getAllPhotos()  const;
+    int         getPhotoCount() const;
 
 private:
     QMap<QDateTime, Photo*> _photos;
@@ -30,14 +32,18 @@ class SameDateClusters
 {
 public:
     void addCluster(Cluster* cluster);
-    Cluster* addPhoto(Photo* photo);
-    ClusterList getAllClusters() const;
+    Cluster* addPhoto   (Photo* photo);
+    void     removePhoto(Photo* photo);
+    QDate       getDate()           const;
+    ClusterList getAllClusters()    const;
+    int         getClusterCount()   const;
 
 private:
-    Cluster* findCluster(Photo* photo) const;
+    Cluster* findColocatedCluster(Photo* photo) const;
 
 private:
     ClusterList _clusters;
+    QDate       _date;
 };
 
 typedef QMap<QDate, SameDateClusters*>   ClusterLists;
@@ -45,7 +51,8 @@ typedef QMap<QDate, SameDateClusters*>   ClusterLists;
 class PhotoClusters
 {
 public:
-    Cluster* addPhoto(Photo* photo);
+    Cluster* addPhoto   (Photo* photo);
+    Cluster* removePhoto(Photo* photo);
     PhotoList   getAllPhotos()      const;
     ClusterList getAllClusters()    const;
 

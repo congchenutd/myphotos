@@ -33,6 +33,17 @@ PhotoList Cluster::getAllPhotos() const {
     return _photos.values();
 }
 
+int Cluster::getPhotoCount() const {
+    return _photos.count();
+}
+
+void Cluster::removePhoto(Photo* photo)
+{
+    for (QMap<QDateTime, Photo*>::iterator it = _photos.begin(); it != _photos.end(); ++it)
+        if (it.value() == photo)
+            _photos.erase(it);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////
 void SameDateClusters::addCluster(Cluster* cluster) {
@@ -41,21 +52,43 @@ void SameDateClusters::addCluster(Cluster* cluster) {
 
 Cluster* SameDateClusters::addPhoto(Photo* photo)
 {
-    Cluster* cluster = findCluster(photo);
+    Cluster* cluster = findColocatedCluster(photo);
     if (cluster == 0)
     {
         cluster = new Cluster;
         addCluster(cluster);
     }
     cluster->addPhoto(photo);
+    _date = photo->getTimeTaken().date();
     return cluster;
+}
+
+void SameDateClusters::removePhoto(Photo* photo)
+{
+    if (Cluster* cluster = findColocatedCluster(photo))
+    {
+        cluster->removePhoto(photo);
+        if (cluster->getPhotoCount() == 0)
+        {
+            _clusters.removeAll(cluster);
+            delete cluster;
+        }
+    }
+}
+
+QDate SameDateClusters::getDate() const {
+    return _date;
 }
 
 ClusterList SameDateClusters::getAllClusters() const {
     return _clusters;
 }
 
-Cluster* SameDateClusters::findCluster(Photo* photo) const
+int SameDateClusters::getClusterCount() const {
+    return _clusters.count();
+}
+
+Cluster* SameDateClusters::findColocatedCluster(Photo* photo) const
 {
     foreach (Cluster* cluster, _clusters)
         if (cluster->colocatedWith(photo))
@@ -71,6 +104,22 @@ Cluster* PhotoClusters::addPhoto(Photo* photo)
     if (!_clusterLists.contains(date))
         _clusterLists.insert(date, new SameDateClusters());
     return _clusterLists[date]->addPhoto(photo);
+}
+
+Cluster* PhotoClusters::removePhoto(Photo* photo)
+{
+    QDate date = photo->getTimeTaken().date();
+    if (_clusterLists.contains(date))
+    {
+        SameDateClusters* sameDate = _clusterLists[date];
+        sameDate->removePhoto(photo);
+        if (sameDate->getClusterCount() == 0)
+        {
+            _clusterLists.remove(sameDate->getDate());
+            delete sameDate;
+        }
+    }
+    return 0;
 }
 
 ClusterList PhotoClusters::getAllClusters() const

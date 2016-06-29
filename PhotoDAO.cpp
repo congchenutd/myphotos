@@ -71,13 +71,10 @@ void PhotoDAO::remove(Persistable* persistable)
     // remove thumbnail
     Photo* photo = static_cast<Photo*>(persistable);
     if (Thumbnail* thumbnail = photo->getThumbnail())
-    {
         thumbnail->destroy();
-        photo->setThumbnail(0);
-    }
 
     // remove itself and relationships
-    DAO::remove(persistable);
+    DAO::remove(photo);
 }
 
 PhotoDAO::PhotoDAO(): DAO("Photos") {}

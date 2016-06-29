@@ -13,8 +13,9 @@
 #include <QUrl>
 #include <QDesktopServices>
 
-PhotoItem::PhotoItem(Photo* photo)
-    : _selected(false),
+PhotoItem::PhotoItem(Photo* photo, ClusterView* clusterView)
+    : _clusterView(clusterView),
+      _selected(false),
       _videoLabel(0)
 {
     _thumbnail  = new QLabel(this);
@@ -105,5 +106,9 @@ QRect PhotoItem::geometryMappedTo(const QWidget* widget) const
 {
     QPoint topLeft = mapTo(widget, mapFromParent(geometry().topLeft()));
     return QRect(topLeft, size());
+}
+
+ClusterView* PhotoItem::getClusterView() const {
+    return _clusterView;
 }
 

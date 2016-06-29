@@ -302,11 +302,11 @@ void MainWindow::onAbout()
 
 void MainWindow::onInfoChanged(Photo* photo)
 {
-//    if (PhotoItem* item = ui.photoView->getItem(photo))
-//    {
-//        item->setPhoto(photo);
-//        sort();
-//    }
+    if (PhotoItem* item = ui.photoView->getItem(photo))
+    {
+        item->setPhoto(photo);
+        sort();
+    }
 }
 
 void MainWindow::resetPhotos() {
