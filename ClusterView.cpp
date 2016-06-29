@@ -12,9 +12,9 @@ ClusterView::ClusterView(Cluster* cluster, QWidget* parent)
     _labelTitle = new QLabel(_cluster->getTitle());
     vBoxLayout->addWidget(_labelTitle);
 
-    _flowLayout = new FlowLayout;
-    vBoxLayout->addLayout(_flowLayout);
-    vBoxLayout->setAlignment(_flowLayout, Qt::AlignLeft);
+    _layout = new FlowLayout;
+    vBoxLayout->addLayout(_layout);
+    vBoxLayout->setAlignment(_layout, Qt::AlignLeft);
 
     foreach (Photo* photo, _cluster->getAllPhotos())
         addPhoto(photo);
@@ -24,7 +24,7 @@ void ClusterView::addPhoto(Photo* photo)
 {
     PhotoItem* photoItem = new PhotoItem(photo);
 //    connect(photoItem, SIGNAL(titleChanged(QString)), this, SLOT(sort()));
-    _flowLayout->addWidget(photoItem);
+    _layout->addWidget(photoItem);
     //    _photos.insert(photo, photoItem);
 }
 
@@ -40,6 +40,15 @@ QDate ClusterView::getDate() const {
     return _cluster->getDate();
 }
 
+QList<PhotoItem *> ClusterView::getAllPhotoItems() const
+{
+    QList<PhotoItem*> result;
+    for (int i = 0; i < _layout->count(); ++i)
+        if (PhotoItem* item = dynamic_cast<PhotoItem*>(_layout->itemAt(i)->widget()))
+            result << item;
+    return result;
+}
+
 void ClusterView::sort(std::function<bool (QLayoutItem *, QLayoutItem *)> comparator) {
-    _flowLayout->sort(comparator);
+    _layout->sort(comparator);
 }

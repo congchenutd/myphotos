@@ -190,13 +190,14 @@ void PhotoView::mouseMoveEvent(QMouseEvent* event)
     if (_rubberBand == 0)
         return;
 
-    _rubberBand->setGeometry(QRect(_clickedPosition, event->pos()).normalized());
-    QRect rubberBandRect = _rubberBand->geometry();
+    QRect rubberBandRect(QRect(_clickedPosition, event->pos()).normalized());
+    _rubberBand->setGeometry(rubberBandRect);
 
     _selected.clear();
-    foreach (PhotoItem* item, getAllPhotoItems()) {
-        if (rubberBandRect.contains  (item->geometry()) ||
-            rubberBandRect.intersects(item->geometry()))
+    foreach (PhotoItem* item, getAllPhotoItems())
+    {
+        if (rubberBandRect.contains  (item->geometryMappedTo(this)) ||
+            rubberBandRect.intersects(item->geometryMappedTo(this)))
             _selected << item;
     }
     updateSelection();
@@ -222,10 +223,10 @@ void PhotoView::updateSelection()
  */
 int PhotoView::getClickedItemIndex(const QPoint& point) const
 {
-//    for (int i = 0; i < _layout->count(); ++i)
-//        if (PhotoItem* item = getItemAt(i))
-//            if (item->geometry().contains(point))
-//                return i;
+    QList<PhotoItem*> items = getAllPhotoItems();
+    for (int i = 0; i < items.count(); ++i)
+        if (items.at(i)->geometryMappedTo(this).contains(point))
+            return i;
     return -1;
 }
 
@@ -252,6 +253,20 @@ QSet<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& e
         if (PhotoItem* item = getItemAt(i))
             result << item;
     return result;
+}
+
+QList<PhotoItem*> PhotoView::getAllPhotoItems() const
+{
+    QList<PhotoItem*> result;
+    for (int i = 0; i < _vBoxLayout->count(); ++i)
+        if (ClusterView* clusterView = dynamic_cast<ClusterView*>(_vBoxLayout->itemAt(i)->widget()))
+            result << clusterView->getAllPhotoItems();
+    return result;
+}
+
+PhotoItem* PhotoView::getItemAt(int index) const {
+    QList<PhotoItem*> items = getAllPhotoItems();
+    return items.at(index);
 }
 
 /**
@@ -392,20 +407,6 @@ NewItemMenu* PhotoView::createEventMenu()
         eventMenu->addAction(action);
     }
     return eventMenu;
-}
-
-QList<PhotoItem*> PhotoView::getAllPhotoItems() const
-{
-    QList<PhotoItem*> result;
-//    for (int i = 0; i < _layout->count(); ++i)
-//        if (PhotoItem* item = getItemAt(i))
-//            result << item;
-    return result;
-}
-
-PhotoItem* PhotoView::getItemAt(int index) const {
-//    return dynamic_cast<PhotoItem*>(_layout->itemAt(index)->widget());
-    return 0;
 }
 
 

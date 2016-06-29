@@ -4,6 +4,7 @@
 #include "EditableLabel.h"
 #include "Library.h"
 #include "Settings.h"
+#include "ClusterView.h"
 
 #include <QLabel>
 #include <QPixmap>
@@ -96,3 +97,13 @@ void PhotoItem::resizeThumbnail()
                 QPixmap(":/Images/Error.png");
     _thumbnail->setPixmap(pixmap.scaled(thumbnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
+
+/**
+ * @return geometry using a given widget's coordinates
+ */
+QRect PhotoItem::geometryMappedTo(const QWidget* widget) const
+{
+    QPoint topLeft = mapTo(widget, mapFromParent(geometry().topLeft()));
+    return QRect(topLeft, size());
+}
+

@@ -7,6 +7,7 @@
 class QLabel;
 class FlowLayout;
 class QLayoutItem;
+class PhotoItem;
 
 class ClusterView : public QWidget
 {
@@ -14,13 +15,16 @@ public:
     explicit ClusterView(Cluster* cluster, QWidget* parent = 0);
     void addPhoto(Photo* photo);
     void reloadTitle();
+
     QString getTitle()  const;
     QDate   getDate()   const;
+    QList<PhotoItem*> getAllPhotoItems() const;
+
     void sort(std::function<bool (QLayoutItem*, QLayoutItem*)> comparator);
 
 private:
     QLabel*     _labelTitle;
-    FlowLayout* _flowLayout;
+    FlowLayout* _layout;
     Cluster*    _cluster;
 };
 

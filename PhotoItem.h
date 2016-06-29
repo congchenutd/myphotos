@@ -21,6 +21,7 @@ public:
     Photo* getPhoto();
     void rename();
     void resizeThumbnail();
+    QRect geometryMappedTo(const QWidget* widget) const;
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);
