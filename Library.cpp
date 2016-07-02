@@ -58,6 +58,19 @@ Thumbnail* Library::getThumbnail(const QString& filePath) {
     return _thumbnails.contains(filePath) ? _thumbnails[filePath] : 0;
 }
 
+int Library::getPhotoCount() const {
+    return _photos.count() - getVideoCount();
+}
+
+int Library::getVideoCount() const
+{
+    int result = 0;
+    foreach (Photo* photo, _photos)
+        if (photo->isVideo())
+            result ++;
+    return result;
+}
+
 Photo* Library::getPhoto(const QString& filePath) {
     return _photos.contains(filePath) ? _photos[filePath] : 0;
 }

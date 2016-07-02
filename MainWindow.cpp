@@ -171,6 +171,13 @@ void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
     ui.actionRename ->setEnabled(hasSelection);
 
     ui.pageInfo->setCurrentPhoto(selected.isEmpty() ? 0 : selected.front()->getPhoto());
+
+    if (hasSelection)
+        ui.statusBar->showMessage(tr("%1 photo(s) selected").arg(selected.length()));
+    else
+        ui.statusBar->showMessage(tr("%1 photo(s), %2 video(s)")
+                                  .arg(_library->getPhotoCount())
+                                  .arg(_library->getVideoCount()));
 }
 
 void MainWindow::onRename() {

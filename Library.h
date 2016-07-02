@@ -38,6 +38,9 @@ public:
     Event*      getEvent    (const QString& name);
     Thumbnail*  getThumbnail(const QString& filePath);
 
+    int getPhotoCount() const;
+    int getVideoCount() const;
+
     void addPhoto       (Photo*     photo);
     void addPeople      (People*    people);
     void addTag         (Tag*       tag);
