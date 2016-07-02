@@ -9,7 +9,12 @@ ClusterView::ClusterView(Cluster* cluster, QWidget* parent)
       _cluster(cluster)
 {
     QVBoxLayout* vBoxLayout = new QVBoxLayout(this);
-    _labelTitle = new QLabel(_cluster->getTitle());
+    QFrame* line = new QFrame(this);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    vBoxLayout->addWidget(line);
+
+    _labelTitle = new QLabel(_cluster->getTitle(), this);
     vBoxLayout->addWidget(_labelTitle);
 
     _layout = new FlowLayout;
@@ -18,6 +23,8 @@ ClusterView::ClusterView(Cluster* cluster, QWidget* parent)
 
     foreach (Photo* photo, _cluster->getAllPhotos())
         addPhoto(photo);
+
+    vBoxLayout->addStretch(10);
 }
 
 void ClusterView::addPhoto(Photo* photo)
@@ -42,11 +49,15 @@ int ClusterView::getPhotoItemCount() const {
 }
 
 QString ClusterView::getTitle() const {
-    return _cluster->getTitle();
+    return getCluster()->getTitle();
 }
 
 QDate ClusterView::getDate() const {
-    return _cluster->getDate();
+    return getCluster()->getDate();
+}
+
+QString ClusterView::getAddress() const {
+    return getCluster()->getAddress();
 }
 
 Cluster* ClusterView::getCluster() const {
@@ -69,7 +80,7 @@ PhotoItem* ClusterView::findPhotoItem(const Photo* photo) const
     return 0;
 }
 
-void ClusterView::sort(std::function<bool (QLayoutItem *, QLayoutItem *)> comparator)
+void ClusterView::sort(const Comparator& comparator)
 {
     _comparator = comparator;
     _layout->sort(comparator);

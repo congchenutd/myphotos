@@ -71,7 +71,6 @@ SOURCES += \
     Exif.cpp \
     Clustering.cpp \
     ClusterView.cpp \
-    PhotoView2.cpp \
     PhotoClusters.cpp \
     SortableVBoxLayout.cpp
 
@@ -118,15 +117,14 @@ HEADERS += \
     Exif.h \
     Clustering.h \
     ClusterView.h \
-    PhotoView2.h \
     PhotoClusters.h \
-    SortableVBoxLayout.h
+    SortableVBoxLayout.h \
+    QuickSort.h
 
 FORMS += \
 	MainWindow.ui \
     SettingsDlg.ui \
     MonitoredFoldersDlg.ui \
-    PhotoView.ui \
     TagsView.ui \
     NewTagDlg.ui \
     NewEventDlg.ui \

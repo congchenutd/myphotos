@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QSpacerItem>
 #include <QVBoxLayout>
+#include <QShortcut>
 
 PhotoView::PhotoView(QWidget *parent) :
     QWidget(parent),
@@ -30,10 +31,13 @@ PhotoView::PhotoView(QWidget *parent) :
     _sortBy("Time"),
     _ascending(false)
 {
-//    ui.setupUi(this);
     _library    = Library::getInstance();
-    _vBoxLayout = new SortableVBoxLayout(this);
-    setLayout(_vBoxLayout);
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    _vBoxLayout = new SortableVBoxLayout;
+    layout->addLayout(_vBoxLayout);
+    layout->addSpacing(1000);
+
+    new QShortcut(QKeySequence("Ctrl+A"), this, SLOT(onSelectAll()));
 }
 
 /**
@@ -44,6 +48,7 @@ void PhotoView::clear()
     _vBoxLayout->clear();
     _selected.clear();
     _cluster2ClusterView.clear();
+    _photoClusters.clear();
 }
 
 /**
@@ -85,7 +90,7 @@ void PhotoView::sort(const QString& byWhat, bool ascending)
     }
     else if (byWhat == "Title")
     {
-        _vBoxLayout->sort(ClusterViewLessAddress(ascending));
+        _vBoxLayout->sort(ClusterViewLessTitle(ascending));
         foreach (ClusterView* clusterView, _cluster2ClusterView)
             clusterView->sort(PhotoItemLessTitle(ascending));
     }
@@ -335,6 +340,12 @@ void PhotoView::onLocationDecoded(Photo* photo)
             clusterView->reloadTitle();
 }
 
+void PhotoView::onSelectAll()
+{
+    _selected = getAllPhotoItems().toSet();
+    updateSelection();
+}
+
 NewItemMenu* PhotoView::createTagMenu()
 {
     NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), new NewTagDlg(tr("New Tag"), this), this);
@@ -417,9 +428,9 @@ NewItemMenu* PhotoView::createEventMenu()
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-ClusterViewLessAddress::ClusterViewLessAddress(bool lessThan) : _lessThan(lessThan) {}
+ClusterViewLessTitle::ClusterViewLessTitle(bool lessThan) : _lessThan(lessThan) {}
 
-bool ClusterViewLessAddress::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+bool ClusterViewLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
 {
     ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
     ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
@@ -441,6 +452,21 @@ bool ClusterViewLessDate::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
     if (view1 != 0 && view2 != 0)
     {
         bool result = view1->getDate() < view2->getDate();
+        return _lessThan ? result : !result;
+    }
+    return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+ClusterViewLessAddress::ClusterViewLessAddress(bool lessThan) : _lessThan(lessThan) {}
+
+bool ClusterViewLessAddress::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
+{
+    ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
+    ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
+    if (view1 != 0 && view2 != 0)
+    {
+        bool result = view1->getAddress() < view2->getAddress();
         return _lessThan ? result : !result;
     }
     return false;

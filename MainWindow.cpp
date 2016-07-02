@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _library->load();
 
     ui.setupUi(this);
+
     _progressBar = new QProgressBar(this);
     _progressBar->setTextVisible(true);
     _progressBar->setFormat("%v/%m");
@@ -59,9 +60,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionAbout,         SIGNAL(triggered()), this, SLOT(onAbout()));
     connect(ui.actionScan,          SIGNAL(triggered(bool)),    SLOT(onScan()));
     connect(ui.actionOptions,       SIGNAL(triggered(bool)),    SLOT(onOptions()));
-    connect(ui.actionSortByAddress, SIGNAL(triggered()),        SLOT(sort()));
-    connect(ui.actionSortByTitle,   SIGNAL(triggered()),        SLOT(sort()));
-    connect(ui.actionSortByTime,    SIGNAL(triggered()),        SLOT(sort()));
+    connect(ui.actionSortByAddress, SIGNAL(toggled(bool)),        SLOT(sort()));
+    connect(ui.actionSortByTitle,   SIGNAL(toggled(bool)),        SLOT(sort()));
+    connect(ui.actionSortByTime,    SIGNAL(toggled(bool)),        SLOT(sort()));
     connect(ui.actionOrder,         SIGNAL(triggered()),        SLOT(onSortingOrder()));
     connect(ui.photoView, SIGNAL(selectionChanged(QList<PhotoItem*>)),
             this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
@@ -87,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.pageEvents,  SIGNAL(filter(QString)),                    SLOT(onFilterByEvent    (QString)));
 
     _scanner = new Scanner;
-    connect(_scanner, SIGNAL(photoAdded(Photo*)), SLOT(onPhotoAdded(Photo*)));
+    connect(_scanner, SIGNAL(scanned(Photo*)), SLOT(onPhotoScanned(Photo*)));
 
     _geocoder = new Geocoder;
     connect(_geocoder, SIGNAL(decoded(Photo*)), ui.photoView, SLOT(onLocationDecoded(Photo*)));
@@ -123,7 +124,7 @@ void MainWindow::onOptions()
     dlg.exec();
 }
 
-void MainWindow::onPhotoAdded(Photo* photo)
+void MainWindow::onPhotoScanned(Photo* photo)
 {
     ui.photoView->addPhoto(photo);
 

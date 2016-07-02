@@ -50,7 +50,7 @@ QLayoutItem* FlowLayout::takeAt(int index)
     return 0;
 }
 
-void FlowLayout::sort(std::function<bool (QLayoutItem *, QLayoutItem *)> comparator)
+void FlowLayout::sort(const Comparator& comparator)
 {
     std::sort(_itemList.begin(), _itemList.end(), comparator);
     update();

@@ -11,13 +11,13 @@ void SortableVBoxLayout::clear() {
         item->widget()->deleteLater();
 }
 
-void SortableVBoxLayout::sort(std::function<bool (QLayoutItem *, QLayoutItem *)> comparator)
+void SortableVBoxLayout::sort(const Comparator& comparator)
 {
     QList<QLayoutItem*> items;
     while (QLayoutItem* item = takeAt(0))
         items << item;
 
-    std::sort(items.begin(), items.end(), comparator);
+    quickSort(items, 0, items.length() - 1, comparator);
 
     foreach (QLayoutItem* item, items)
         addItem(item);

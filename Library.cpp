@@ -93,8 +93,9 @@ void Library::addTag(Tag* tag) {
  */
 void Library::removePhoto(Photo* photo)
 {
-    _photos     .remove(photo->getFilePath());
-    _thumbnails .remove(photo->getThumbnail()->getFilePath());
+    _photos.remove(photo->getFilePath());
+    if (photo->getThumbnail() != 0)
+        _thumbnails.remove(photo->getThumbnail()->getFilePath());
     photo->destroy();
 }
 

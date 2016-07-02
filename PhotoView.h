@@ -1,10 +1,11 @@
 #ifndef PHOTOVIEW_H
 #define PHOTOVIEW_H
 
-#include "ui_PhotoView.h"
 #include "Clustering.h"
 #include "PhotoClusters.h"
 #include <QList>
+#include <QSet>
+#include <QWidget>
 
 class Library;
 class Photo;
@@ -13,6 +14,7 @@ class QLayoutItem;
 class NewItemMenu;
 class SortableVBoxLayout;
 class ClusterView;
+class QRubberBand;
 
 /**
  * A view widget for photos
@@ -41,6 +43,7 @@ private slots:
     void onPeopleChecked(bool checked);
     void onEventChecked (bool checked);
     void onLocationDecoded(Photo* photo);
+    void onSelectAll();
 
 signals:
     void photoSelected(Photo*);
@@ -68,7 +71,6 @@ private:
     PhotoItem* getItemAt(int index) const;
 
 private:
-    Ui::PhotoView ui;
     Library*            _library;
     QPoint              _clickedPosition;
     QRubberBand*        _rubberBand;
@@ -81,6 +83,15 @@ private:
 };
 
 // Comparators for sorting
+class ClusterViewLessTitle
+{
+public:
+    ClusterViewLessTitle(bool lessThan = true);
+    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
+private:
+    bool _lessThan;
+};
+
 class ClusterViewLessAddress
 {
 public:

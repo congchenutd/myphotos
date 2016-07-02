@@ -46,18 +46,9 @@ QList<Photo*> Scanner::scan()
             }
     }
 
-    QList<Photo*> task;
-    for (int i = 0; i < photos.length(); ++i)
-    {
-        task << photos.at(i);
-        if (i % 10 == 0 || i == photos.length() - 1)    // 10 photos each thread
-        {
-            ScannerThread* thread = new ScannerThread(QList<Photo*>(task));
-            connect(thread, SIGNAL(photoAdded(Photo*)), SIGNAL(photoAdded(Photo*)));
-            QThreadPool::globalInstance()->start(thread);
-            task.clear();
-        }
-    }
+    ScannerThread* thread = new ScannerThread(QList<Photo*>(photos));
+    connect(thread, SIGNAL(scanned(Photo*)), SIGNAL(scanned(Photo*)));
+    QThreadPool::globalInstance()->start(thread);
 
     return photos;
 }
@@ -80,6 +71,6 @@ void ScannerThread::run()
         Exif exif(photo);
         photo->setExif(exif);
         photo->save();
-        emit photoAdded(photo);
+        emit scanned(photo);
     }
 }

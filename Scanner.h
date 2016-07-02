@@ -22,7 +22,7 @@ public:
     QList<Photo*> scan();
 
 signals:
-    void photoAdded(Photo* photo);
+    void scanned(Photo* photo);
 };
 
 class ScannerThread: public QObject, public QRunnable
@@ -34,7 +34,7 @@ public:
     void run();
 
 signals:
-    void photoAdded(Photo* photo);
+    void scanned(Photo* photo);
 
 private:
     QList<Photo*>   _photos;

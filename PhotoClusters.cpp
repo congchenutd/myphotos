@@ -26,7 +26,7 @@ QDate Cluster::getDate() const {
 }
 
 QString Cluster::getTitle() const {
-    return getAddress() + "  " + getDate().toString("MM/dd/yyyy");
+    return getDate().toString("MM/dd/yyyy") + "  " + getAddress();
 }
 
 PhotoList Cluster::getAllPhotos() const {
@@ -37,11 +37,19 @@ int Cluster::getPhotoCount() const {
     return _photos.count();
 }
 
+void Cluster::clear() {
+    _photos.clear();
+}
+
 void Cluster::removePhoto(Photo* photo)
 {
-    for (QMap<QDateTime, Photo*>::iterator it = _photos.begin(); it != _photos.end(); ++it)
+    for (QMap<QDateTime, Photo*>::iterator it = _photos.begin(); it != _photos.end();)
+    {
         if (it.value() == photo)
-            _photos.erase(it);
+            it = _photos.erase(it);
+        else
+            ++ it;
+    }
 }
 
 
@@ -88,6 +96,14 @@ int SameDateClusters::getClusterCount() const {
     return _clusters.count();
 }
 
+void SameDateClusters::clear()
+{
+    foreach (Cluster* cluster, _clusters)
+        cluster->clear();
+    _clusters.clear();
+    _date = QDate();
+}
+
 Cluster* SameDateClusters::findColocatedCluster(Photo* photo) const
 {
     foreach (Cluster* cluster, _clusters)
@@ -128,5 +144,12 @@ ClusterList PhotoClusters::getAllClusters() const
     foreach (SameDateClusters* sameDate, _clusterLists)
         result << sameDate->getAllClusters();
     return result;
+}
+
+void PhotoClusters::clear()
+{
+    foreach (SameDateClusters* sameDateClusters, _clusterLists)
+        sameDateClusters->clear();
+    _clusterLists.clear();
 }
 

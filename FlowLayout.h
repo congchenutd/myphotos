@@ -1,6 +1,7 @@
 #ifndef FLOWLAYOUT_H
 #define FLOWLAYOUT_H
 
+#include "SortableVBoxLayout.h"
 #include <QLayout>
 #include <QRect>
 #include <QStyle>
@@ -28,7 +29,7 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QLayoutItem* takeAt(int index) Q_DECL_OVERRIDE;
 
-    void sort(std::function<bool (QLayoutItem*, QLayoutItem*)> comparator);
+    void sort(const Comparator& comparator);
 
 private:
     int doLayout(const QRect& rect, bool testOnly) const;

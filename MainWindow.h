@@ -29,7 +29,7 @@ protected:
 private slots:
     void onScan();
     void onOptions();
-    void onPhotoAdded(Photo* photo);
+    void onPhotoScanned(Photo* photo);
     void onSortingOrder();
     void sort();
     void onPhotoSelected(const QList<PhotoItem*>& selected);

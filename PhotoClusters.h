@@ -21,6 +21,7 @@ public:
     QString     getTitle()      const;
     PhotoList   getAllPhotos()  const;
     int         getPhotoCount() const;
+    void clear();
 
 private:
     QMap<QDateTime, Photo*> _photos;
@@ -37,6 +38,7 @@ public:
     QDate       getDate()           const;
     ClusterList getAllClusters()    const;
     int         getClusterCount()   const;
+    void clear();
 
 private:
     Cluster* findColocatedCluster(Photo* photo) const;
@@ -55,6 +57,7 @@ public:
     Cluster* removePhoto(Photo* photo);
     PhotoList   getAllPhotos()      const;
     ClusterList getAllClusters()    const;
+    void clear();
 
 private:
     ClusterLists    _clusterLists;
