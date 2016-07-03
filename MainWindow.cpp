@@ -15,7 +15,6 @@
 #include "EventModel.h"
 #include "SliderWithToolTip.h"
 #include "Geocoder.h"
-#include "Clustering.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
@@ -36,24 +35,28 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui.setupUi(this);
 
+    // progress bar and status bar
     _progressBar = new QProgressBar(this);
     _progressBar->setTextVisible(true);
     _progressBar->setFormat("%v/%m");
     _progressBar->hide();
     ui.statusBar->addPermanentWidget(_progressBar);
 
+    // action group makes the actions exclusive
     QActionGroup* actionGroup = new QActionGroup(this);
     actionGroup->addAction(ui.actionSortByTime);
     actionGroup->addAction(ui.actionSortByAddress);
     actionGroup->addAction(ui.actionSortByTitle);
     ui.actionSortByTime->setChecked(true);
 
+    // slider shows the size of thumbnails
     _slider = new SliderWithToolTip(this);
     _slider->setOrientation(Qt::Horizontal);
     _slider->setMinimumWidth(150);
     _slider->setMaximumWidth(150);
     _slider->setRange(100, 500);
     _slider->setValue(200);
+    _slider->setValue(Settings::getInstance()->getThumbnailSize().width());
     ui.statusBar->addPermanentWidget(_slider);
     ui.statusBar->addPermanentWidget(new QLabel("  "));
 
@@ -76,17 +79,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_slider,            SIGNAL(valueChanged(int)),  SLOT(onThumbnailSize(int)));
     connect(ui.pageInfo, SIGNAL(infoChanged(Photo*)), SLOT(onInfoChanged(Photo*)));
 
+    // load photos to photo view
     ui.photoView->load(_library->getAllPhotos().values());
-    _slider->setValue(Settings::getInstance()->getThumbnailSize().width());
-    sort();
-    onPhotoSelected(QList<PhotoItem*>());   // clear selection
+    onPhotoSelected(QList<PhotoItem*>());   // clear selection and disable actions
 
+    // filtering pages
     ui.pageTags     ->setModel(new TagModel     (this));
     ui.pagePeople   ->setModel(new PeopleModel  (this));
     ui.pageEvents   ->setModel(new EventModel   (this));
-    connect(ui.pageTags,    SIGNAL(filterByTags(QStringList, bool)),    SLOT(onFilterByTags     (QStringList, bool)));
-    connect(ui.pagePeople,  SIGNAL(filterByTags(QStringList, bool)),    SLOT(onFilterByPeople   (QStringList, bool)));
-    connect(ui.pageEvents,  SIGNAL(filter(QString)),                    SLOT(onFilterByEvent    (QString)));
+    connect(ui.pageTags,    SIGNAL(filter(QStringList, bool)),  SLOT(onFilterByTags     (QStringList, bool)));
+    connect(ui.pagePeople,  SIGNAL(filter(QStringList, bool)),  SLOT(onFilterByPeople   (QStringList, bool)));
+    connect(ui.pageEvents,  SIGNAL(filter(QString)),            SLOT(onFilterByEvent    (QString)));
 
     _scanner = new Scanner;
     connect(_scanner, SIGNAL(scanned(Photo*)), SLOT(onPhotoScanned(Photo*)));
@@ -94,6 +97,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _geocoder = new Geocoder;
     connect(_geocoder, SIGNAL(decoded(Photo*)), ui.photoView, SLOT(onLocationDecoded(Photo*)));
     _geocoder->start(_library->getAllPhotos().values());
+
+    sort();
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }
@@ -105,7 +110,7 @@ QAction*    MainWindow::getSortByTimeAction()   { return ui.actionSortByTime;   
 QAction*    MainWindow::getSortingOrderAction() { return ui.actionOrder;        }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
-    _library->clean();
+    _library->clean();  // clean up unused tags and save the library
     QMainWindow::closeEvent(event);
 }
 
@@ -131,11 +136,13 @@ void MainWindow::onPhotoScanned(Photo* photo)
     ui.photoView->addPhoto(photo);
 
     _progressBar->setValue(_progressBar->value() + 1);
+    sort();
+
+    // all scanned
     if (_progressBar->value() == _progressBar->maximum())
     {
         _progressBar->hide();
         ui.statusBar->showMessage(tr("%1 photo(s) imported").arg(_progressBar->maximum()), 2000);
-        sort();
         _geocoder->start(_newPhotos);
     }
     else
@@ -172,16 +179,19 @@ void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
     ui.actionDelete ->setEnabled(hasSelection);
     ui.actionRename ->setEnabled(hasSelection);
 
-    ui.pageInfo->setCurrentPhoto(selected.isEmpty() ? 0 : selected.front()->getPhoto());
+    ui.pageInfo->setCurrentPhoto(hasSelection ? selected.front()->getPhoto() : 0);
 
-    if (hasSelection)
+    if (hasSelection)   // show selection info
         ui.statusBar->showMessage(tr("%1 photo(s) selected").arg(selected.length()));
-    else
+    else                // show all info
         ui.statusBar->showMessage(tr("%1 photo(s), %2 video(s)")
                                   .arg(_library->getPhotoCount())
                                   .arg(_library->getVideoCount()));
 }
 
+/**
+ * Trigger title editing
+ */
 void MainWindow::onRename() {
     ui.photoView->getSelectedItems().front()->rename();
 }
@@ -195,7 +205,7 @@ void MainWindow::onRemove()
         for (PhotoItem* item: ui.photoView->getSelectedItems())
         {
             _library->removePhoto(item->getPhoto());
-            ui.photoView->removeItem(item);
+            ui.photoView->removePhotoItem(item);
         }
     }
 }
@@ -209,12 +219,12 @@ void MainWindow::onDelete()
         for (PhotoItem* item: ui.photoView->getSelectedItems())
         {
             _library->removePhoto(item->getPhoto());
-            ui.photoView->removeItem(item);
+            ui.photoView->removePhotoItem(item);
 
+            // move the file to trash
             QFileInfo fileInfo(item->getPhoto()->getFilePath());
             QString newPath = Settings::getInstance()->getTrashLocation() + QDir::separator() + fileInfo.fileName();
-            QFile file(fileInfo.filePath());
-            file.rename(newPath);
+            QFile(fileInfo.filePath()).rename(newPath);
         }
     }
 }
@@ -227,10 +237,12 @@ void MainWindow::onThumbnailSize(int size)
 
 void MainWindow::onNewTag(const QString& tagValue)
 {
+    // create a tag object
     Tag* tag = new Tag(TagDAO::getInstance()->getNextID(), tagValue);
     _library->addTag(tag);
     tag->save();
 
+    // add the tag to selected photos
     foreach(PhotoItem* item, ui.photoView->getSelectedItems())
     {
         Photo* photo = item->getPhoto();
@@ -238,15 +250,18 @@ void MainWindow::onNewTag(const QString& tagValue)
         photo->save();
     }
 
+    // update tag page
     ui.pageTags->update();
 }
 
 void MainWindow::onNewPeople(const QString& name)
 {
+    // create a people object
     People* people = new People(PeopleDAO::getInstance()->getNextID(), name);
     _library->addPeople(people);
     people->save();
 
+    // add the people to selected photos
     foreach(PhotoItem* item, ui.photoView->getSelectedItems())
     {
         Photo* photo = item->getPhoto();
@@ -254,15 +269,18 @@ void MainWindow::onNewPeople(const QString& name)
         photo->save();
     }
 
+    // update people page
     ui.pagePeople->update();
 }
 
 void MainWindow::onNewEvent(const QString& name, const QDate& date)
 {
+    // create an event object
     Event* event = new Event(EventDAO::getInstance()->getNextID(), name, date);
     _library->addEvent(event);
     event->save();
 
+    // add it to selected photos
     foreach(PhotoItem* item, ui.photoView->getSelectedItems())
     {
         Photo* photo = item->getPhoto();
@@ -270,36 +288,28 @@ void MainWindow::onNewEvent(const QString& name, const QDate& date)
         photo->save();
     }
 
+    // update event page
     ui.pageEvents->update();
 }
 
 void MainWindow::onFilterByTags(const QStringList& tags, bool AND)
 {
     ui.photoView->clear();
-    if (tags.isEmpty())
-        resetPhotos();
-    else
-        ui.photoView->load(_library->filterPhotosByTags(tags.toSet(), AND));
+    ui.photoView->load(_library->filterPhotosByTags(tags.toSet(), AND));
     sort();
 }
 
 void MainWindow::onFilterByPeople(const QStringList& people, bool AND)
 {
     ui.photoView->clear();
-    if (people.isEmpty())
-        resetPhotos();
-    else
-        ui.photoView->load(_library->filterPhotosByPeople(people.toSet(), AND));
+    ui.photoView->load(_library->filterPhotosByPeople(people.toSet(), AND));
     sort();
 }
 
 void MainWindow::onFilterByEvent(const QString& eventName)
 {
     ui.photoView->clear();
-    if (eventName.isEmpty())
-        resetPhotos();
-    else
-        ui.photoView->load(_library->filterPhotosByEvent(eventName));
+    ui.photoView->load(_library->filterPhotosByEvent(eventName));
     sort();
 }
 
@@ -312,6 +322,10 @@ void MainWindow::onAbout()
                        .arg(Settings::getInstance()->getCompileDate()));
 }
 
+/**
+ * Information page changed the meta data of a given photo
+ * Update the corresponding PhotoItem
+ */
 void MainWindow::onInfoChanged(Photo* photo)
 {
     if (PhotoItem* item = ui.photoView->getItem(photo))
@@ -319,8 +333,4 @@ void MainWindow::onInfoChanged(Photo* photo)
         item->setPhoto(photo);
         sort();
     }
-}
-
-void MainWindow::resetPhotos() {
-    ui.photoView->load(_library->getAllPhotos().values());
 }

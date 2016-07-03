@@ -1,7 +1,6 @@
 #ifndef PHOTOVIEW_H
 #define PHOTOVIEW_H
 
-#include "Clustering.h"
 #include "PhotoClusters.h"
 #include <QList>
 #include <QScrollArea>
@@ -31,7 +30,7 @@ public:
     void load(const QList<Photo*>& photos);
     void sort(const QString& byWhat, bool ascending);
     QList<PhotoItem*> getSelectedItems() const;
-    void removeItem(PhotoItem* item);
+    void removePhotoItem(PhotoItem* item);
     void addPhoto(Photo* photo);
     PhotoItem* getItem(Photo* photo) const;
 
@@ -59,7 +58,7 @@ protected:
     void mouseReleaseEvent  (QMouseEvent* event);
 
 private:
-    void updateSelection();
+    void updateSelection(const QSet<PhotoItem*> &selected);
     int                 getClickedItemIndex (const QPoint& point) const;
     PhotoItem*          getClickedItem      (const QPoint& point) const;
     QSet<PhotoItem *>   getClickedItems     (const QPoint& start, const QPoint& end) const;
@@ -68,20 +67,19 @@ private:
     NewItemMenu* createPeopleMenu();
     NewItemMenu* createEventMenu();
 
-    QList<ClusterView*> getAllClusterViews() const;
     QList<PhotoItem*> getAllPhotoItems() const;
     PhotoItem* getItemAt(int index) const;
 
 private:
-    Library*            _library;
-    QPoint              _clickedPosition;
-    QRubberBand*        _rubberBand;
-    QSet<PhotoItem*>    _selected;
-    QString             _sortBy;
-    bool                _ascending;
-    SortableVBoxLayout* _vBoxLayout;
-    PhotoClusters       _photoClusters;
-    QMap<Cluster*, ClusterView*>    _cluster2ClusterView;
+    Library*                        _library;
+    QPoint                          _clickedPosition;
+    QRubberBand*                    _rubberBand;
+    QSet<PhotoItem*>                _selected;
+    QString                         _sortBy;
+    bool                            _ascending;
+    SortableVBoxLayout*             _vBoxLayout;
+    PhotoClusters                   _photoClusters;     // the model
+    QMap<Cluster*, ClusterView*>    _clusterViews;
 };
 
 // Comparators for sorting

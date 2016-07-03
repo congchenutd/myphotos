@@ -24,7 +24,7 @@ private slots:
     void onShowAll();
 
 signals:
-    void filterByTags(const QStringList& tags, bool AND);
+    void filter(const QStringList& tags, bool AND);
 
 private:
     QVBoxLayout*    _layoutTags;

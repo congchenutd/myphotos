@@ -15,7 +15,6 @@ public:
     void setMonitoredFileTypes(const QString& list);
 
     QSize getNewThumbnailSize() const;
-    void setNewThumbnailSize(const QSize& size);
 
     QSize getThumbnailSize() const;
     void setThumbnailSize(const QSize& size);
@@ -24,6 +23,12 @@ public:
     QString getTrashLocation() const;
 
     QString getCompileDate() const;
+
+    QString getExiftoolPath() const;
+    void setExiftoolPath(const QString& path);
+
+    QString getFfmpegPath() const;
+    void setFfmpegPath(const QString& path);
 
 private:
     Settings(const QString& fileName);

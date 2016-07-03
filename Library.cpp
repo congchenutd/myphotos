@@ -58,6 +58,10 @@ Thumbnail* Library::getThumbnail(const QString& filePath) {
     return _thumbnails.contains(filePath) ? _thumbnails[filePath] : 0;
 }
 
+Photo* Library::getPhoto(const QString& filePath) {
+    return _photos.contains(filePath) ? _photos[filePath] : 0;
+}
+
 int Library::getPhotoCount() const {
     return _photos.count() - getVideoCount();
 }
@@ -69,10 +73,6 @@ int Library::getVideoCount() const
         if (photo->isVideo())
             result ++;
     return result;
-}
-
-Photo* Library::getPhoto(const QString& filePath) {
-    return _photos.contains(filePath) ? _photos[filePath] : 0;
 }
 
 void Library::addPhoto(Photo* photo) {
@@ -102,27 +102,33 @@ void Library::addTag(Tag* tag) {
 
 /**
  * Remove a photo object from the library
- * WARNING: the photo object is destroyed by this method, DO NOT use it afterwards
+ * WARNING: the photo and its thumbnail are destroyed by this method, DO NOT use them afterwards
  */
 void Library::removePhoto(Photo* photo)
 {
     _photos.remove(photo->getFilePath());
-    if (photo->getThumbnail() != 0)
-        _thumbnails.remove(photo->getThumbnail()->getFilePath());
+    if (Thumbnail* thumbnail = photo->getThumbnail())
+    {
+        _thumbnails.remove(thumbnail->getFilePath());
+        thumbnail->destroy();
+    }
     photo->destroy();
 }
 
 QList<Photo*> Library::filterPhotosByTags(const QSet<QString>& tags, bool AND)
 {
+    if (tags.isEmpty())
+        return getAllPhotos().values();
+
     QList<Photo*> result;
     foreach (Photo* photo, _photos)
     {
         if (AND) {
-            if (photo->getTagNames().contains(tags))
+            if (photo->getTagNames().contains(tags))    // contains all the tags
                 result << photo;
         }
         else {
-            if (photo->getTagNames().intersects(tags))
+            if (photo->getTagNames().intersects(tags))  // contains at least one of the tags
                 result << photo;
         }
     }
@@ -131,15 +137,18 @@ QList<Photo*> Library::filterPhotosByTags(const QSet<QString>& tags, bool AND)
 
 QList<Photo *> Library::filterPhotosByPeople(const QSet<QString>& people, bool AND)
 {
+    if (people.isEmpty())
+        return getAllPhotos().values();
+
     QList<Photo*> result;
     foreach (Photo* photo, _photos)
     {
         if (AND) {
-            if (photo->getPeopleNames().contains(people))
+            if (photo->getPeopleNames().contains(people))   // contains all the people
                 result << photo;
         }
         else {
-            if (photo->getPeopleNames().intersects(people))
+            if (photo->getPeopleNames().intersects(people)) // contains at least one of the people
                 result << photo;
         }
     }
@@ -148,6 +157,9 @@ QList<Photo *> Library::filterPhotosByPeople(const QSet<QString>& people, bool A
 
 QList<Photo *> Library::filterPhotosByEvent(const QString& eventName)
 {
+    if (eventName.isEmpty())
+        return getAllPhotos().values();
+
     QList<Photo*> result;
     foreach (Photo* photo, _photos)
         if (Event* event = photo->getEvent())

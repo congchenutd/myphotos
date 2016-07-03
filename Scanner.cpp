@@ -46,6 +46,7 @@ QList<Photo*> Scanner::scan()
             }
     }
 
+    // assign the photos to ScannerThread for generating thumbnail and exif
     ScannerThread* thread = new ScannerThread(QList<Photo*>(photos));
     connect(thread, SIGNAL(scanned(Photo*)), SIGNAL(scanned(Photo*)));
     QThreadPool::globalInstance()->start(thread);

@@ -31,11 +31,7 @@ void Settings::setMonitoredFileTypes(const QString& list)
 }
 
 QSize Settings::getNewThumbnailSize() const {
-    return value("NewThumbnailSize").toSize();
-}
-
-void Settings::setNewThumbnailSize(const QSize& size) {
-    setValue("NewThumbnailSize", size);
+    return QSize(500, 500);
 }
 
 QSize Settings::getThumbnailSize() const {
@@ -70,4 +66,20 @@ QString Settings::getCompileDate() const
     QResource resource(":/CompileDate.txt");
     QString result = (char*) resource.data();
     return result.isEmpty() ? "Unknown date" : result;
+}
+
+QString Settings::getExiftoolPath() const {
+    return value("Exiftool").toString();
+}
+
+void Settings::setExiftoolPath(const QString& path) {
+    setValue("Exiftool", path);
+}
+
+QString Settings::getFfmpegPath() const {
+    return value("Ffmpeg").toString();
+}
+
+void Settings::setFfmpegPath(const QString& path) {
+    setValue("Ffmpeg", path);
 }

@@ -10,15 +10,17 @@ class FlowLayout;
 class QLayoutItem;
 class PhotoItem;
 
+/**
+ * A ClusterView holds PhotoItems that have the same date and location
+ */
 class ClusterView : public QWidget
 {
-    Q_OBJECT
-
 public:
     explicit ClusterView(Cluster* cluster, QWidget* parent = 0);
     void addPhoto(Photo* photo);
     void removePhotoItem(PhotoItem* item);
     void reloadTitle();
+    void sort(const Comparator& comparator);
 
     int                 getPhotoItemCount() const;
     QString             getTitle()          const;
@@ -26,11 +28,6 @@ public:
     QString             getAddress()        const;
     Cluster*            getCluster()        const;
     QList<PhotoItem*>   getAllPhotoItems()  const;
-    PhotoItem*          findPhotoItem(const Photo* photo) const;
-    void sort(const Comparator& comparator);
-
-private slots:
-    void sort();
 
 private:
     QLabel*     _labelTitle;

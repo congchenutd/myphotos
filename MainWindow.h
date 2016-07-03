@@ -16,6 +16,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget* parent = 0);
     static MainWindow* getInstance();
+
     QAction* getRenameAction();
     QAction* getRemoveAction();
     QAction* getDeleteAction();
@@ -24,7 +25,7 @@ public:
     QAction* getSortingOrderAction();
 
 protected:
-    void closeEvent (QCloseEvent*  event);
+    void closeEvent(QCloseEvent* event);
 
 private slots:
     void onScan();
@@ -45,9 +46,6 @@ private slots:
     void onFilterByEvent    (const QString& eventName);
     void onAbout();
     void onInfoChanged(Photo* photo);
-
-private:
-    void resetPhotos();
 
 private:
     Ui::MainWindow ui;

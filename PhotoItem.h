@@ -39,11 +39,10 @@ signals:
 private:
     ClusterView*    _clusterView;
     Photo*          _photo;
-    QLabel*         _thumbnail;
     EditableLabel*  _title;
-    QColor          _backgroundColor;
-    bool            _selected;
+    QLabel*         _thumbnail;
     QLabel*         _videoLabel;
+    QColor          _backgroundColor;
     QSize           _thumbnailSize;
 };
 

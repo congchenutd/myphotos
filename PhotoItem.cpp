@@ -15,7 +15,6 @@
 
 PhotoItem::PhotoItem(Photo* photo, ClusterView* clusterView)
     : _clusterView(clusterView),
-      _selected(false),
       _videoLabel(0)
 {
     _thumbnail  = new QLabel(this);
@@ -44,6 +43,7 @@ void PhotoItem::setPhoto(Photo* photo)
     _photo = photo;
     _title->setText(photo->getTitle());
 
+    // show video icon if it's a video
     if (photo->exists() && photo->isVideo())
     {
         _videoLabel->setPixmap(QPixmap(":/Images/Video.png"));
@@ -55,8 +55,7 @@ void PhotoItem::setPhoto(Photo* photo)
     }
 }
 
-void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
-{
+void PhotoItem::mouseDoubleClickEvent(QMouseEvent*) {
     QDesktopServices::openUrl(QUrl::fromLocalFile(_photo->getFilePath()));
 }
 
@@ -78,7 +77,7 @@ void PhotoItem::onTitleEdited(const QString& title)
  */
 void PhotoItem::setSelected(bool selected)
 {
-    _selected = selected;
+    // highlight
     QPalette palette(this->palette());
     palette.setColor(QPalette::Background,
                      selected ? palette.highlight().color() : _backgroundColor);
@@ -97,7 +96,7 @@ void PhotoItem::resizeThumbnail()
 {
     // resize only when it's invalid and visible
     QSize size = Settings::getInstance()->getThumbnailSize();
-    if (_thumbnailSize == size || (visibleRegion().isEmpty() && _thumbnailSize.isValid()))
+    if (_thumbnailSize == size || visibleRegion().isEmpty())
         return;
 
     _thumbnailSize = size;

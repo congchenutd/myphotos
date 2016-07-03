@@ -1,7 +1,9 @@
 #include "Geocoder.h"
 #include "Photo.h"
 #include "Exif.h"
+#include "Settings.h"
 
+#include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QProcess>
@@ -25,8 +27,12 @@ Exif::Exif(Photo* photo)
     if (photo == 0)
         return;
 
+    QString exiftoolPath = Settings::getInstance()->getExiftoolPath();
+    if (exiftoolPath.isEmpty() || !QFile::exists(exiftoolPath))
+        return;
+
     QProcess* process = new QProcess;
-    process->start("/usr/local/bin/exiftool", QStringList() << photo->getFilePath());
+    process->start(exiftoolPath, QStringList() << photo->getFilePath());
     process->waitForFinished();
 
     QStringList list = QString(process->readAllStandardOutput()).split("\n");

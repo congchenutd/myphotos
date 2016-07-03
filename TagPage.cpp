@@ -61,7 +61,7 @@ void TagPage::onTagChecked()
             if (checkBox->isChecked())
                 tags << checkBox->text();
     }
-    emit filterByTags(tags, _radioAnd->isChecked());
+    emit filter(tags, _radioAnd->isChecked());
 }
 
 void TagPage::onShowAll()
@@ -72,6 +72,6 @@ void TagPage::onShowAll()
         if (QCheckBox* checkBox = qobject_cast<QCheckBox*>(item->widget()))
             checkBox->setChecked(false);
     }
-    emit filterByTags(QStringList(), _radioAnd->isChecked());
+    emit filter(QStringList(), _radioAnd->isChecked());
 }
 

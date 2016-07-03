@@ -19,21 +19,26 @@ Thumbnail* generateThumbnail(Photo* photo)
 
     // generate thumbnail file path
     QString location = Settings::getInstance()->getThumbnailCacheLocation();
-    QString filePath = location + QDir::separator() + fileName;
+    QString thumbnailFilePath = location + QDir::separator() + fileName;
 
     if (photo->isVideo())
     {
-        QString command = QObject::tr("/usr/local/Cellar/ffmpeg/2.8.4/bin/ffmpeg -y \
-                                      -i \"%1\" -vframes 1 -filter:v scale=\'500:-1\' \"%2\"")
-                .arg(photo->getFilePath()).arg(filePath);
-        QProcess::execute(command);
+        QString ffmpegPath = Settings::getInstance()->getFfmpegPath();
+        if (!ffmpegPath.isEmpty())
+        {
+            QString command = QObject::tr("%1 -y -i \"%2\" -vframes 1 -filter:v scale=\'500:-1\' \"%3\"")
+                    .arg(ffmpegPath)
+                    .arg(photo->getFilePath())
+                    .arg(thumbnailFilePath);
+            QProcess::execute(command);
+        }
     }
     else
     {
         QImageReader reader(photo->getFilePath());
         reader.setAutoTransform(true);
-        reader.read().scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(filePath);
+        reader.read().scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbnailFilePath);
     }
 
-    return new Thumbnail(ThumbnailDAO::getInstance()->getNextID(), filePath);
+    return new Thumbnail(ThumbnailDAO::getInstance()->getNextID(), thumbnailFilePath);
 }

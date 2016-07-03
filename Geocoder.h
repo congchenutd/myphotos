@@ -18,6 +18,9 @@ struct Address
     QString toString() const;
 };
 
+/**
+ * Geocoder decode a GPS coordinate into an Address
+ */
 class Geocoder : public QObject
 {
     Q_OBJECT
@@ -30,10 +33,11 @@ private slots:
 
 private:
     void processNext();
-    static QString coordinate2Decimal(const QString& coordinates);
+    bool canDecode(Photo* photo) const;
     Address parse(const QByteArray& json);
     QString findComponent(const QJsonObject& resultsObj, const QString& typeName) const;
-    bool canDecode(Photo* photo) const;
+
+    static QString coordinate2Decimal(const QString& coordinates);
 
 signals:
     void decoded(Photo* photo);

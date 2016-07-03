@@ -69,7 +69,6 @@ SOURCES += \
     InfoModel.cpp \
     Geocoder.cpp \
     Exif.cpp \
-    Clustering.cpp \
     ClusterView.cpp \
     PhotoClusters.cpp \
     SortableVBoxLayout.cpp
@@ -115,7 +114,6 @@ HEADERS += \
     InfoModel.h \
     Geocoder.h \
     Exif.h \
-    Clustering.h \
     ClusterView.h \
     PhotoClusters.h \
     SortableVBoxLayout.h \

@@ -38,6 +38,9 @@ PhotoView::PhotoView(QWidget *parent) :
     layout->addLayout(_vBoxLayout);
     layout->addSpacing(1000);
 
+    _rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+    _rubberBand->setGeometry(QRect(_clickedPosition, QSize()));
+
     new QShortcut(QKeySequence("Ctrl+A"), this, SLOT(onSelectAll()));
 }
 
@@ -48,7 +51,7 @@ void PhotoView::clear()
 {
     _vBoxLayout->clear();
     _selected.clear();
-    _cluster2ClusterView.clear();
+    _clusterViews.clear();
     _photoClusters.clear();
 }
 
@@ -61,18 +64,25 @@ void PhotoView::load(const QList<Photo*>& photos)
         addPhoto(photo);
 }
 
+/**
+ * Creates a PhotoItem and add it to a new or existing ClusterView
+ */
 void PhotoView::addPhoto(Photo* photo)
 {
+    // Get an exiting or new Cluster for the photo, and add the photo to the cluster
     Cluster* cluster = _photoClusters.addPhoto(photo);
-    if (!_cluster2ClusterView.contains(cluster))
+
+    // new cluster, create a clusterview
+    if (!_clusterViews.contains(cluster))
     {
         ClusterView* clusterView = new ClusterView(cluster, this);
-        _cluster2ClusterView.insert(cluster, clusterView);
+        _clusterViews.insert(cluster, clusterView);
         _vBoxLayout->addWidget(clusterView);
     }
+    // add to existing clusterview
     else
     {
-        ClusterView* clusterView = _cluster2ClusterView[cluster];
+        ClusterView* clusterView = _clusterViews[cluster];
         clusterView->addPhoto(photo);
     }
 }
@@ -82,17 +92,18 @@ void PhotoView::sort(const QString& byWhat, bool ascending)
     _sortBy     = byWhat;
     _ascending  = ascending;
 
+    // sort the clusterviews first, then the photoitems within each clusterview
     if (byWhat == "Address")
         _vBoxLayout->sort(ClusterViewLessAddress(ascending));
     else if (byWhat == "Time") {
         _vBoxLayout->sort(ClusterViewLessDate(ascending));
-        foreach (ClusterView* clusterView, _cluster2ClusterView)
+        foreach (ClusterView* clusterView, _clusterViews)
             clusterView->sort(PhotoItemLessTime(ascending));
     }
     else if (byWhat == "Title")
     {
         _vBoxLayout->sort(ClusterViewLessTitle(ascending));
-        foreach (ClusterView* clusterView, _cluster2ClusterView)
+        foreach (ClusterView* clusterView, _clusterViews)
             clusterView->sort(PhotoItemLessTitle(ascending));
     }
 }
@@ -105,31 +116,29 @@ QList<PhotoItem*> PhotoView::getSelectedItems() const {
     return _selected.toList();
 }
 
-void PhotoView::removeItem(PhotoItem* item)
+void PhotoView::removePhotoItem(PhotoItem* item)
 {
     _selected.remove(item);
     Photo* photo = item->getPhoto();
     ClusterView* clusterView = item->getClusterView();
     clusterView->removePhotoItem(item);
+    _photoClusters.removePhoto(photo);
+
+    // when a clusterview becomes empty, remove the clusterview
     if (clusterView->getPhotoItemCount() == 0)
     {
         _vBoxLayout->removeWidget(clusterView);
-        _cluster2ClusterView.remove(clusterView->getCluster());
+        _clusterViews.remove(clusterView->getCluster());
         delete clusterView;
     }
-    _photoClusters.removePhoto(photo);
 }
 
+/**
+ * Resize the thumbnails based on Settings
+ */
 void PhotoView::resizeThumbnails() {
     foreach (PhotoItem* item, getAllPhotoItems())
         item->resizeThumbnail();
-}
-
-PhotoItem* PhotoView::getItem(Photo* photo) const {
-    foreach (ClusterView* clusterView, _cluster2ClusterView)
-        if (PhotoItem* item = clusterView->findPhotoItem(photo))
-            return item;
-    return 0;
 }
 
 void PhotoView::mousePressEvent(QMouseEvent* event)
@@ -138,8 +147,6 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
 
     // show the selection rubber band
     _clickedPosition = event->pos();
-    if (!_rubberBand)
-        _rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     _rubberBand->setGeometry(QRect(_clickedPosition, QSize()));
     _rubberBand->show();
 
@@ -149,26 +156,27 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
 
     else if (event->button() == Qt::LeftButton)
     {
-        // add clicked item to selection
+        // add clicked items to selection
         if (event->modifiers() == Qt::ShiftModifier)
             _selected += getClickedItems(lastClickedPosition, _clickedPosition);
         else if (event->modifiers() == Qt::ControlModifier)
             toggleSelection(clickedItem);
         else
-            _selected = QSet<PhotoItem*>() << clickedItem;
+            _selected = QSet<PhotoItem*>() << clickedItem;  // single selection
     }
 
     // show the selection
-    updateSelection();
+    updateSelection(_selected);
     lastClickedPosition = _clickedPosition;
 
     // context menu
     if (event->button() == Qt::RightButton)
     {
+        // right clicked on an unselected item, reselect this item
         if (clickedItem != 0 && !_selected.contains(clickedItem))
         {
             _selected = QSet<PhotoItem*>() << clickedItem;
-            updateSelection();
+            updateSelection(_selected);
         }
 
         QMenu menu(this);
@@ -193,39 +201,47 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
 }
 
 /**
- * Draw a selection rectangle and add selected photo items to _selected
+ * Draw a selection rectangle and update selected photo items
  */
 void PhotoView::mouseMoveEvent(QMouseEvent* event)
 {
-    if (_rubberBand == 0)
-        return;
-
     QRect rubberBandRect(QRect(_clickedPosition, event->pos()).normalized());
     _rubberBand->setGeometry(rubberBandRect);
 
     _selected.clear();
     foreach (PhotoItem* item, getAllPhotoItems())
     {
-        if (rubberBandRect.contains  (item->geometryMappedTo(this)) ||
-            rubberBandRect.intersects(item->geometryMappedTo(this)))
+        QRect itemRect = item->geometryMappedTo(this);
+        if (rubberBandRect.contains  (itemRect) ||
+            rubberBandRect.intersects(itemRect))
             _selected << item;
     }
-    updateSelection();
+    updateSelection(_selected);
 }
 
-void PhotoView::mouseReleaseEvent(QMouseEvent* event) {
-    if (event->button() == Qt::LeftButton && _rubberBand != 0)
-        _rubberBand->hide();
+void PhotoView::mouseReleaseEvent(QMouseEvent*) {
+    _rubberBand->hide();
 }
 
 /**
  * Highlight selected items
  */
-void PhotoView::updateSelection()
+void PhotoView::updateSelection(const QSet<PhotoItem*>& selected)
 {
     foreach (PhotoItem* item, getAllPhotoItems())
-        item->setSelected(_selected.contains(item));
-    emit selectionChanged(_selected.toList());
+        item->setSelected(selected.contains(item));
+    emit selectionChanged(selected.toList());
+}
+
+/**
+ * @return  pointer to the photo item being clicked on
+ */
+PhotoItem* PhotoView::getClickedItem(const QPoint& point) const
+{
+    foreach (PhotoItem* item, getAllPhotoItems())
+        if (item->geometryMappedTo(this).contains(point))
+            return item;
+    return 0;
 }
 
 /**
@@ -241,15 +257,6 @@ int PhotoView::getClickedItemIndex(const QPoint& point) const
 }
 
 /**
- * @return  pointer to the photo item being clicked on
- */
-PhotoItem* PhotoView::getClickedItem(const QPoint& point) const
-{
-    int index = getClickedItemIndex(point);
-    return index > -1 ? getItemAt(index) : 0;
-}
-
-/**
  * @return  a set of items between the 2 clicked positions
  */
 QSet<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& end) const
@@ -259,32 +266,32 @@ QSet<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& e
     int startIdx = qMax(0, qMin(idx1, idx2));
     int endIdx   = qMax(idx1, idx2);
     QSet<PhotoItem*> result;
+    QList<PhotoItem*> items = getAllPhotoItems();
     for (int i = startIdx; i <= endIdx; ++i)
-        if (PhotoItem* item = getItemAt(i))
-            result << item;
-    return result;
-}
-
-QList<ClusterView*> PhotoView::getAllClusterViews() const
-{
-    QList<ClusterView*> result;
-    for (int i = 0; i < _vBoxLayout->count(); ++i)
-        if (ClusterView* clusterView = dynamic_cast<ClusterView*>(_vBoxLayout->itemAt(i)->widget()))
-            result << clusterView;
+        result << items.at(i);
     return result;
 }
 
 QList<PhotoItem*> PhotoView::getAllPhotoItems() const
 {
     QList<PhotoItem*> result;
-    foreach (ClusterView* clusterView, getAllClusterViews())
+    foreach (ClusterView* clusterView, _clusterViews)
         result << clusterView->getAllPhotoItems();
     return result;
 }
 
 PhotoItem* PhotoView::getItemAt(int index) const {
-    QList<PhotoItem*> items = getAllPhotoItems();
-    return items.at(index);
+    return getAllPhotoItems().at(index);
+}
+
+/**
+ * Mapping from Photo* to PhotoItem*
+ */
+PhotoItem* PhotoView::getItem(Photo* photo) const {
+    foreach (PhotoItem* item, getAllPhotoItems())
+        if (item->getPhoto() == photo)
+            return item;
+    return 0;
 }
 
 /**
@@ -343,14 +350,14 @@ void PhotoView::onEventChecked(bool checked)
 void PhotoView::onLocationDecoded(Photo* photo)
 {
     if (Cluster* cluster = photo->getCluster())
-        if (ClusterView* clusterView = _cluster2ClusterView[cluster])
+        if (ClusterView* clusterView = _clusterViews[cluster])
             clusterView->reloadTitle();
 }
 
 void PhotoView::onSelectAll()
 {
     _selected = getAllPhotoItems().toSet();
-    updateSelection();
+    updateSelection(_selected);
 }
 
 NewItemMenu* PhotoView::createTagMenu()

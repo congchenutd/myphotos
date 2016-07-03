@@ -25,6 +25,11 @@ void Geocoder::start(const QList<Photo*>& photos)
     processNext();
 }
 
+/**
+ * Process next photo in the queue
+ * Due to the limitation of google map api, we can't simultanenously launch too many requests.
+ * Request one after one instead.
+ */
 void Geocoder::processNext()
 {
     if (_photos.isEmpty())

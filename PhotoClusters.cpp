@@ -55,7 +55,8 @@ void Cluster::removePhoto(Photo* photo)
 
 ////////////////////////////////////////////////////////////////////////////////////////
 void SameDateClusters::addCluster(Cluster* cluster) {
-    _clusters << cluster;
+    if (!_clusters.contains(cluster))
+        _clusters << cluster;
 }
 
 Cluster* SameDateClusters::addPhoto(Photo* photo)
@@ -73,9 +74,13 @@ Cluster* SameDateClusters::addPhoto(Photo* photo)
 
 void SameDateClusters::removePhoto(Photo* photo)
 {
+    // find the cluster
     if (Cluster* cluster = findColocatedCluster(photo))
     {
+        // remove the photo from the cluster
         cluster->removePhoto(photo);
+
+        // remove the empty cluster
         if (cluster->getPhotoCount() == 0)
         {
             _clusters.removeAll(cluster);
@@ -84,17 +89,9 @@ void SameDateClusters::removePhoto(Photo* photo)
     }
 }
 
-QDate SameDateClusters::getDate() const {
-    return _date;
-}
-
-ClusterList SameDateClusters::getAllClusters() const {
-    return _clusters;
-}
-
-int SameDateClusters::getClusterCount() const {
-    return _clusters.count();
-}
+QDate       SameDateClusters::getDate()         const { return _date;               }
+ClusterList SameDateClusters::getAllClusters()  const { return _clusters;           }
+int         SameDateClusters::getClusterCount() const { return _clusters.count();   }
 
 void SameDateClusters::clear()
 {
@@ -104,6 +101,9 @@ void SameDateClusters::clear()
     _date = QDate();
 }
 
+/**
+ * @return  the cluster a given photo belongs to
+ */
 Cluster* SameDateClusters::findColocatedCluster(Photo* photo) const
 {
     foreach (Cluster* cluster, _clusters)
@@ -127,11 +127,14 @@ Cluster* PhotoClusters::removePhoto(Photo* photo)
     QDate date = photo->getTimeTaken().date();
     if (_clusterLists.contains(date))
     {
+        // remove the photo from the SameDateClusters
         SameDateClusters* sameDate = _clusterLists[date];
         sameDate->removePhoto(photo);
+
+        // remove the empty SameDateClusters
         if (sameDate->getClusterCount() == 0)
         {
-            _clusterLists.remove(sameDate->getDate());
+            _clusterLists.remove(date);
             delete sameDate;
         }
     }
