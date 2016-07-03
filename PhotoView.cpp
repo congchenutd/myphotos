@@ -13,6 +13,7 @@
 #include "NewEventDlg.h"
 #include "ClusterView.h"
 #include "SortableVBoxLayout.h"
+#include "Settings.h"
 
 #include <QFileSystemModel>
 #include <QLabel>
@@ -266,12 +267,20 @@ QSet<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& e
     return result;
 }
 
+QList<ClusterView*> PhotoView::getAllClusterViews() const
+{
+    QList<ClusterView*> result;
+    for (int i = 0; i < _vBoxLayout->count(); ++i)
+        if (ClusterView* clusterView = dynamic_cast<ClusterView*>(_vBoxLayout->itemAt(i)->widget()))
+            result << clusterView;
+    return result;
+}
+
 QList<PhotoItem*> PhotoView::getAllPhotoItems() const
 {
     QList<PhotoItem*> result;
-    for (int i = 0; i < _vBoxLayout->count(); ++i)
-        if (ClusterView* clusterView = dynamic_cast<ClusterView*>(_vBoxLayout->itemAt(i)->widget()))
-            result << clusterView->getAllPhotoItems();
+    foreach (ClusterView* clusterView, getAllClusterViews())
+        result << clusterView->getAllPhotoItems();
     return result;
 }
 
@@ -501,3 +510,4 @@ bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
     }
     return false;
 }
+

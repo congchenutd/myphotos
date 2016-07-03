@@ -4,6 +4,7 @@
 #include "Clustering.h"
 #include "PhotoClusters.h"
 #include <QList>
+#include <QScrollArea>
 #include <QSet>
 #include <QWidget>
 
@@ -67,6 +68,7 @@ private:
     NewItemMenu* createPeopleMenu();
     NewItemMenu* createEventMenu();
 
+    QList<ClusterView*> getAllClusterViews() const;
     QList<PhotoItem*> getAllPhotoItems() const;
     PhotoItem* getItemAt(int index) const;
 
@@ -127,5 +129,6 @@ public:
 private:
     bool _lessThan;
 };
+
 
 #endif // PHOTOVIEW_H

@@ -1,6 +1,7 @@
 #ifndef PHOTOITEM_H
 #define PHOTOITEM_H
 
+#include <QThread>
 #include <QWidget>
 
 class Photo;
@@ -24,6 +25,7 @@ public:
     void resizeThumbnail();
     QRect geometryMappedTo(const QWidget* widget) const;
     ClusterView* getClusterView() const;
+    void setThumbnail(const QPixmap& pixmap);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);
@@ -42,8 +44,7 @@ private:
     QColor          _backgroundColor;
     bool            _selected;
     QLabel*         _videoLabel;
+    QSize           _thumbnailSize;
 };
-
-
 
 #endif // PHOTOITEM_H

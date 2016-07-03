@@ -92,11 +92,15 @@ void PhotoItem::rename() {
 
 void PhotoItem::resizeThumbnail()
 {
-    QSize thumbnailSize = Settings::getInstance()->getThumbnailSize();
+    QSize size = Settings::getInstance()->getThumbnailSize();
+    if (_thumbnailSize == size || visibleRegion().isEmpty())
+        return;
+
+    _thumbnailSize = size;
     QPixmap pixmap = (getPhoto()->exists() && getPhoto()->getThumbnail() != 0) ?
-                QPixmap(_photo->getThumbnail()->getFilePath()) :
-                QPixmap(":/Images/Error.png");
-    _thumbnail->setPixmap(pixmap.scaled(thumbnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                    QPixmap(_photo->getThumbnail()->getFilePath()) :
+                    QPixmap(":/Images/Error.png");
+    _thumbnail->setPixmap(pixmap.scaled(_thumbnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 /**
@@ -112,3 +116,6 @@ ClusterView* PhotoItem::getClusterView() const {
     return _clusterView;
 }
 
+void PhotoItem::setThumbnail(const QPixmap& pixmap) {
+    _thumbnail->setPixmap(pixmap);
+}

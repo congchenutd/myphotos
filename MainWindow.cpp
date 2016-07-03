@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QDir>
+#include <QScrollBar>
 
 MainWindow* MainWindow::_instance = 0;
 
@@ -75,7 +76,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_slider,            SIGNAL(valueChanged(int)),  SLOT(onThumbnailSize(int)));
     connect(ui.pageInfo, SIGNAL(infoChanged(Photo*)), SLOT(onInfoChanged(Photo*)));
 
-    _slider->setValue(Settings::getInstance()->getThumbnailSize().width());
     ui.photoView->load(_library->getAllPhotos().values());
     sort();
     onPhotoSelected(QList<PhotoItem*>());   // clear selection
@@ -93,6 +93,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _geocoder = new Geocoder;
     connect(_geocoder, SIGNAL(decoded(Photo*)), ui.photoView, SLOT(onLocationDecoded(Photo*)));
     _geocoder->start(_library->getAllPhotos().values());
+
+    connect(ui.scrollArea->horizontalScrollBar(), SIGNAL(valueChanged(int)), SLOT(onScrolled()));
+    connect(ui.scrollArea->verticalScrollBar(),   SIGNAL(valueChanged(int)), SLOT(onScrolled()));
+    _slider->setValue(Settings::getInstance()->getThumbnailSize().width());
 }
 
 MainWindow* MainWindow::getInstance()           { return _instance;             }
@@ -103,8 +107,15 @@ QAction*    MainWindow::getSortByTitleAction()  { return ui.actionSortByTitle;  
 QAction*    MainWindow::getSortByTimeAction()   { return ui.actionSortByTime;   }
 QAction*    MainWindow::getSortingOrderAction() { return ui.actionOrder;        }
 
-void MainWindow::closeEvent(QCloseEvent*) {
+void MainWindow::closeEvent(QCloseEvent* event) {
     _library->clean();
+    QMainWindow::closeEvent(event);
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    ui.photoView->resizeThumbnails();
+    QMainWindow::resizeEvent(event);
 }
 
 void MainWindow::onScan()
@@ -317,6 +328,10 @@ void MainWindow::onInfoChanged(Photo* photo)
         item->setPhoto(photo);
         sort();
     }
+}
+
+void MainWindow::onScrolled() {
+    ui.photoView->resizeThumbnails();
 }
 
 void MainWindow::resetPhotos() {

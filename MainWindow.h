@@ -24,7 +24,8 @@ public:
     QAction* getSortingOrderAction();
 
 protected:
-    void closeEvent(QCloseEvent*);
+    void closeEvent (QCloseEvent*  event);
+    void resizeEvent(QResizeEvent* event);
 
 private slots:
     void onScan();
@@ -45,6 +46,7 @@ private slots:
     void onFilterByEvent    (const QString& eventName);
     void onAbout();
     void onInfoChanged(Photo* photo);
+    void onScrolled();
 
 private:
     void resetPhotos();
