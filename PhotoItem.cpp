@@ -43,7 +43,6 @@ void PhotoItem::setPhoto(Photo* photo)
 
     _photo = photo;
     _title->setText(photo->getTitle());
-    resizeThumbnail();
 
     if (photo->exists() && photo->isVideo())
     {
@@ -54,13 +53,17 @@ void PhotoItem::setPhoto(Photo* photo)
     else {
         _videoLabel->hide();
     }
-
-    resizeThumbnail();
 }
 
 void PhotoItem::mouseDoubleClickEvent(QMouseEvent*)
 {
     QDesktopServices::openUrl(QUrl::fromLocalFile(_photo->getFilePath()));
+}
+
+void PhotoItem::paintEvent(QPaintEvent* event)
+{
+    resizeThumbnail();
+    QWidget::paintEvent(event);
 }
 
 void PhotoItem::onTitleEdited(const QString& title)
@@ -92,8 +95,9 @@ void PhotoItem::rename() {
 
 void PhotoItem::resizeThumbnail()
 {
+    // resize only when it's invalid and visible
     QSize size = Settings::getInstance()->getThumbnailSize();
-    if (_thumbnailSize == size || visibleRegion().isEmpty())
+    if (_thumbnailSize == size || (visibleRegion().isEmpty() && _thumbnailSize.isValid()))
         return;
 
     _thumbnailSize = size;
@@ -114,8 +118,4 @@ QRect PhotoItem::geometryMappedTo(const QWidget* widget) const
 
 ClusterView* PhotoItem::getClusterView() const {
     return _clusterView;
-}
-
-void PhotoItem::setThumbnail(const QPixmap& pixmap) {
-    _thumbnail->setPixmap(pixmap);
 }

@@ -32,11 +32,11 @@ public:
     void sort(const QString& byWhat, bool ascending);
     QList<PhotoItem*> getSelectedItems() const;
     void removeItem(PhotoItem* item);
-    void resizeThumbnails();
     void addPhoto(Photo* photo);
     PhotoItem* getItem(Photo* photo) const;
 
 public slots:
+    void resizeThumbnails();
     void sort();
 
 private slots:

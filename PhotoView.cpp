@@ -120,9 +120,7 @@ void PhotoView::removeItem(PhotoItem* item)
     _photoClusters.removePhoto(photo);
 }
 
-// TODO: improve performance, maybe using multi-threading
-void PhotoView::resizeThumbnails()
-{
+void PhotoView::resizeThumbnails() {
     foreach (PhotoItem* item, getAllPhotoItems())
         item->resizeThumbnail();
 }

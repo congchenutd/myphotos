@@ -25,10 +25,10 @@ public:
     void resizeThumbnail();
     QRect geometryMappedTo(const QWidget* widget) const;
     ClusterView* getClusterView() const;
-    void setThumbnail(const QPixmap& pixmap);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);
+    void paintEvent(QPaintEvent* event);
 
 private slots:
     void onTitleEdited(const QString& title);
