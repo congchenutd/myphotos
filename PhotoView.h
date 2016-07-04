@@ -33,6 +33,7 @@ public:
     void removePhotoItem(PhotoItem* item);
     void addPhoto(Photo* photo);
     PhotoItem* getItem(Photo* photo) const;
+    void showTitles(bool show);
 
 public slots:
     void resizeThumbnails();
@@ -80,52 +81,6 @@ private:
     SortableVBoxLayout*             _vBoxLayout;
     PhotoClusters                   _photoClusters;     // the model
     QMap<Cluster*, ClusterView*>    _clusterViews;
-};
-
-// Comparators for sorting
-class ClusterViewLessTitle
-{
-public:
-    ClusterViewLessTitle(bool lessThan = true);
-    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
-private:
-    bool _lessThan;
-};
-
-class ClusterViewLessAddress
-{
-public:
-    ClusterViewLessAddress(bool lessThan = true);
-    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
-private:
-    bool _lessThan;
-};
-
-class ClusterViewLessDate
-{
-public:
-    ClusterViewLessDate(bool lessThan = true);
-    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
-private:
-    bool _lessThan;
-};
-
-class PhotoItemLessTime
-{
-public:
-    PhotoItemLessTime(bool lessThan = true);
-    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
-private:
-    bool _lessThan;
-};
-
-class PhotoItemLessTitle
-{
-public:
-    PhotoItemLessTitle(bool lessThan = true);
-    bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
-private:
-    bool _lessThan;
 };
 
 

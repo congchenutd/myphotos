@@ -1,6 +1,5 @@
 #include "ClusterView.h"
 #include "SortableVBoxLayout.h"
-#include <QDebug>
 #include <QLabel>
 
 SortableVBoxLayout::SortableVBoxLayout(QWidget* parent)
@@ -17,7 +16,7 @@ void SortableVBoxLayout::sort(const Comparator& comparator)
     while (QLayoutItem* item = takeAt(0))
         items << item;
 
-    quickSort(items, 0, items.length() - 1, comparator);
+    std::sort(items.begin(), items.end(), comparator);
 
     foreach (QLayoutItem* item, items)
         addItem(item);

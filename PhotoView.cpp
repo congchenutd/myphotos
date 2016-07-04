@@ -94,15 +94,20 @@ void PhotoView::sort(const QString& byWhat, bool ascending)
 
     // sort the clusterviews first, then the photoitems within each clusterview
     if (byWhat == "Address")
+    {
         _vBoxLayout->sort(ClusterViewLessAddress(ascending));
-    else if (byWhat == "Time") {
+        foreach (ClusterView* clusterView, _clusterViews)
+            clusterView->sort(PhotoItemLessTime(false));
+    }
+    else if (byWhat == "Time")
+    {
         _vBoxLayout->sort(ClusterViewLessDate(ascending));
         foreach (ClusterView* clusterView, _clusterViews)
             clusterView->sort(PhotoItemLessTime(ascending));
     }
     else if (byWhat == "Title")
     {
-        _vBoxLayout->sort(ClusterViewLessTitle(ascending));
+        _vBoxLayout->sort(ClusterViewLessDate(false));
         foreach (ClusterView* clusterView, _clusterViews)
             clusterView->sort(PhotoItemLessTitle(ascending));
     }
@@ -275,8 +280,9 @@ QSet<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& e
 QList<PhotoItem*> PhotoView::getAllPhotoItems() const
 {
     QList<PhotoItem*> result;
-    foreach (ClusterView* clusterView, _clusterViews)
-        result << clusterView->getAllPhotoItems();
+    for (int i = 0; i < _vBoxLayout->count(); ++i)
+        if (ClusterView* clusterView = dynamic_cast<ClusterView*>(_vBoxLayout->itemAt(i)->widget()))
+            result << clusterView->getAllPhotoItems();
     return result;
 }
 
@@ -292,6 +298,11 @@ PhotoItem* PhotoView::getItem(Photo* photo) const {
         if (item->getPhoto() == photo)
             return item;
     return 0;
+}
+
+void PhotoView::showTitles(bool show) {
+    foreach (PhotoItem* item, getAllPhotoItems())
+        item->showTitle(show);
 }
 
 /**
@@ -439,80 +450,3 @@ NewItemMenu* PhotoView::createEventMenu()
     }
     return eventMenu;
 }
-
-
-////////////////////////////////////////////////////////////////////////////////////////
-ClusterViewLessTitle::ClusterViewLessTitle(bool lessThan) : _lessThan(lessThan) {}
-
-bool ClusterViewLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
-{
-    ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
-    ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
-    if (view1 != 0 && view2 != 0)
-    {
-        bool result = view1->getTitle() < view2->getTitle();
-        return _lessThan ? result : !result;
-    }
-    return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////
-ClusterViewLessDate::ClusterViewLessDate(bool lessThan) : _lessThan(lessThan) {}
-
-bool ClusterViewLessDate::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
-{
-    ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
-    ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
-    if (view1 != 0 && view2 != 0)
-    {
-        bool result = view1->getDate() < view2->getDate();
-        return _lessThan ? result : !result;
-    }
-    return false;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
-ClusterViewLessAddress::ClusterViewLessAddress(bool lessThan) : _lessThan(lessThan) {}
-
-bool ClusterViewLessAddress::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
-{
-    ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
-    ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
-    if (view1 != 0 && view2 != 0)
-    {
-        bool result = view1->getAddress() < view2->getAddress();
-        return _lessThan ? result : !result;
-    }
-    return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////////
-PhotoItemLessTime::PhotoItemLessTime(bool lessThan) : _lessThan(lessThan) {}
-
-bool PhotoItemLessTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
-{
-    PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
-    PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
-    if (item1 != 0 && item2 != 0)
-    {
-        bool result = item1->getPhoto()->getTimeTaken() < item2->getPhoto()->getTimeTaken();
-        return _lessThan ? result : !result;
-    }
-    return false;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-PhotoItemLessTitle::PhotoItemLessTitle(bool lessThan) : _lessThan(lessThan) {}
-
-bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
-{
-    PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
-    PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
-    if (item1 != 0 && item2 != 0)
-    {
-        bool result = item1->getPhoto()->getTitle() < item2->getPhoto()->getTitle();
-        return _lessThan ? result : !result;
-    }
-    return false;
-}
-

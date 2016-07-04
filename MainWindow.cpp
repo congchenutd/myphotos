@@ -128,7 +128,10 @@ void MainWindow::onScan()
 void MainWindow::onOptions()
 {
     SettingsDlg dlg(this);
-    dlg.exec();
+    if (dlg.exec() == QDialog::Accepted)
+    {
+        ui.photoView->showTitles(Settings::getInstance()->getShowTitle());
+    }
 }
 
 void MainWindow::onPhotoScanned(Photo* photo)
@@ -170,6 +173,7 @@ void MainWindow::sort()
     else if (ui.actionSortByTitle->isChecked())
         sortBy = "Title";
     ui.photoView->sort(sortBy, _ascending);
+    ui.scrollArea->verticalScrollBar()->setValue(0);    // scroll to top
 }
 
 void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)

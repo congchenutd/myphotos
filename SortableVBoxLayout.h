@@ -1,7 +1,7 @@
 #ifndef SORTABLEVBOXLAYOUT_H
 #define SORTABLEVBOXLAYOUT_H
 
-#include "QuickSort.h"
+#include "Comparator.h"
 #include <QVBoxLayout>
 #include <QList>
 

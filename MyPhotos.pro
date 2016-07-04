@@ -71,7 +71,8 @@ SOURCES += \
     Exif.cpp \
     ClusterView.cpp \
     PhotoClusters.cpp \
-    SortableVBoxLayout.cpp
+    SortableVBoxLayout.cpp \
+    Comparator.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -117,7 +118,7 @@ HEADERS += \
     ClusterView.h \
     PhotoClusters.h \
     SortableVBoxLayout.h \
-    QuickSort.h
+    Comparator.h
 
 FORMS += \
 	MainWindow.ui \

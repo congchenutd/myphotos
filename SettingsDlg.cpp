@@ -2,8 +2,6 @@
 #include "Settings.h"
 #include "SettingsDlg.h"
 
-#include <QToolTip>
-
 SettingsDlg::SettingsDlg(QWidget *parent) :
     QDialog(parent)
 {
@@ -14,6 +12,7 @@ SettingsDlg::SettingsDlg(QWidget *parent) :
     ui.leMonitoredFileTypes ->setText(_settings->getMonitoredFileTypes());
     ui.leExiftool           ->setText(_settings->getExiftoolPath());
     ui.leFfmpeg             ->setText(_settings->getFfmpegPath());
+    ui.cbShowTitle->setChecked(_settings->getShowTitle());
 }
 
 void SettingsDlg::accept()
@@ -21,6 +20,7 @@ void SettingsDlg::accept()
     _settings->setMonitoredFileTypes(ui.leMonitoredFileTypes->text());
     _settings->setExiftoolPath      (ui.leExiftool          ->text());
     _settings->setFfmpegPath        (ui.leFfmpeg            ->text());
+    _settings->setShowTitle         (ui.cbShowTitle->isChecked());
 
     QDialog::accept();
 }

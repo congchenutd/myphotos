@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "PhotoClusters.h"
-#include "QuickSort.h"
+#include "Comparator.h"
 
 class QLabel;
 class FlowLayout;
@@ -33,7 +33,6 @@ private:
     QLabel*     _labelTitle;
     FlowLayout* _layout;
     Cluster*    _cluster;
-    Comparator  _comparator;
 };
 
 #endif // CLUSTERVIEW_H

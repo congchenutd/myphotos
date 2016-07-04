@@ -118,3 +118,7 @@ QRect PhotoItem::geometryMappedTo(const QWidget* widget) const
 ClusterView* PhotoItem::getClusterView() const {
     return _clusterView;
 }
+
+void PhotoItem::showTitle(bool show) {
+    _title->setVisible(show);
+}

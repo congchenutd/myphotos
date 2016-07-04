@@ -30,6 +30,9 @@ public:
     QString getFfmpegPath() const;
     void setFfmpegPath(const QString& path);
 
+    bool getShowTitle() const;
+    void setShowTitle(bool show);
+
 private:
     Settings(const QString& fileName);
 

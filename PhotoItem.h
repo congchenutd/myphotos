@@ -25,6 +25,7 @@ public:
     void resizeThumbnail();
     QRect geometryMappedTo(const QWidget* widget) const;
     ClusterView* getClusterView() const;
+    void showTitle(bool show);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);

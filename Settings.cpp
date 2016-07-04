@@ -83,3 +83,11 @@ QString Settings::getFfmpegPath() const {
 void Settings::setFfmpegPath(const QString& path) {
     setValue("Ffmpeg", path);
 }
+
+bool Settings::getShowTitle() const {
+    return value("ShowTitle").toBool();
+}
+
+void Settings::setShowTitle(bool show) {
+    setValue("ShowTitle", show);
+}
