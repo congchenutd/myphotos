@@ -52,6 +52,7 @@ public:
     QList<Photo*> filterPhotosByTags    (const QSet<QString>& tags,     bool AND);
     QList<Photo*> filterPhotosByPeople  (const QSet<QString>& people,   bool AND);
     QList<Photo*> filterPhotosByEvent   (const QString& eventName);
+    QList<Photo*> filterPhotosByTitle   (const QString& title);
 
 private:
     Library();

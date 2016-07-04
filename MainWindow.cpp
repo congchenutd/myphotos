@@ -15,6 +15,7 @@
 #include "EventModel.h"
 #include "SliderWithToolTip.h"
 #include "Geocoder.h"
+#include "SearchLineEdit.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
@@ -59,6 +60,27 @@ MainWindow::MainWindow(QWidget *parent) :
     _slider->setValue(Settings::getInstance()->getThumbnailSize().width());
     ui.statusBar->addPermanentWidget(_slider);
     ui.statusBar->addPermanentWidget(new QLabel("  "));
+
+    // search edit
+    _searchEdit = new SearchLineEdit(this);
+
+    QLabel* label = new QLabel;
+    label->setPixmap(QPixmap(":/Images/Search.png"));
+    label->resize(16, 16);
+
+    ClearButton* btClear = new ClearButton;
+    btClear->setToolTip(tr("Clear"));
+    btClear->setShortcut(QKeySequence(Qt::Key_Escape));
+    btClear->resize(16, 16);
+
+    _searchEdit->setLabel(label);
+    _searchEdit->setClearButton (btClear);
+    _searchEdit->setFocusShortcut(QKeySequence("Ctrl+F"));
+    connect(_searchEdit, SIGNAL(filter(QString)), SLOT(onFilterbyTitle(QString)));
+
+    ui.mainToolBar->addSeparator();
+    ui.mainToolBar->addWidget(_searchEdit);
+    ui.mainToolBar->addWidget(new QLabel("  ", this));
 
     connect(ui.actionAboutQt,       SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui.actionAbout,         SIGNAL(triggered()), this, SLOT(onAbout()));
@@ -314,6 +336,13 @@ void MainWindow::onFilterByEvent(const QString& eventName)
 {
     ui.photoView->clear();
     ui.photoView->load(_library->filterPhotosByEvent(eventName));
+    sort();
+}
+
+void MainWindow::onFilterbyTitle(const QString& title)
+{
+    ui.photoView->clear();
+    ui.photoView->load(_library->filterPhotosByTitle(title));
     sort();
 }
 

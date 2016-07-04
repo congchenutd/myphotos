@@ -27,5 +27,6 @@
         <file>Images/Error.png</file>
         <file>Images/Information.png</file>
         <file>Images/Location.png</file>
+        <file>Images/Search.png</file>
     </qresource>
 </RCC>

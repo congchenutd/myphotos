@@ -72,7 +72,9 @@ SOURCES += \
     ClusterView.cpp \
     PhotoClusters.cpp \
     SortableVBoxLayout.cpp \
-    Comparator.cpp
+    Comparator.cpp \
+    EmbeddableLineEdit.cpp \
+    SearchLineEdit.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -118,7 +120,9 @@ HEADERS += \
     ClusterView.h \
     PhotoClusters.h \
     SortableVBoxLayout.h \
-    Comparator.h
+    Comparator.h \
+    EmbeddableLineEdit.h \
+    SearchLineEdit.h
 
 FORMS += \
 	MainWindow.ui \

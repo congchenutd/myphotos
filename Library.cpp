@@ -167,3 +167,15 @@ QList<Photo *> Library::filterPhotosByEvent(const QString& eventName)
                 result << photo;
     return result;
 }
+
+QList<Photo *> Library::filterPhotosByTitle(const QString& title)
+{
+    if (title.isEmpty())
+        return getAllPhotos().values();
+
+    QList<Photo*> result;
+    foreach (Photo* photo, _photos)
+        if (photo->getTitle().contains(title, Qt::CaseInsensitive))
+                result << photo;
+    return result;
+}
