@@ -82,24 +82,27 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.mainToolBar->addWidget(_searchEdit);
     ui.mainToolBar->addWidget(new QLabel("  ", this));
 
-    connect(ui.actionAboutQt,       SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(ui.actionAbout,         SIGNAL(triggered()), this, SLOT(onAbout()));
-    connect(ui.actionScan,          SIGNAL(triggered(bool)),    SLOT(onScan()));
-    connect(ui.actionOptions,       SIGNAL(triggered(bool)),    SLOT(onOptions()));
-    connect(ui.actionSortByAddress, SIGNAL(toggled(bool)),        SLOT(sort()));
-    connect(ui.actionSortByTitle,   SIGNAL(toggled(bool)),        SLOT(sort()));
-    connect(ui.actionSortByTime,    SIGNAL(toggled(bool)),        SLOT(sort()));
+    connect(ui.actionAboutQt,       SIGNAL(triggered()), qApp,  SLOT(aboutQt()));
+    connect(ui.actionAbout,         SIGNAL(triggered()),        SLOT(onAbout()));
+    connect(ui.actionScan,          SIGNAL(triggered()),        SLOT(onScan()));
+    connect(ui.actionOptions,       SIGNAL(triggered()),        SLOT(onOptions()));
+    connect(ui.actionSortByAddress, SIGNAL(triggered(bool)),    SLOT(sort()));
+    connect(ui.actionSortByTitle,   SIGNAL(triggered(bool)),    SLOT(sort()));
+    connect(ui.actionSortByTime,    SIGNAL(triggered(bool)),    SLOT(sort()));
     connect(ui.actionOrder,         SIGNAL(triggered()),        SLOT(onSortingOrder()));
     connect(ui.photoView, SIGNAL(selectionChanged(QList<PhotoItem*>)),
             this, SLOT(onPhotoSelected(QList<PhotoItem*>)));
     connect(ui.photoView, SIGNAL(newTag     (QString)), SLOT(onNewTag     (QString)));
     connect(ui.photoView, SIGNAL(newPeople  (QString)), SLOT(onNewPeople  (QString)));
     connect(ui.photoView, SIGNAL(newEvent   (QString, QDate)), SLOT(onNewEvent(QString, QDate)));
-    connect(ui.actionRemove,    SIGNAL(triggered(bool)),    SLOT(onRemove()));
-    connect(ui.actionDelete,    SIGNAL(triggered(bool)),    SLOT(onDelete()));
-    connect(ui.actionRename,    SIGNAL(triggered(bool)),    SLOT(onRename()));
+    connect(ui.actionRemove,    SIGNAL(triggered()),    SLOT(onRemove()));
+    connect(ui.actionDelete,    SIGNAL(triggered()),    SLOT(onDelete()));
+    connect(ui.actionRename,    SIGNAL(triggered()),    SLOT(onRename()));
     connect(_slider,            SIGNAL(valueChanged(int)),  SLOT(onThumbnailSize(int)));
     connect(ui.pageInfo, SIGNAL(infoChanged(Photo*)), SLOT(onInfoChanged(Photo*)));
+    connect(ui.actionShowPhotos,    SIGNAL(triggered(bool)), SLOT(onShowPhotos(bool)));
+    connect(ui.actionShowVideos,    SIGNAL(triggered(bool)), SLOT(onShowVideos(bool)));
+    connect(ui.actionShowFavorites, SIGNAL(triggered(bool)), SLOT(onShowFavorites(bool)));
 
     // load photos to photo view
     ui.photoView->load(_library->getAllPhotos().values());
@@ -344,6 +347,43 @@ void MainWindow::onFilterbyTitle(const QString& title)
     ui.photoView->clear();
     ui.photoView->load(_library->filterPhotosByTitle(title));
     sort();
+}
+
+void MainWindow::onShowPhotos(bool show)
+{
+    if (show)
+    {
+        ui.photoView->clear();
+        ui.photoView->load(_library->getAllImages());
+        ui.actionShowVideos     ->setChecked(false);
+        ui.actionShowFavorites  ->setChecked(false);
+    }
+    else
+        onFilterbyTitle("");
+}
+
+void MainWindow::onShowVideos(bool show)
+{
+    if (show)
+    {
+        ui.photoView->clear();
+        ui.photoView->load(_library->getAllVideos());
+        ui.actionShowPhotos     ->setChecked(false);
+        ui.actionShowFavorites  ->setChecked(false);
+    }
+    else
+        onFilterbyTitle("");
+}
+
+void MainWindow::onShowFavorites(bool show)
+{
+    if (show)
+    {
+        ui.actionShowPhotos->setChecked(false);
+        ui.actionShowVideos->setChecked(false);
+    }
+    else
+        onFilterbyTitle("");
 }
 
 void MainWindow::onAbout()

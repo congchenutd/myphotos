@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>388</height>
+    <width>697</width>
+    <height>428</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="Resources.qrc">
-    <normaloff>:/Images/Photos.png</normaloff>:/Images/Photos.png</iconset>
+    <normaloff>:/Images/MyPhotos.png</normaloff>:/Images/MyPhotos.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -41,8 +41,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>259</width>
-         <height>299</height>
+         <width>394</width>
+         <height>339</height>
         </rect>
        </property>
       </widget>
@@ -55,7 +55,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>562</width>
+     <width>697</width>
      <height>22</height>
     </rect>
    </property>
@@ -111,6 +111,10 @@
    <addaction name="actionRename"/>
    <addaction name="actionRemove"/>
    <addaction name="actionDelete"/>
+   <addaction name="separator"/>
+   <addaction name="actionShowPhotos"/>
+   <addaction name="actionShowVideos"/>
+   <addaction name="actionShowFavorites"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -142,7 +146,7 @@
           <x>0</x>
           <y>0</y>
           <width>276</width>
-          <height>119</height>
+          <height>159</height>
          </rect>
         </property>
         <attribute name="icon">
@@ -159,7 +163,7 @@
           <x>0</x>
           <y>0</y>
           <width>276</width>
-          <height>119</height>
+          <height>159</height>
          </rect>
         </property>
         <attribute name="icon">
@@ -176,7 +180,7 @@
           <x>0</x>
           <y>0</y>
           <width>276</width>
-          <height>119</height>
+          <height>159</height>
          </rect>
         </property>
         <attribute name="icon">
@@ -193,7 +197,7 @@
           <x>0</x>
           <y>0</y>
           <width>276</width>
-          <height>119</height>
+          <height>159</height>
          </rect>
         </property>
         <attribute name="icon">
@@ -347,6 +351,51 @@
    </property>
    <property name="text">
     <string>Sort by location</string>
+   </property>
+  </action>
+  <action name="actionShowPhotos">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Photos.png</normaloff>:/Images/Photos.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Photos</string>
+   </property>
+   <property name="toolTip">
+    <string>Show photos</string>
+   </property>
+  </action>
+  <action name="actionShowVideos">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Videos.png</normaloff>:/Images/Videos.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Videos</string>
+   </property>
+   <property name="toolTip">
+    <string>Show videos</string>
+   </property>
+  </action>
+  <action name="actionShowFavorites">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Heart.png</normaloff>:/Images/Heart.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Favorites</string>
+   </property>
+   <property name="toolTip">
+    <string>Show favorites</string>
    </property>
   </action>
  </widget>

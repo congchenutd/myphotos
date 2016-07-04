@@ -3,27 +3,11 @@ QT += core gui sql testlib widgets concurrent multimedia multimediawidgets posit
 TARGET = MyPhotos
 TEMPLATE = app
 
-#QMAKE_CXXFLAGS += -F/Users/Cong/Program/MyPhotos/VLC-Qt_1.0.1_osx/lib
-#QMAKE_LFLAGS += -F/Users/Cong/Program/MyPhotos/VLC-Qt_1.0.1_osx/lib
-#LIBS += -framework VLCQtCore
-
-OPENCV_LOCATION = /usr/local/opt/opencv3
-INCLUDEPATH += $$OPENCV_LOCATION/include
-
-mac {
-LIBS += -L$$OPENCV_LOCATION/lib \
-	-lopencv_core \
-	-lopencv_highgui \
-	-lopencv_imgproc \
-	-lopencv_video \
-	-lopencv_videoio
-}
-
 win32 {
 	RC_FILE = Resources.rc
 }
 macx {
-	ICON = Images/Photos.icns
+	ICON = Images/MyPhotos.icns
 }
 
 SOURCES += \

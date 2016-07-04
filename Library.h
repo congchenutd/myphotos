@@ -38,8 +38,10 @@ public:
     Event*      getEvent    (const QString& name);
     Thumbnail*  getThumbnail(const QString& filePath);
 
-    int getPhotoCount() const;
-    int getVideoCount() const;
+    QList<Photo*>   getAllImages()  const;
+    QList<Photo*>   getAllVideos()  const;
+    int             getPhotoCount() const;
+    int             getVideoCount() const;
 
     void addPhoto       (Photo*     photo);
     void addPeople      (People*    people);

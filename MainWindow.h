@@ -48,6 +48,9 @@ private slots:
     void onAbout();
     void onInfoChanged(Photo* photo);
     void onFilterbyTitle(const QString& title);
+    void onShowPhotos   (bool show);
+    void onShowVideos   (bool show);
+    void onShowFavorites(bool show);
 
 private:
     Ui::MainWindow ui;
