@@ -10,13 +10,20 @@
 
 Photo::Photo(int id, const QString& title, const QString& path, const QDateTime& time)
     : Persistable(id, PhotoDAO::getInstance()),
-      _title(title),
-      _filePath(path),
-      _time(time),
-      _event(0),
+      _title    (title),
+      _filePath (path),
+      _time     (time),
+      _event    (0),
       _thumbnail(0),
-      _favorite(false)
+      _favorite (false)
 {}
+
+Photo* Photo::fromFileInfo(const QFileInfo &fileInfo) {
+    return new Photo(PhotoDAO::getInstance()->getNextID(),
+                     fileInfo.baseName(),
+                     fileInfo.absoluteFilePath(),
+                     fileInfo.lastModified());
+}
 
 QString                 Photo::getTitle()       const { return _title;      }
 QString                 Photo::getFilePath()    const { return _filePath;   }

@@ -6,10 +6,6 @@
 #include <QList>
 
 class Photo;
-class Library;
-class Thumbnail;
-class Exif;
-class Geocoder;
 
 /**
  * A Scanner scans monitored folders and create Photos and their thumbnails

@@ -11,6 +11,7 @@
 #include <QString>
 #include <QStringList>
 #include <QGeoCoordinate>
+#include <QFileInfo>
 
 class People;
 class Event;
@@ -28,6 +29,7 @@ class Photo: public Persistable
 {
 public:
     Photo(int id, const QString& title, const QString& path, const QDateTime& time);
+    static Photo* fromFileInfo(const QFileInfo& fileInfo);
 
     QString                 getTitle()          const;
     QString                 getFilePath()       const;
