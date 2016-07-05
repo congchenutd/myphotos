@@ -80,6 +80,15 @@ QList<Photo *> Library::getAllVideos() const
     return result;
 }
 
+QList<Photo*> Library::getFavorites() const
+{
+    QList<Photo*> result;
+    foreach (Photo* photo, getAllPhotos())
+        if (photo->isFavorite())
+            result << photo;
+    return result;
+}
+
 int Library::getPhotoCount() const {
     return getAllImages().count();
 }

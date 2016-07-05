@@ -40,6 +40,7 @@ public:
 
     QList<Photo*>   getAllImages()  const;
     QList<Photo*>   getAllVideos()  const;
+    QList<Photo*>   getFavorites()  const;
     int             getPhotoCount() const;
     int             getVideoCount() const;
 

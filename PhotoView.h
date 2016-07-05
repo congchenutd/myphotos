@@ -45,6 +45,7 @@ private slots:
     void onEventChecked (bool checked);
     void onLocationDecoded(Photo* photo);
     void onSelectAll();
+    void onSetFavorite(bool favorite);
 
 signals:
     void photoSelected(Photo*);
@@ -67,6 +68,7 @@ private:
     NewItemMenu* createTagMenu();
     NewItemMenu* createPeopleMenu();
     NewItemMenu* createEventMenu();
+    QAction*     createFavoriteAction();
 
     QList<PhotoItem*> getAllPhotoItems() const;
     PhotoItem* getItemAt(int index) const;

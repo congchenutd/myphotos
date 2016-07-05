@@ -379,6 +379,8 @@ void MainWindow::onShowFavorites(bool show)
 {
     if (show)
     {
+        ui.photoView->clear();
+        ui.photoView->load(_library->getFavorites());
         ui.actionShowPhotos->setChecked(false);
         ui.actionShowVideos->setChecked(false);
     }

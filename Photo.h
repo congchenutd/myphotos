@@ -42,6 +42,7 @@ public:
     QString                 getAddress()        const;
     QGeoCoordinate          getCoordinates()    const;
     Cluster*                getCluster()        const;
+    bool                    isFavorite()        const;
 
     bool isVideo() const;
     bool exists () const;
@@ -59,6 +60,7 @@ public:
     void setExif        (const Exif& info);
     void setAddress     (const QString& address);
     void setCluster     (Cluster* cluster);
+    void setFavorite    (bool favorite);
 
 private:
     QString                 _title;
@@ -71,6 +73,7 @@ private:
     Exif                    _exif;
     QString                 _address;
     Cluster*                _cluster;
+    bool                    _favorite;
 
     static const int PROXIMITY = 500;
 };

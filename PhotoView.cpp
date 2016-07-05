@@ -200,6 +200,9 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
             menu.addMenu(createEventMenu());
             menu.addMenu(createTagMenu());
             menu.addMenu(createPeopleMenu());
+
+            menu.addSeparator();
+            menu.addAction(createFavoriteAction());
         }
         menu.exec(event->globalPos());
     }
@@ -371,6 +374,15 @@ void PhotoView::onSelectAll()
     updateSelection(_selected);
 }
 
+void PhotoView::onSetFavorite(bool favorite)
+{
+    foreach (PhotoItem* item, getSelectedItems())
+    {
+        item->getPhoto()->setFavorite(favorite);
+        item->getPhoto()->save();
+    }
+}
+
 NewItemMenu* PhotoView::createTagMenu()
 {
     NewItemMenu* tagMenu = new NewItemMenu(tr("New tag"), new NewTagDlg(tr("New Tag"), this), this);
@@ -449,4 +461,16 @@ NewItemMenu* PhotoView::createEventMenu()
         eventMenu->addAction(action);
     }
     return eventMenu;
+}
+
+QAction* PhotoView::createFavoriteAction()
+{
+    QAction* action = new QAction(QIcon(":/Images/Heart.png"), tr("Favorite"));
+    connect(action, SIGNAL(triggered(bool)), SLOT(onSetFavorite(bool)));
+    action->setCheckable(true);
+    action->setChecked(true);
+    foreach (PhotoItem* item, _selected)
+        if (!item->getPhoto()->isFavorite())
+            action->setChecked(false);
+    return action;
 }

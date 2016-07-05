@@ -14,7 +14,8 @@ Photo::Photo(int id, const QString& title, const QString& path, const QDateTime&
       _filePath(path),
       _time(time),
       _event(0),
-      _thumbnail(0)
+      _thumbnail(0),
+      _favorite(false)
 {}
 
 QString                 Photo::getTitle()       const { return _title;      }
@@ -29,6 +30,7 @@ QSet<QString>           Photo::getPeopleNames() const { return getPeople().keys(
 Exif                    Photo::getExif()        const { return _exif;       }
 QString                 Photo::getAddress()     const { return _address;    }
 Cluster*                Photo::getCluster()     const { return _cluster;    }
+bool                    Photo::isFavorite()     const { return _favorite;   }
 
 QGeoCoordinate Photo::getCoordinates() const
 {
@@ -105,4 +107,8 @@ void Photo::setAddress(const QString &address) {
 
 void Photo::setCluster(Cluster* cluster) {
     _cluster = cluster;
+}
+
+void Photo::setFavorite(bool favorite) {
+    _favorite = favorite;
 }
