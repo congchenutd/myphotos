@@ -106,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // load photos to photo view
     ui.photoView->load(_library->getAllPhotos().values());
+    ui.photoView->showTitles(Settings::getInstance()->getShowTitle());
     onPhotoSelected(QList<PhotoItem*>());   // clear selection and disable actions
 
     // filtering pages
@@ -355,6 +356,7 @@ void MainWindow::onShowPhotos(bool show)
     {
         ui.photoView->clear();
         ui.photoView->load(_library->getAllImages());
+        sort();
         ui.actionShowVideos     ->setChecked(false);
         ui.actionShowFavorites  ->setChecked(false);
     }
@@ -368,6 +370,7 @@ void MainWindow::onShowVideos(bool show)
     {
         ui.photoView->clear();
         ui.photoView->load(_library->getAllVideos());
+        sort();
         ui.actionShowPhotos     ->setChecked(false);
         ui.actionShowFavorites  ->setChecked(false);
     }
@@ -381,6 +384,7 @@ void MainWindow::onShowFavorites(bool show)
     {
         ui.photoView->clear();
         ui.photoView->load(_library->getFavorites());
+        sort();
         ui.actionShowPhotos->setChecked(false);
         ui.actionShowVideos->setChecked(false);
     }

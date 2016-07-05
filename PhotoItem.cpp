@@ -22,6 +22,7 @@ PhotoItem::PhotoItem(Photo* photo, ClusterView* clusterView)
 
     _title = new EditableLabel;
     _title->setAlignment(Qt::AlignCenter);
+    showTitle(Settings::getInstance()->getShowTitle());
     connect(_title, SIGNAL(editingFinished(QString)), this, SLOT(onTitleEdited(QString)));
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -31,7 +32,8 @@ PhotoItem::PhotoItem(Photo* photo, ClusterView* clusterView)
     _backgroundColor = palette().background().color();
     setAutoFillBackground(true);
 
-    _videoLabel = new QLabel(this);
+    _videoLabel     = new QLabel(this);
+    _favoriteLabel  = new QLabel(this);
     setPhoto(photo);
 }
 
@@ -46,13 +48,17 @@ void PhotoItem::setPhoto(Photo* photo)
     // show video icon if it's a video
     if (photo->exists() && photo->isVideo())
     {
-        _videoLabel->setPixmap(QPixmap(":/Images/Video.png"));
+        _videoLabel->setPixmap(QPixmap(":/Images/Video.png").scaled(24, 24));
         _videoLabel->show();
         _videoLabel->move(16, 10);
     }
     else {
         _videoLabel->hide();
     }
+
+    _favoriteLabel->setPixmap(QPixmap(":/Images/Heart2.png"));
+    _favoriteLabel->move(50, 10);
+    _favoriteLabel->setVisible(photo->isFavorite());
 }
 
 void PhotoItem::mouseDoubleClickEvent(QMouseEvent*) {

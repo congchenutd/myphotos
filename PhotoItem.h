@@ -42,9 +42,10 @@ private:
     Photo*          _photo;
     EditableLabel*  _title;
     QLabel*         _thumbnail;
-    QLabel*         _videoLabel;
     QColor          _backgroundColor;
     QSize           _thumbnailSize;
+    QLabel*         _videoLabel;
+    QLabel*         _favoriteLabel;
 };
 
 #endif // PHOTOITEM_H

@@ -36,7 +36,7 @@ PhotoView::PhotoView(QWidget *parent) :
     QVBoxLayout* layout = new QVBoxLayout(this);
     _vBoxLayout = new SortableVBoxLayout;
     layout->addLayout(_vBoxLayout);
-    layout->addSpacing(1000);
+    layout->addSpacing(100);
 
     _rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     _rubberBand->setGeometry(QRect(_clickedPosition, QSize()));
@@ -380,6 +380,7 @@ void PhotoView::onSetFavorite(bool favorite)
     {
         item->getPhoto()->setFavorite(favorite);
         item->getPhoto()->save();
+        item->setPhoto(item->getPhoto());   // reload the favorite icon
     }
 }
 
