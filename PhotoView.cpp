@@ -118,12 +118,12 @@ void PhotoView::sort() {
 }
 
 QList<PhotoItem*> PhotoView::getSelectedItems() const {
-    return _selected.toList();
+    return _selected;
 }
 
 void PhotoView::removePhotoItem(PhotoItem* item)
 {
-    _selected.remove(item);
+    _selected.removeAll(item);
     Photo* photo = item->getPhoto();
     ClusterView* clusterView = item->getClusterView();
     clusterView->removePhotoItem(item);
@@ -163,11 +163,11 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
     {
         // add clicked items to selection
         if (event->modifiers() == Qt::ShiftModifier)
-            _selected += getClickedItems(lastClickedPosition, _clickedPosition);
+            _selected << getClickedItems(lastClickedPosition, _clickedPosition);
         else if (event->modifiers() == Qt::ControlModifier)
             toggleSelection(clickedItem);
         else
-            _selected = QSet<PhotoItem*>() << clickedItem;  // single selection
+            _selected = QList<PhotoItem*>() << clickedItem;  // single selection
     }
 
     // show the selection
@@ -180,7 +180,7 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
         // right clicked on an unselected item, reselect this item
         if (clickedItem != 0 && !_selected.contains(clickedItem))
         {
-            _selected = QSet<PhotoItem*>() << clickedItem;
+            _selected = QList<PhotoItem*>() << clickedItem;
             updateSelection(_selected);
         }
 
@@ -234,11 +234,11 @@ void PhotoView::mouseReleaseEvent(QMouseEvent*) {
 /**
  * Highlight selected items
  */
-void PhotoView::updateSelection(const QSet<PhotoItem*>& selected)
+void PhotoView::updateSelection(const QList<PhotoItem*>& selected)
 {
     foreach (PhotoItem* item, getAllPhotoItems())
         item->setSelected(selected.contains(item));
-    emit selectionChanged(selected.toList());
+    emit selectionChanged(selected);
 }
 
 /**
@@ -267,13 +267,13 @@ int PhotoView::getClickedItemIndex(const QPoint& point) const
 /**
  * @return  a set of items between the 2 clicked positions
  */
-QSet<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& end) const
+QList<PhotoItem*> PhotoView::getClickedItems(const QPoint& start, const QPoint& end) const
 {
     int idx1 = getClickedItemIndex(start);
     int idx2 = getClickedItemIndex(end);
     int startIdx = qMax(0, qMin(idx1, idx2));
     int endIdx   = qMax(idx1, idx2);
-    QSet<PhotoItem*> result;
+    QList<PhotoItem*> result;
     QList<PhotoItem*> items = getAllPhotoItems();
     for (int i = startIdx; i <= endIdx; ++i)
         result << items.at(i);
@@ -303,9 +303,9 @@ PhotoItem* PhotoView::getItem(Photo* photo) const {
     return 0;
 }
 
-void PhotoView::showTitles(bool show) {
+void PhotoView::updateTitles() {
     foreach (PhotoItem* item, getAllPhotoItems())
-        item->showTitle(show);
+        item->updateTitleVisibility();
 }
 
 /**
@@ -314,7 +314,7 @@ void PhotoView::showTitles(bool show) {
 void PhotoView::toggleSelection(PhotoItem* clicked)
 {
     if (_selected.contains(clicked))
-        _selected.remove(clicked);
+        _selected.removeAll(clicked);
     else
         _selected << clicked;
 }
@@ -352,12 +352,13 @@ void PhotoView::onPeopleChecked(bool checked)
 // Toggle event assignment
 void PhotoView::onEventChecked(bool checked)
 {
-    QString name = static_cast<QAction*>(sender())->text();
-    foreach (PhotoItem* item, _selected)
+    QString eventName = static_cast<QAction*>(sender())->text();
+    for (int i = 0; i < _selected.count(); ++ i)
     {
-        Photo* photo = item->getPhoto();
-        photo->setEvent(checked ? _library->getEvent(name) : 0);
+        Photo* photo = _selected.at(i)->getPhoto();
+        photo->setEvent(checked ? _library->getEvent(eventName) : 0);
         photo->save();
+//        _selected.at(i)->setEvent(checked ? _library->getEvent(eventName) : 0);
     }
 }
 
@@ -370,7 +371,7 @@ void PhotoView::onLocationDecoded(Photo* photo)
 
 void PhotoView::onSelectAll()
 {
-    _selected = getAllPhotoItems().toSet();
+    _selected = getAllPhotoItems();
     updateSelection(_selected);
 }
 

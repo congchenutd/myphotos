@@ -22,7 +22,7 @@ PhotoItem::PhotoItem(Photo* photo, ClusterView* clusterView)
 
     _title = new EditableLabel;
     _title->setAlignment(Qt::AlignCenter);
-    showTitle(Settings::getInstance()->getShowTitle());
+    updateTitleVisibility();
     connect(_title, SIGNAL(editingFinished(QString)), this, SLOT(onTitleEdited(QString)));
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -43,18 +43,13 @@ void PhotoItem::setPhoto(Photo* photo)
         return;
 
     _photo = photo;
+    connect(photo, SIGNAL(changed()), SLOT(reloadTitle()));
     _title->setText(photo->getTitle());
 
     // show video icon if it's a video
-    if (photo->exists() && photo->isVideo())
-    {
-        _videoLabel->setPixmap(QPixmap(":/Images/Video.png").scaled(24, 24));
-        _videoLabel->show();
-        _videoLabel->move(16, 10);
-    }
-    else {
-        _videoLabel->hide();
-    }
+    _videoLabel->setPixmap(QPixmap(":/Images/Video.png").scaled(24, 24));
+    _videoLabel->move(16, 10);
+    _videoLabel->setVisible(photo->exists() && photo->isVideo());
 
     _favoriteLabel->setPixmap(QPixmap(":/Images/Heart2.png"));
     _favoriteLabel->move(50, 10);
@@ -68,14 +63,20 @@ void PhotoItem::mouseDoubleClickEvent(QMouseEvent*) {
 void PhotoItem::paintEvent(QPaintEvent* event)
 {
     resizeThumbnail();
+    updateTitleVisibility();
     QWidget::paintEvent(event);
 }
 
 void PhotoItem::onTitleEdited(const QString& title)
 {
-    _photo->setTitle(title);
+    _photo->setTitle(title, false);
     _photo->save();
-    emit titleChanged(title);
+}
+
+void PhotoItem::reloadTitle()
+{
+    if (_photo != 0)
+        _title->setText(_photo->getTitle());
 }
 
 /**
@@ -125,6 +126,22 @@ ClusterView* PhotoItem::getClusterView() const {
     return _clusterView;
 }
 
-void PhotoItem::showTitle(bool show) {
-    _title->setVisible(show);
+void PhotoItem::updateTitleVisibility()
+{
+    bool show = Settings::getInstance()->getShowTitle();
+    if (!visibleRegion().isEmpty())
+        _title->setVisible(show);
+}
+
+void PhotoItem::setTitle(const QString& title) {
+    _title->setText(title);
+}
+
+void PhotoItem::setEvent(Event* event)
+{
+    Photo* photo = getPhoto();
+    photo->setEvent(event);
+    photo->save();
+    if (event != 0)
+        setPhoto(photo);
 }

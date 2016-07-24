@@ -8,6 +8,7 @@ class Photo;
 class QLabel;
 class EditableLabel;
 class ClusterView;
+class Event;
 
 /**
  * A widget in the PhotoView representing a Photo
@@ -25,7 +26,9 @@ public:
     void resizeThumbnail();
     QRect geometryMappedTo(const QWidget* widget) const;
     ClusterView* getClusterView() const;
-    void showTitle(bool show);
+    void updateTitleVisibility();
+    void setTitle(const QString& title);
+    void setEvent(Event* event);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);
@@ -33,9 +36,7 @@ protected:
 
 private slots:
     void onTitleEdited(const QString& title);
-
-signals:
-    void titleChanged(const QString&);
+    void reloadTitle();
 
 private:
     ClusterView*    _clusterView;

@@ -3,10 +3,14 @@
 #include "Photo.h"
 #include "PhotoDAO.h"
 #include "Tag.h"
+#include "Thumbnail.h"
+#include "ThumbnailGenerator.h"
 
 #include <QFileInfo>
 #include <QProcess>
 #include <QFile>
+#include <QDir>
+#include <cmath>
 
 Photo::Photo(int id, const QString& title, const QString& path, const QDateTime& time)
     : Persistable(id, PhotoDAO::getInstance()),
@@ -62,13 +66,32 @@ bool Photo::colocatedWith(const Photo* another) const {
     return getCoordinates().distanceTo(another->getCoordinates()) * 100 < PROXIMITY;
 }
 
-void Photo::setTitle(const QString& title)  {
+void Photo::setTitle(const QString& title, bool emitChange)
+{
     _title = title;
+
+    // change file name to title
+    QFileInfo fileInfo(getFilePath());
+    QString newPath = fileInfo.absolutePath() + QDir::separator() + title + "." + fileInfo.suffix();
+    setFilePath(newPath);
+
+    if (emitChange)
+        emit changed();
 }
 
-void Photo::setFilePath(const QString& filePath) {
-    QFile::rename(_filePath, filePath);
-    _filePath = filePath;
+void Photo::setFilePath(const QString& filePath)
+{
+    if (QFile::rename(_filePath, filePath))
+    {
+        _filePath = filePath;
+
+        // rename thumbnail file
+        if (Thumbnail* thumbnail = getThumbnail())
+        {
+            QFile::remove(thumbnail->getFilePath());
+            thumbnail->setFilePath(createThumbnailFile(this));
+        }
+    }
 }
 
 void Photo::setTimeTaken(const QDateTime& time)
@@ -88,8 +111,11 @@ void Photo::addPeople(People* people) {
     _people.insert(people->getName(), people);
 }
 
-void Photo::setEvent(Event* event) {
+void Photo::setEvent(Event* event)
+{
     _event = event;
+    if (_event != 0)
+        _event->addPhoto(this);
 }
 
 void Photo::setThumbnail(Thumbnail* thumbnail) {
@@ -118,4 +144,13 @@ void Photo::setCluster(Cluster* cluster) {
 
 void Photo::setFavorite(bool favorite) {
     _favorite = favorite;
+}
+
+void Photo::renameBasedOnEvent(int idx, int eventSize)
+{
+    QFileInfo fileInfo(getFilePath());
+    QString date = fileInfo.lastModified().toString("yyyy-MM-dd");
+    QString index = QString("%1").arg(QString::number(idx), log10(eventSize) + 1, '0');  // pad with 0
+    QString title = date + "-" + getEvent()->getName() + "-" + index;
+    setTitle(title);
 }

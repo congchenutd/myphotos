@@ -6,8 +6,6 @@
 #include <QRect>
 #include <QStyle>
 
-struct LayoutItemComparator;
-
 class FlowLayout : public QLayout
 {
 public:
@@ -29,7 +27,7 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QLayoutItem* takeAt(int index) Q_DECL_OVERRIDE;
 
-    void sort(const Comparator& comparator);
+    void sort(const LayoutItemComparator& comparator);
 
 private:
     int doLayout(const QRect& rect, bool testOnly) const;

@@ -12,6 +12,7 @@
 #include <QStringList>
 #include <QGeoCoordinate>
 #include <QFileInfo>
+#include <QObject>
 
 class People;
 class Event;
@@ -25,8 +26,10 @@ class Cluster;
  * A Photo may have 0 or 1 event, 1 thumbnail, 0-n tags, and 0-n people.
  * NOTE: all the relationship between Photo and others are managed by Photo and PhotoDAO
  */
-class Photo: public Persistable
+class Photo: public QObject, public Persistable
 {
+    Q_OBJECT
+
 public:
     Photo(int id, const QString& title, const QString& path, const QDateTime& time);
     static Photo* fromFileInfo(const QFileInfo& fileInfo);
@@ -50,7 +53,7 @@ public:
     bool exists () const;
     bool colocatedWith(const Photo* another) const;
 
-    void setTitle       (const QString& title);
+    void setTitle       (const QString& title, bool emitChange = true);
     void setFilePath    (const QString& filePath);
     void setTimeTaken   (const QDateTime& time);
     void addTag         (Tag*       tag);
@@ -63,6 +66,11 @@ public:
     void setAddress     (const QString& address);
     void setCluster     (Cluster* cluster);
     void setFavorite    (bool favorite);
+
+    void renameBasedOnEvent(int idx, int eventSize);
+
+signals:
+    void changed();
 
 private:
     QString                 _title;

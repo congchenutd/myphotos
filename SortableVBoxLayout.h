@@ -10,7 +10,7 @@ class SortableVBoxLayout : public QVBoxLayout
 public:
     SortableVBoxLayout(QWidget* parent = 0);
     void clear();
-    void sort(const Comparator& comparator);
+    void sort(const LayoutItemComparator& comparator);
 };
 
 

@@ -9,7 +9,11 @@
 #include <QProcess>
 #include <QDebug>
 
-Thumbnail* generateThumbnail(Photo* photo)
+Thumbnail* generateThumbnail(Photo* photo) {
+    return new Thumbnail(ThumbnailDAO::getInstance()->getNextID(), createThumbnailFile(photo));
+}
+
+QString createThumbnailFile(Photo* photo)
 {
     QSize size = Settings::getInstance()->getNewThumbnailSize();
 
@@ -40,5 +44,5 @@ Thumbnail* generateThumbnail(Photo* photo)
         reader.read().scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbnailFilePath);
     }
 
-    return new Thumbnail(ThumbnailDAO::getInstance()->getNextID(), thumbnailFilePath);
+    return thumbnailFilePath;
 }

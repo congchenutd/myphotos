@@ -6,6 +6,8 @@
 #include <QDate>
 #include <QString>
 
+class Photo;
+
 class Event: public Persistable
 {
 public:
@@ -17,9 +19,18 @@ public:
     void setName(const QString& name);
     void setDate(const QDate& date);
 
+    QList<Photo*> getAllPhotos() const;
+    void addPhoto(Photo* photo);
+
+    int photoCount() const;
+
 private:
-    QString _name;
-    QDate   _date;
+    void renamePhotos();
+
+private:
+    QString         _name;
+    QDate           _date;
+    QList<Photo*>   _photos;
 };
 
 #endif // EVENT_H

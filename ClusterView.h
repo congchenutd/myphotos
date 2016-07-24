@@ -20,7 +20,7 @@ public:
     void addPhoto(Photo* photo);
     void removePhotoItem(PhotoItem* item);
     void reloadTitle();
-    void sort(const Comparator& comparator);
+    void sort(const LayoutItemComparator& comparator);
 
     int                 getPhotoItemCount() const;
     QString             getTitle()          const;

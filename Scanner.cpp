@@ -25,6 +25,8 @@ QList<Photo*> Scanner::scan()
         while (it.hasNext())
         {
             it.next();
+            if (Library::getInstance()->getPhoto(it.filePath()) != 0)   // already exists
+                continue;
 
             // create a photo object
             Photo* photo = Photo::fromFileInfo(it.fileInfo());

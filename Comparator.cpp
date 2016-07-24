@@ -56,3 +56,7 @@ bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
     return false;
 }
 
+
+bool ComparePhotoByTime::operator() (Photo* lhs, Photo* rhs) const {
+    return lhs->getTimeTaken() < rhs->getTimeTaken();
+}

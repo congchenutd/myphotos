@@ -55,7 +55,7 @@ QList<PhotoItem*> ClusterView::getAllPhotoItems() const
     return result;
 }
 
-void ClusterView::sort(const Comparator& comparator) {
+void ClusterView::sort(const LayoutItemComparator& comparator) {
     _layout->sort(comparator);
 }
 

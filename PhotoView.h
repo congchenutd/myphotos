@@ -33,7 +33,7 @@ public:
     void removePhotoItem(PhotoItem* item);
     void addPhoto(Photo* photo);
     PhotoItem* getItem(Photo* photo) const;
-    void showTitles(bool show);
+    void updateTitles();
 
 public slots:
     void resizeThumbnails();
@@ -60,10 +60,10 @@ protected:
     void mouseReleaseEvent  (QMouseEvent* event);
 
 private:
-    void updateSelection(const QSet<PhotoItem*> &selected);
+    void updateSelection(const QList<PhotoItem*>& selected);
     int                 getClickedItemIndex (const QPoint& point) const;
     PhotoItem*          getClickedItem      (const QPoint& point) const;
-    QSet<PhotoItem *>   getClickedItems     (const QPoint& start, const QPoint& end) const;
+    QList<PhotoItem*> getClickedItems(const QPoint& start, const QPoint& end) const;
     void toggleSelection(PhotoItem* clicked);
     NewItemMenu* createTagMenu();
     NewItemMenu* createPeopleMenu();
@@ -77,7 +77,7 @@ private:
     Library*                        _library;
     QPoint                          _clickedPosition;
     QRubberBand*                    _rubberBand;
-    QSet<PhotoItem*>                _selected;
+    QList<PhotoItem*>               _selected;
     QString                         _sortBy;
     bool                            _ascending;
     SortableVBoxLayout*             _vBoxLayout;

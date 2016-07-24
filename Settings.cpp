@@ -52,7 +52,7 @@ QString Settings::getThumbnailCacheLocation() const
     QDir dir = QDir::current();
     dir.mkdir("Thumbnails");
     dir.cd("Thumbnails");
-    return dir.absolutePath();
+    return dir.path();
 }
 
 QString Settings::getTrashLocation() const {

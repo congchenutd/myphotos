@@ -4,9 +4,10 @@
 #include <functional>
 
 class QLayoutItem;
+class Photo;
 
 // Comparators for sorting
-typedef std::function<bool (QLayoutItem*, QLayoutItem*)> Comparator;
+typedef std::function<bool (QLayoutItem*, QLayoutItem*)> LayoutItemComparator;
 
 class ClusterViewLessAddress
 {
@@ -42,6 +43,12 @@ public:
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 private:
     bool _lessThan;
+};
+
+class ComparePhotoByTime
+{
+public:
+    bool operator() (Photo* lhs, Photo* rhs) const;
 };
 
 #endif // COMPARATOR_H

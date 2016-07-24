@@ -106,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // load photos to photo view
     ui.photoView->load(_library->getAllPhotos().values());
-    ui.photoView->showTitles(Settings::getInstance()->getShowTitle());
+//    ui.photoView->updateTitles();
     onPhotoSelected(QList<PhotoItem*>());   // clear selection and disable actions
 
     // filtering pages
@@ -156,7 +156,7 @@ void MainWindow::onOptions()
     SettingsDlg dlg(this);
     if (dlg.exec() == QDialog::Accepted)
     {
-        ui.photoView->showTitles(Settings::getInstance()->getShowTitle());
+        ui.photoView->updateTitles();
     }
 }
 
@@ -311,11 +311,13 @@ void MainWindow::onNewEvent(const QString& name, const QDate& date)
     event->save();
 
     // add it to selected photos
-    foreach(PhotoItem* item, ui.photoView->getSelectedItems())
+    QList<PhotoItem*> selected = ui.photoView->getSelectedItems();
+    for (int i = 0; i < selected.count(); ++ i)
     {
-        Photo* photo = item->getPhoto();
+        Photo* photo = selected.at(i)->getPhoto();
         photo->setEvent(event);
         photo->save();
+//        selected.at(i)->setEvent(event);
     }
 
     // update event page

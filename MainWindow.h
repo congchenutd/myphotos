@@ -45,9 +45,9 @@ private slots:
     void onFilterByTags     (const QStringList& tags,   bool AND);
     void onFilterByPeople   (const QStringList& people, bool AND);
     void onFilterByEvent    (const QString& eventName);
+    void onFilterbyTitle    (const QString& title);
     void onAbout();
     void onInfoChanged(Photo* photo);
-    void onFilterbyTitle(const QString& title);
     void onShowPhotos   (bool show);
     void onShowVideos   (bool show);
     void onShowFavorites(bool show);

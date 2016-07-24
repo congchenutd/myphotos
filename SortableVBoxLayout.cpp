@@ -10,7 +10,7 @@ void SortableVBoxLayout::clear() {
         item->widget()->deleteLater();
 }
 
-void SortableVBoxLayout::sort(const Comparator& comparator)
+void SortableVBoxLayout::sort(const LayoutItemComparator& comparator)
 {
     QList<QLayoutItem*> items;
     while (QLayoutItem* item = takeAt(0))
