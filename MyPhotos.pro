@@ -58,7 +58,8 @@ SOURCES += \
     SortableVBoxLayout.cpp \
     Comparator.cpp \
     EmbeddableLineEdit.cpp \
-    SearchLineEdit.cpp
+    SearchLineEdit.cpp \
+    RenameDlg.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -106,7 +107,8 @@ HEADERS += \
     SortableVBoxLayout.h \
     Comparator.h \
     EmbeddableLineEdit.h \
-    SearchLineEdit.h
+    SearchLineEdit.h \
+    RenameDlg.h
 
 FORMS += \
 	MainWindow.ui \
@@ -116,7 +118,8 @@ FORMS += \
     NewTagDlg.ui \
     NewEventDlg.ui \
     EventPage.ui \
-    InfoPage.ui
+    InfoPage.ui \
+    RenameDlg.ui
 
 RESOURCES += \
     Resources.qrc

@@ -5,50 +5,57 @@
 
 class QLayoutItem;
 class Photo;
+class PhotoItem;
 
 // Comparators for sorting
 typedef std::function<bool (QLayoutItem*, QLayoutItem*)> LayoutItemComparator;
 
-class ClusterViewLessAddress
+class CompareClusterViewsByAddress
 {
 public:
-    ClusterViewLessAddress(bool lessThan = true);
+    CompareClusterViewsByAddress(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 private:
     bool _lessThan;
 };
 
-class ClusterViewLessDate
+class CompareClusterViewsByDate
 {
 public:
-    ClusterViewLessDate(bool lessThan = true);
+    CompareClusterViewsByDate(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 private:
     bool _lessThan;
 };
 
-class PhotoItemLessTime
+class ComparePhotoItemsByTime
 {
 public:
-    PhotoItemLessTime(bool lessThan = true);
+    ComparePhotoItemsByTime(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 private:
     bool _lessThan;
 };
 
-class PhotoItemLessTitle
+class ComparePhotoItemsByTitle
 {
 public:
-    PhotoItemLessTitle(bool lessThan = true);
+    ComparePhotoItemsByTitle(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 private:
     bool _lessThan;
 };
 
-class ComparePhotoByTime
+class ComparePhotosByTime
 {
 public:
     bool operator() (Photo* lhs, Photo* rhs) const;
+};
+
+class ComparePhotoItemsByTime2
+{
+public:
+    bool operator() (PhotoItem* lhs, PhotoItem* rhs) const;
 };
 
 #endif // COMPARATOR_H

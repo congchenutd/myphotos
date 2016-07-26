@@ -9,21 +9,10 @@
 #include <QProcess>
 #include <QDebug>
 
-Thumbnail* generateThumbnail(Photo* photo) {
-    return new Thumbnail(ThumbnailDAO::getInstance()->getNextID(), createThumbnailFile(photo));
-}
-
-QString createThumbnailFile(Photo* photo)
+Thumbnail* generateThumbnail(const Photo* photo)
 {
     QSize size = Settings::getInstance()->getNewThumbnailSize();
-
-    // thumbnail file name is the path of the photo
-    QString fileName = photo->getFilePath() + ".png";
-    fileName.replace(QDir::separator(), '-');
-
-    // generate thumbnail file path
-    QString location = Settings::getInstance()->getThumbnailCacheLocation();
-    QString thumbnailFilePath = location + QDir::separator() + fileName;
+    QString thumbnailFilePath = createThumbnailFilePath(photo);
 
     if (photo->isVideo())
     {
@@ -44,5 +33,16 @@ QString createThumbnailFile(Photo* photo)
         reader.read().scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(thumbnailFilePath);
     }
 
-    return thumbnailFilePath;
+    return new Thumbnail(ThumbnailDAO::getInstance()->getNextID(), thumbnailFilePath);
+}
+
+QString createThumbnailFilePath(const Photo *photo)
+{
+    // thumbnail file name is the path of the photo
+    QString fileName = photo->getFilePath() + ".png";
+    fileName.replace(QDir::separator(), '-');
+
+    // generate thumbnail file path
+    QString location = Settings::getInstance()->getThumbnailCacheLocation();
+    return location + QDir::separator() + fileName;
 }

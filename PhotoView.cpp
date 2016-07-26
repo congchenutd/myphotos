@@ -14,6 +14,7 @@
 #include "ClusterView.h"
 #include "SortableVBoxLayout.h"
 #include "Settings.h"
+#include "Comparator.h"
 
 #include <QFileSystemModel>
 #include <QLabel>
@@ -25,6 +26,7 @@
 #include <QSpacerItem>
 #include <QVBoxLayout>
 #include <QShortcut>
+#include <cmath>
 
 PhotoView::PhotoView(QWidget *parent) :
     QWidget(parent),
@@ -95,21 +97,21 @@ void PhotoView::sort(const QString& byWhat, bool ascending)
     // sort the clusterviews first, then the photoitems within each clusterview
     if (byWhat == "Address")
     {
-        _vBoxLayout->sort(ClusterViewLessAddress(ascending));
+        _vBoxLayout->sort(CompareClusterViewsByAddress(ascending));
         foreach (ClusterView* clusterView, _clusterViews)
-            clusterView->sort(PhotoItemLessTime(false));
+            clusterView->sort(ComparePhotoItemsByTime(false));
     }
     else if (byWhat == "Time")
     {
-        _vBoxLayout->sort(ClusterViewLessDate(ascending));
+        _vBoxLayout->sort(CompareClusterViewsByDate(ascending));
         foreach (ClusterView* clusterView, _clusterViews)
-            clusterView->sort(PhotoItemLessTime(ascending));
+            clusterView->sort(ComparePhotoItemsByTime(ascending));
     }
     else if (byWhat == "Title")
     {
-        _vBoxLayout->sort(ClusterViewLessDate(false));
+        _vBoxLayout->sort(CompareClusterViewsByDate(false));
         foreach (ClusterView* clusterView, _clusterViews)
-            clusterView->sort(PhotoItemLessTitle(ascending));
+            clusterView->sort(ComparePhotoItemsByTitle(ascending));
     }
 }
 
@@ -303,9 +305,27 @@ PhotoItem* PhotoView::getItem(Photo* photo) const {
     return 0;
 }
 
-void PhotoView::updateTitles() {
+void PhotoView::updateTitleVisibility() {
     foreach (PhotoItem* item, getAllPhotoItems())
         item->updateTitleVisibility();
+}
+
+void PhotoView::rename(const QString& title)
+{
+    std::sort(_selected.begin(), _selected.end(), ComparePhotoItemsByTime2());
+    int selectedCount = getSelectedItems().count();
+    for (int i = 0; i < selectedCount; ++i)
+    {
+        PhotoItem* item = _selected.at(i);
+        Photo* photo = item->getPhoto();
+        QFileInfo fileInfo(photo->getFilePath());
+        QString date = fileInfo.lastModified().toString("yyyy-MM-dd");
+        QString index = QString("%1").arg(QString::number(i), log10(selectedCount) + 1, '0');  // pad with 0
+        QString thisTitle = date + "-" + title;
+        if (selectedCount > 1)
+            thisTitle += "-" + index;
+        item->setTitle(thisTitle);
+    }
 }
 
 /**
@@ -358,7 +378,6 @@ void PhotoView::onEventChecked(bool checked)
         Photo* photo = _selected.at(i)->getPhoto();
         photo->setEvent(checked ? _library->getEvent(eventName) : 0);
         photo->save();
-//        _selected.at(i)->setEvent(checked ? _library->getEvent(eventName) : 0);
     }
 }
 

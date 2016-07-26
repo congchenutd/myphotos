@@ -137,6 +137,12 @@ void Library::removePhoto(Photo* photo)
     photo->destroy();
 }
 
+void Library::changePhotoFilePath(Photo* photo, const QString& oldPath, const QString& newPath)
+{
+    _photos.remove(oldPath);
+    _photos.insert(newPath, photo);
+}
+
 QList<Photo*> Library::filterPhotosByTags(const QSet<QString>& tags, bool AND)
 {
     if (tags.isEmpty())

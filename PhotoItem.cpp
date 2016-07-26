@@ -23,7 +23,7 @@ PhotoItem::PhotoItem(Photo* photo, ClusterView* clusterView)
     _title = new EditableLabel;
     _title->setAlignment(Qt::AlignCenter);
     updateTitleVisibility();
-    connect(_title, SIGNAL(editingFinished(QString)), this, SLOT(onTitleEdited(QString)));
+    connect(_title, SIGNAL(editingFinished(QString)), this, SLOT(setTitle(QString)));
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(_thumbnail);
@@ -43,7 +43,6 @@ void PhotoItem::setPhoto(Photo* photo)
         return;
 
     _photo = photo;
-    connect(photo, SIGNAL(changed()), SLOT(reloadTitle()));
     _title->setText(photo->getTitle());
 
     // show video icon if it's a video
@@ -67,16 +66,15 @@ void PhotoItem::paintEvent(QPaintEvent* event)
     QWidget::paintEvent(event);
 }
 
-void PhotoItem::onTitleEdited(const QString& title)
+void PhotoItem::setTitle(const QString& title)
 {
-    _photo->setTitle(title, false);
-    _photo->save();
-}
-
-void PhotoItem::reloadTitle()
-{
-    if (_photo != 0)
-        _title->setText(_photo->getTitle());
+    if (_photo->setTitle(title))
+    {
+        _photo->save();
+        _title->setText(title);
+    }
+    else
+        _title->setText(_photo->getTitle());    // restore title
 }
 
 /**
@@ -131,17 +129,4 @@ void PhotoItem::updateTitleVisibility()
     bool show = Settings::getInstance()->getShowTitle();
     if (!visibleRegion().isEmpty())
         _title->setVisible(show);
-}
-
-void PhotoItem::setTitle(const QString& title) {
-    _title->setText(title);
-}
-
-void PhotoItem::setEvent(Event* event)
-{
-    Photo* photo = getPhoto();
-    photo->setEvent(event);
-    photo->save();
-    if (event != 0)
-        setPhoto(photo);
 }

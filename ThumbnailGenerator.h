@@ -6,7 +6,7 @@
 class Photo;
 class Thumbnail;
 
-Thumbnail*  generateThumbnail   (Photo* photo);
-QString     createThumbnailFile (Photo* photo);
+Thumbnail*  generateThumbnail       (const Photo* photo);
+QString     createThumbnailFilePath (const Photo* photo);
 
 #endif // THUMBNAILGENERATOR_H

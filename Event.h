@@ -19,18 +19,9 @@ public:
     void setName(const QString& name);
     void setDate(const QDate& date);
 
-    QList<Photo*> getAllPhotos() const;
-    void addPhoto(Photo* photo);
-
-    int photoCount() const;
-
 private:
-    void renamePhotos();
-
-private:
-    QString         _name;
-    QDate           _date;
-    QList<Photo*>   _photos;
+    QString _name;
+    QDate   _date;
 };
 
 #endif // EVENT_H

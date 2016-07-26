@@ -5,12 +5,14 @@
 #include "Tag.h"
 #include "Thumbnail.h"
 #include "ThumbnailGenerator.h"
+#include "Library.h"
 
 #include <QFileInfo>
 #include <QProcess>
 #include <QFile>
 #include <QDir>
 #include <cmath>
+#include <QDebug>
 
 Photo::Photo(int id, const QString& title, const QString& path, const QDateTime& time)
     : Persistable(id, PhotoDAO::getInstance()),
@@ -66,32 +68,36 @@ bool Photo::colocatedWith(const Photo* another) const {
     return getCoordinates().distanceTo(another->getCoordinates()) * 100 < PROXIMITY;
 }
 
-void Photo::setTitle(const QString& title, bool emitChange)
+bool Photo::setTitle(const QString& title)
 {
-    _title = title;
-
     // change file name to title
     QFileInfo fileInfo(getFilePath());
     QString newPath = fileInfo.absolutePath() + QDir::separator() + title + "." + fileInfo.suffix();
-    setFilePath(newPath);
+    if (Library::getInstance()->getPhoto(newPath) != 0)
+        return false;
 
-    if (emitChange)
-        emit changed();
+    _title = title;
+    setFilePath(newPath);
+    return true;
 }
 
 void Photo::setFilePath(const QString& filePath)
 {
     if (QFile::rename(_filePath, filePath))
     {
+        Library::getInstance()->changePhotoFilePath(this, _filePath, filePath);
         _filePath = filePath;
 
         // rename thumbnail file
         if (Thumbnail* thumbnail = getThumbnail())
         {
-            QFile::remove(thumbnail->getFilePath());
-            thumbnail->setFilePath(createThumbnailFile(this));
+            QString newThumbnailPath = createThumbnailFilePath(this);
+            QFile::rename(thumbnail->getFilePath(), newThumbnailPath);
+            thumbnail->setFilePath(newThumbnailPath);
         }
     }
+    else
+        qDebug() << "Rename file path failed: " + filePath;
 }
 
 void Photo::setTimeTaken(const QDateTime& time)
@@ -114,8 +120,8 @@ void Photo::addPeople(People* people) {
 void Photo::setEvent(Event* event)
 {
     _event = event;
-    if (_event != 0)
-        _event->addPhoto(this);
+//    if (_event != 0)
+//        _event->addPhoto(this);
 }
 
 void Photo::setThumbnail(Thumbnail* thumbnail) {
@@ -144,13 +150,4 @@ void Photo::setCluster(Cluster* cluster) {
 
 void Photo::setFavorite(bool favorite) {
     _favorite = favorite;
-}
-
-void Photo::renameBasedOnEvent(int idx, int eventSize)
-{
-    QFileInfo fileInfo(getFilePath());
-    QString date = fileInfo.lastModified().toString("yyyy-MM-dd");
-    QString index = QString("%1").arg(QString::number(idx), log10(eventSize) + 1, '0');  // pad with 0
-    QString title = date + "-" + getEvent()->getName() + "-" + index;
-    setTitle(title);
 }

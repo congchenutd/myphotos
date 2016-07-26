@@ -16,6 +16,7 @@
 #include "SliderWithToolTip.h"
 #include "Geocoder.h"
 #include "SearchLineEdit.h"
+#include "RenameDlg.h"
 
 #include <QProgressBar>
 #include <QActionGroup>
@@ -106,7 +107,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // load photos to photo view
     ui.photoView->load(_library->getAllPhotos().values());
-//    ui.photoView->updateTitles();
     onPhotoSelected(QList<PhotoItem*>());   // clear selection and disable actions
 
     // filtering pages
@@ -156,7 +156,7 @@ void MainWindow::onOptions()
     SettingsDlg dlg(this);
     if (dlg.exec() == QDialog::Accepted)
     {
-        ui.photoView->updateTitles();
+        ui.photoView->updateTitleVisibility();
     }
 }
 
@@ -222,8 +222,15 @@ void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
 /**
  * Trigger title editing
  */
-void MainWindow::onRename() {
-    ui.photoView->getSelectedItems().front()->rename();
+void MainWindow::onRename()
+{
+    RenameDlg dlg(this);
+    if (dlg.exec() == QDialog::Accepted)
+    {
+        QString title = dlg.getTitle();
+        if (!title.isEmpty())
+            ui.photoView->rename(title);
+    }
 }
 
 void MainWindow::onRemove()
@@ -317,7 +324,6 @@ void MainWindow::onNewEvent(const QString& name, const QDate& date)
         Photo* photo = selected.at(i)->getPhoto();
         photo->setEvent(event);
         photo->save();
-//        selected.at(i)->setEvent(event);
     }
 
     // update event page
@@ -412,6 +418,5 @@ void MainWindow::onInfoChanged(Photo* photo)
     if (PhotoItem* item = ui.photoView->getItem(photo))
     {
         item->setPhoto(photo);
-        sort();
     }
 }

@@ -51,6 +51,7 @@ public:
     void addThumbnail   (Thumbnail* thumbnail);
 
     void removePhoto(Photo* photo);
+    void changePhotoFilePath(Photo* photo, const QString& oldPath, const QString& newPath);
 
     QList<Photo*> filterPhotosByTags    (const QSet<QString>& tags,     bool AND);
     QList<Photo*> filterPhotosByPeople  (const QSet<QString>& people,   bool AND);
@@ -63,11 +64,11 @@ private:
 
 private:
     LibraryDAO*                 _dao;
-    QMap<QString, Photo*>       _photos;
-    QMap<QString, People*>      _people;
-    QMap<QString, Tag*>         _tags;
-    QMap<QString, Event*>       _events;
-    QMap<QString, Thumbnail*>   _thumbnails;
+    QMap<QString, Photo*>       _photos;        // file path -> Photo*
+    QMap<QString, People*>      _people;        // people name -> People*
+    QMap<QString, Tag*>         _tags;          // tag name -> Tag*
+    QMap<QString, Event*>       _events;        // event name -> Event*
+    QMap<QString, Thumbnail*>   _thumbnails;    // thumbnail path -> Thumbnail*
 };
 
 #endif // LIBRARY_H

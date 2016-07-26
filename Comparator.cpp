@@ -5,9 +5,9 @@
 #include <QLayoutItem>
 
 /////////////////////////////////////////////////////////////////////////////////////////
-ClusterViewLessDate::ClusterViewLessDate(bool lessThan) : _lessThan(lessThan) {}
+CompareClusterViewsByDate::CompareClusterViewsByDate(bool lessThan) : _lessThan(lessThan) {}
 
-bool ClusterViewLessDate::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
+bool CompareClusterViewsByDate::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
 {
     ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
     ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
@@ -18,9 +18,9 @@ bool ClusterViewLessDate::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-ClusterViewLessAddress::ClusterViewLessAddress(bool lessThan) : _lessThan(lessThan) {}
+CompareClusterViewsByAddress::CompareClusterViewsByAddress(bool lessThan) : _lessThan(lessThan) {}
 
-bool ClusterViewLessAddress::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
+bool CompareClusterViewsByAddress::operator()(QLayoutItem* lhs, QLayoutItem* rhs) const
 {
     ClusterView* view1 = dynamic_cast<ClusterView*>(lhs->widget());
     ClusterView* view2 = dynamic_cast<ClusterView*>(rhs->widget());
@@ -31,9 +31,9 @@ bool ClusterViewLessAddress::operator()(QLayoutItem* lhs, QLayoutItem* rhs) cons
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-PhotoItemLessTime::PhotoItemLessTime(bool lessThan) : _lessThan(lessThan) {}
+ComparePhotoItemsByTime::ComparePhotoItemsByTime(bool lessThan) : _lessThan(lessThan) {}
 
-bool PhotoItemLessTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+bool ComparePhotoItemsByTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
 {
     PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
     PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
@@ -44,9 +44,9 @@ bool PhotoItemLessTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-PhotoItemLessTitle::PhotoItemLessTitle(bool lessThan) : _lessThan(lessThan) {}
+ComparePhotoItemsByTitle::ComparePhotoItemsByTitle(bool lessThan) : _lessThan(lessThan) {}
 
-bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
+bool ComparePhotoItemsByTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
 {
     PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
     PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
@@ -57,6 +57,10 @@ bool PhotoItemLessTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) const
 }
 
 
-bool ComparePhotoByTime::operator() (Photo* lhs, Photo* rhs) const {
+bool ComparePhotosByTime::operator() (Photo* lhs, Photo* rhs) const {
     return lhs->getTimeTaken() < rhs->getTimeTaken();
+}
+
+bool ComparePhotoItemsByTime2::operator() (PhotoItem *lhs, PhotoItem *rhs) const {
+    return lhs->getPhoto()->getTimeTaken() < rhs->getPhoto()->getTimeTaken();
 }

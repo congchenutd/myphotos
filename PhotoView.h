@@ -33,7 +33,8 @@ public:
     void removePhotoItem(PhotoItem* item);
     void addPhoto(Photo* photo);
     PhotoItem* getItem(Photo* photo) const;
-    void updateTitles();
+    void updateTitleVisibility();
+    void rename(const QString& title);
 
 public slots:
     void resizeThumbnails();

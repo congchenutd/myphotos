@@ -27,16 +27,13 @@ public:
     QRect geometryMappedTo(const QWidget* widget) const;
     ClusterView* getClusterView() const;
     void updateTitleVisibility();
+
+public slots:
     void setTitle(const QString& title);
-    void setEvent(Event* event);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent*);
     void paintEvent(QPaintEvent* event);
-
-private slots:
-    void onTitleEdited(const QString& title);
-    void reloadTitle();
 
 private:
     ClusterView*    _clusterView;

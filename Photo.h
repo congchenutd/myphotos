@@ -53,7 +53,7 @@ public:
     bool exists () const;
     bool colocatedWith(const Photo* another) const;
 
-    void setTitle       (const QString& title, bool emitChange = true);
+    bool setTitle       (const QString& title);
     void setFilePath    (const QString& filePath);
     void setTimeTaken   (const QDateTime& time);
     void addTag         (Tag*       tag);
@@ -66,8 +66,6 @@ public:
     void setAddress     (const QString& address);
     void setCluster     (Cluster* cluster);
     void setFavorite    (bool favorite);
-
-    void renameBasedOnEvent(int idx, int eventSize);
 
 signals:
     void changed();
