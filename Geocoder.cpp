@@ -8,6 +8,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QRegularExpression>
+#include <QDebug>
 
 Geocoder::Geocoder(QObject* parent)
     : QObject(parent)
@@ -39,8 +40,9 @@ void Geocoder::processNext()
     QString latitude    = photo->getExif().getValue("GPS Latitude");
     QString longitude   = photo->getExif().getValue("GPS Longitude");
     QString url = tr("https://maps.googleapis.com/maps/api/geocode/json?"
-                     "latlng=%1,%2&location_type=ROOFTOP&key=AIzaSyC3RwR2lIxzy83W8coGG8ZXdwG_rumNR6Q")
+                     "latlng=%1,%2&key=AIzaSyC3RwR2lIxzy83W8coGG8ZXdwG_rumNR6Q")
             .arg(coordinate2Decimal(latitude)).arg(coordinate2Decimal(longitude));
+    qDebug() << url;
     _networkAccessManager->get(QNetworkRequest(url));
 }
 

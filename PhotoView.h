@@ -61,10 +61,10 @@ protected:
     void mouseReleaseEvent  (QMouseEvent* event);
 
 private:
-    void updateSelection(const QList<PhotoItem*>& selected);
+    void updateSelection(const QSet<PhotoItem *>& selected);
     int                 getClickedItemIndex (const QPoint& point) const;
     PhotoItem*          getClickedItem      (const QPoint& point) const;
-    QList<PhotoItem*> getClickedItems(const QPoint& start, const QPoint& end) const;
+    QSet<PhotoItem*> getClickedItems(const QPoint& start, const QPoint& end) const;
     void toggleSelection(PhotoItem* clicked);
     NewItemMenu* createTagMenu();
     NewItemMenu* createPeopleMenu();
@@ -78,7 +78,7 @@ private:
     Library*                        _library;
     QPoint                          _clickedPosition;
     QRubberBand*                    _rubberBand;
-    QList<PhotoItem*>               _selected;
+    QSet<PhotoItem*>                _selected;
     QString                         _sortBy;
     bool                            _ascending;
     SortableVBoxLayout*             _vBoxLayout;

@@ -42,7 +42,15 @@ bool EditableLabel::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::FocusOut)
     {
-        finishEditing();
+        cancelEditing();
+        return true;
+    }
+
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent* keyEvent = (QKeyEvent*) event;
+        if (keyEvent->key() == Qt::Key_Escape)
+            cancelEditing();
         return true;
     }
     return QObject::eventFilter(obj, event);

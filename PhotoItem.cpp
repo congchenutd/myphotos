@@ -68,13 +68,11 @@ void PhotoItem::paintEvent(QPaintEvent* event)
 
 void PhotoItem::setTitle(const QString& title)
 {
-    if (_photo->setTitle(title))
-    {
-        _photo->save();
-        _title->setText(title);
-    }
-    else
-        _title->setText(_photo->getTitle());    // restore title
+    if (_title->text() == title)
+        return;
+
+    _title->setText(_photo->setTitle(title));
+    _photo->save();
 }
 
 /**

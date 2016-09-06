@@ -241,8 +241,8 @@ void MainWindow::onRemove()
     {
         for (PhotoItem* item: ui.photoView->getSelectedItems())
         {
-            _library->removePhoto(item->getPhoto());
             ui.photoView->removePhotoItem(item);
+            _library->removePhoto(item->getPhoto());
         }
     }
 }

@@ -33,6 +33,8 @@ class ComparePhotoItemsByTime
 public:
     ComparePhotoItemsByTime(bool lessThan = true);
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
+    bool operator() (PhotoItem* lhs, PhotoItem* rhs) const;
+
 private:
     bool _lessThan;
 };
@@ -44,12 +46,6 @@ public:
     bool operator() (QLayoutItem* lhs, QLayoutItem* rhs) const;
 private:
     bool _lessThan;
-};
-
-class ComparePhotosByTime
-{
-public:
-    bool operator() (Photo* lhs, Photo* rhs) const;
 };
 
 class ComparePhotoItemsByTime2

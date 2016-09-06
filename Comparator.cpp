@@ -38,9 +38,13 @@ bool ComparePhotoItemsByTime::operator() (QLayoutItem* lhs, QLayoutItem* rhs) co
     PhotoItem* item1 = dynamic_cast<PhotoItem*>(lhs->widget());
     PhotoItem* item2 = dynamic_cast<PhotoItem*>(rhs->widget());
     if (item1 != 0 && item2 != 0)
-        return _lessThan ? item1->getPhoto()->getTimeTaken() < item2->getPhoto()->getTimeTaken()
-                         : item1->getPhoto()->getTimeTaken() > item2->getPhoto()->getTimeTaken();
+        return operator() (item1, item2);
     return false;
+}
+
+bool ComparePhotoItemsByTime::operator() (PhotoItem* lhs, PhotoItem* rhs) const {
+    return _lessThan ? lhs->getPhoto()->getTimeTaken() < rhs->getPhoto()->getTimeTaken()
+                     : lhs->getPhoto()->getTimeTaken() > rhs->getPhoto()->getTimeTaken();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -56,10 +60,6 @@ bool ComparePhotoItemsByTitle::operator() (QLayoutItem* lhs, QLayoutItem* rhs) c
     return false;
 }
 
-
-bool ComparePhotosByTime::operator() (Photo* lhs, Photo* rhs) const {
-    return lhs->getTimeTaken() < rhs->getTimeTaken();
-}
 
 bool ComparePhotoItemsByTime2::operator() (PhotoItem *lhs, PhotoItem *rhs) const {
     return lhs->getPhoto()->getTimeTaken() < rhs->getPhoto()->getTimeTaken();

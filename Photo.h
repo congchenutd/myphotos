@@ -53,7 +53,7 @@ public:
     bool exists () const;
     bool colocatedWith(const Photo* another) const;
 
-    bool setTitle       (const QString& title);
+    QString setTitle(const QString& title);
     void setFilePath    (const QString& filePath);
     void setTimeTaken   (const QDateTime& time);
     void addTag         (Tag*       tag);

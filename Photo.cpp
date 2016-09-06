@@ -68,17 +68,20 @@ bool Photo::colocatedWith(const Photo* another) const {
     return getCoordinates().distanceTo(another->getCoordinates()) * 100 < PROXIMITY;
 }
 
-bool Photo::setTitle(const QString& title)
+QString Photo::setTitle(const QString& title)
 {
+    if (_title == title)
+        return title;
+
     // change file name to title
     QFileInfo fileInfo(getFilePath());
     QString newPath = fileInfo.absolutePath() + QDir::separator() + title + "." + fileInfo.suffix();
     if (Library::getInstance()->getPhoto(newPath) != 0)
-        return false;
+        return setTitle(title + " (1)");
 
     _title = title;
     setFilePath(newPath);
-    return true;
+    return title;
 }
 
 void Photo::setFilePath(const QString& filePath)

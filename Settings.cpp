@@ -47,12 +47,13 @@ Settings::Settings(const QString& fileName)
 
 Settings* Settings::_instance = 0;
 
+// Return absolute path
 QString Settings::getThumbnailCacheLocation() const
 {
     QDir dir = QDir::current();
     dir.mkdir("Thumbnails");
     dir.cd("Thumbnails");
-    return dir.path();
+    return QDir::current().relativeFilePath(dir.path());
 }
 
 QString Settings::getTrashLocation() const {
