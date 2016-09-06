@@ -3,7 +3,7 @@
 
 #include "ui_MonitoredFoldersDlg.h"
 
-#include <QStringListModel>
+#include <QStandardItemModel>
 
 /**
  * A dialog for editing monitored folders
@@ -19,11 +19,18 @@ public:
 private slots:
     void onAdd();
     void onRemove();
+    void onCurrentRowChanged(const QModelIndex& idx);
+
+private:
+    void load();
+    void save();
 
 private:
     Ui::MonitoredFoldersDlg ui;
+    enum {COL_FOLDER, COL_CHECKED};
 
-    QStringListModel _model;
+    QStandardItemModel _model;
+    const static char  _separator = ';';
 };
 
 #endif // MONITOREDFOLDERSDLG_H

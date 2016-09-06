@@ -10,6 +10,8 @@ macx {
 	ICON = Images/MyPhotos.icns
 }
 
+INCLUDEPATH +=	../ImageColorBoolModel
+
 SOURCES += \
 	MainWindow.cpp \
     Main.cpp \
@@ -59,7 +61,9 @@ SOURCES += \
     Comparator.cpp \
     EmbeddableLineEdit.cpp \
     SearchLineEdit.cpp \
-    RenameDlg.cpp
+    RenameDlg.cpp \
+    ../ImageColorBoolModel/ImageColorBoolDelegate.cpp \
+    ../ImageColorBoolModel/ImageColorBoolProxy.cpp
 
 HEADERS += \
 	MainWindow.h \
@@ -108,7 +112,9 @@ HEADERS += \
     Comparator.h \
     EmbeddableLineEdit.h \
     SearchLineEdit.h \
-    RenameDlg.h
+    RenameDlg.h \
+    ../ImageColorBoolModel/ImageColorBoolDelegate.h \
+    ../ImageColorBoolModel/ImageColorBoolProxy.h
 
 FORMS += \
 	MainWindow.ui \

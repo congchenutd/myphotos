@@ -17,7 +17,7 @@ QList<Photo*> Scanner::scan()
     QList<Photo*> photos;
 
     // Collect files
-    QStringList monitoredFolders = Settings::getInstance()->getMonitoredFolders();
+    QStringList monitoredFolders = Settings::getInstance()->getEnabledMonitoredFolders();
     foreach (const QString& folder, monitoredFolders)
     {
         QDirIterator it(folder, Settings::getInstance()->getMonitoredFileTypes().split(";"),

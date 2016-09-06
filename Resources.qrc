@@ -27,5 +27,7 @@
         <file>Images/Photos.png</file>
         <file>Images/Videos.png</file>
         <file>Images/Heart2.png</file>
+        <file>Images/Checked.png</file>
+        <file>Images/UnChecked.png</file>
     </qresource>
 </RCC>

@@ -10,6 +10,7 @@ public:
 
     QStringList getMonitoredFolders() const;
     void setMonitoredFolders(const QStringList& list);
+    QStringList getEnabledMonitoredFolders() const;
 
     QString getMonitoredFileTypes() const;
     void setMonitoredFileTypes(const QString& list);

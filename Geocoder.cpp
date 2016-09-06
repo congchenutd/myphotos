@@ -16,6 +16,12 @@ Geocoder::Geocoder(QObject* parent)
     _networkAccessManager = new QNetworkAccessManager(this);
     connect(_networkAccessManager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(onReady(QNetworkReply*)));
+
+    _apiKeys << "AIzaSyBPKYi0Mtp_KCgNOCiysRAcyId2F_oULLE"
+             << "AIzaSyC3RwR2lIxzy83W8coGG8ZXdwG_rumNR6Q"
+             << "AIzaSyBUa3QK0opAlshNKHkS93RRMAJC44WePDU"
+             << "AIzaSyAEc6SRUZl0HaLZu2H379wqYwEZ7cjzxsc";
+    _keyIndex = 0;
 }
 
 void Geocoder::start(const QList<Photo*>& photos)
@@ -39,9 +45,10 @@ void Geocoder::processNext()
     Photo* photo = _photos.front();
     QString latitude    = photo->getExif().getValue("GPS Latitude");
     QString longitude   = photo->getExif().getValue("GPS Longitude");
-    QString url = tr("https://maps.googleapis.com/maps/api/geocode/json?"
-                     "latlng=%1,%2&key=AIzaSyC3RwR2lIxzy83W8coGG8ZXdwG_rumNR6Q")
-            .arg(coordinate2Decimal(latitude)).arg(coordinate2Decimal(longitude));
+    QString url = tr("https://maps.googleapis.com/maps/api/geocode/json?latlng=%1,%2&key=%3")
+            .arg(coordinate2Decimal(latitude))
+            .arg(coordinate2Decimal(longitude))
+            .arg(_apiKeys.at(_keyIndex));
     qDebug() << url;
     _networkAccessManager->get(QNetworkRequest(url));
 }
@@ -49,9 +56,24 @@ void Geocoder::processNext()
 void Geocoder::onReady(QNetworkReply* reply)
 {
     Photo* photo = _photos.dequeue();
-    photo->setAddress(parse(reply->readAll()).toString());
-    emit decoded(photo);
-    processNext();
+    Address address;
+    QString status = parse(reply->readAll(), address);
+    if (status == "OK")
+    {
+        photo->setAddress(address.toString());
+        emit decoded(photo);
+        processNext();
+    }
+    else
+    {
+        if (status == "OVER_QUERY_LIMIT")   // this key has reached its (most likely daily) limit
+        {
+            _keyIndex = (_keyIndex + 1) % _apiKeys.length();
+            _photos.push_front(photo);      // reprocess the photo using the next key
+            processNext();
+        }
+        qDebug() << status;
+    }
 }
 
 // Convert coordinate, e.g., 37 deg 19' 53.28" N to decimal, e.g., 37.331467
@@ -207,18 +229,18 @@ QString Geocoder::coordinate2Decimal(const QString& coordinate)
 //}
 
 // Parse the returing json as shown above
-Address Geocoder::parse(const QByteArray& json)
+QString Geocoder::parse(const QByteArray& json, Address& address)
 {
-    Address result;
     QJsonObject jsonObj = QJsonDocument::fromJson(json).object();
-    if (jsonObj.value("status").toString() != "OK")
-        return result;
-
-    result.streetName   = findComponent(jsonObj, "route");
-    result.cityName     = findComponent(jsonObj, "locality");
-    result.stateName    = findComponent(jsonObj, "administrative_area_level_1");
-    result.countryName  = findComponent(jsonObj, "country");
-    return result;
+    QString status = jsonObj.value("status").toString();
+    if (status == "OK")
+    {
+        address.streetName   = findComponent(jsonObj, "route");
+        address.cityName     = findComponent(jsonObj, "locality");
+        address.stateName    = findComponent(jsonObj, "administrative_area_level_1");
+        address.countryName  = findComponent(jsonObj, "country");
+    }
+    return status;
 }
 
 // Find the value of a given type of component
@@ -238,6 +260,11 @@ QString Geocoder::findComponent(const QJsonObject& resultsObj, const QString& ty
         }
     }
     return QString();
+}
+
+QString Geocoder::getKey() const
+{
+    return _apiKeys.at(_keyIndex);
 }
 
 bool Geocoder::canDecode(Photo* photo) const

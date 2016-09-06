@@ -34,8 +34,11 @@ private slots:
 private:
     void processNext();
     bool canDecode(Photo* photo) const;
-    Address parse(const QByteArray& json);
+    QString parse(const QByteArray& json, Address& address);
     QString findComponent(const QJsonObject& resultsObj, const QString& typeName) const;
+
+    QString getKey() const;
+
 
     static QString coordinate2Decimal(const QString& coordinates);
 
@@ -45,6 +48,8 @@ signals:
 private:
     QNetworkAccessManager*  _networkAccessManager;
     QQueue<Photo*>          _photos;
+    QStringList             _apiKeys;
+    int                     _keyIndex;
 };
 
 #endif // GEOCODER_H

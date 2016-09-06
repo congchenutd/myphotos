@@ -19,6 +19,18 @@ void Settings::setMonitoredFolders(const QStringList& list) {
     setValue("MonitoredFolders", list);
 }
 
+QStringList Settings::getEnabledMonitoredFolders() const
+{
+    QStringList result;
+    foreach (const QString& folder, getMonitoredFolders())
+    {
+        QStringList sections = folder.split(";");
+        if(sections.size() == 2 && sections[1].toLower() == "true")
+            result << sections[0];
+    }
+    return result;
+}
+
 QString Settings::getMonitoredFileTypes() const {
     return value("MonitoredFileTypes").toString();
 }
