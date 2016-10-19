@@ -24,6 +24,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QScrollBar>
+#include <QFileDialog>
 
 MainWindow* MainWindow::_instance = 0;
 
@@ -104,6 +105,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionShowPhotos,    SIGNAL(triggered(bool)), SLOT(onShowPhotos(bool)));
     connect(ui.actionShowVideos,    SIGNAL(triggered(bool)), SLOT(onShowVideos(bool)));
     connect(ui.actionShowFavorites, SIGNAL(triggered(bool)), SLOT(onShowFavorites(bool)));
+    connect(ui.actionExport,        SIGNAL(triggered(bool)), SLOT(onExport()));
 
     // load photos to photo view
     ui.photoView->load(_library->getAllPhotos().values());
@@ -208,11 +210,12 @@ void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
     ui.actionRemove ->setEnabled(hasSelection);
     ui.actionDelete ->setEnabled(hasSelection);
     ui.actionRename ->setEnabled(hasSelection);
+    ui.actionExport ->setEnabled(hasSelection);
 
     ui.pageInfo->setCurrentPhoto(hasSelection ? selected.front()->getPhoto() : 0);
 
     if (hasSelection)   // show selection info
-        ui.statusBar->showMessage(tr("%1 photo(s) selected").arg(selected.length()));
+        ui.statusBar->showMessage(tr("%1 file(s) selected").arg(selected.length()));
     else                // show all info
         ui.statusBar->showMessage(tr("%1 photo(s), %2 video(s)")
                                   .arg(_library->getPhotoCount())
@@ -398,6 +401,39 @@ void MainWindow::onShowFavorites(bool show)
     }
     else
         onFilterbyTitle("");
+}
+
+void MainWindow::onExport()
+{
+    QString dir = QFileDialog::getExistingDirectory(
+                this, tr("Select Export Directory"), ".",
+                QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir.isEmpty())
+        return;
+
+    QList<PhotoItem*> selectedItems = ui.photoView->getSelectedItems();
+    int count = selectedItems.length();  // must > 0 if the action is enabled
+    _progressBar->show();
+    _progressBar->setRange(0, count);
+    _progressBar->setValue(0);
+
+    for (int i = 0; i < count; ++ i)
+    {
+        Photo* photo = selectedItems.at(i)->getPhoto();
+        QString sourceFilePath = photo->getFilePath();
+        QString destFilePath = dir + QDir::separator() + QFileInfo(sourceFilePath).fileName();
+        QFile::copy(sourceFilePath, destFilePath);
+        _progressBar->setValue(i+1);
+        ui.statusBar->showMessage(tr("Exporting %1 of %2 file(s)")
+                                  .arg(i+1)
+                                  .arg(count));
+
+        QApplication::instance()->processEvents();
+    }
+    _progressBar->hide();
+    ui.statusBar->showMessage(tr("%1 file(s) exported to %2")
+                              .arg(count)
+                              .arg(dir));
 }
 
 void MainWindow::onAbout()

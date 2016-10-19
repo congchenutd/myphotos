@@ -51,6 +51,7 @@ private slots:
     void onShowPhotos   (bool show);
     void onShowVideos   (bool show);
     void onShowFavorites(bool show);
+    void onExport();
 
 private:
     Ui::MainWindow ui;
