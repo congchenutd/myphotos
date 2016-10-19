@@ -66,7 +66,7 @@
     <addaction name="actionAbout"/>
     <addaction name="actionAboutQt"/>
     <addaction name="separator"/>
-    <addaction name="actionScan"/>
+    <addaction name="actionImport"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionOptions"/>
@@ -108,7 +108,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionQuit"/>
-   <addaction name="actionScan"/>
+   <addaction name="actionImport"/>
    <addaction name="actionOptions"/>
    <addaction name="separator"/>
    <addaction name="actionShowPhotos"/>
@@ -230,13 +230,19 @@
     <string>Quit</string>
    </property>
   </action>
-  <action name="actionScan">
+  <action name="actionImport">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/Images/Scan.png</normaloff>:/Images/Scan.png</iconset>
+     <normaloff>:/Images/Import.png</normaloff>:/Images/Import.png</iconset>
    </property>
    <property name="text">
-    <string>Scan</string>
+    <string>Import</string>
+   </property>
+   <property name="toolTip">
+    <string>Import</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
   <action name="actionOptions">
@@ -407,6 +413,10 @@
    </property>
   </action>
   <action name="actionExport">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Export.png</normaloff>:/Images/Export.png</iconset>
+   </property>
    <property name="text">
     <string>Export</string>
    </property>

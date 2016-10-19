@@ -86,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui.actionAboutQt,       SIGNAL(triggered()), qApp,  SLOT(aboutQt()));
     connect(ui.actionAbout,         SIGNAL(triggered()),        SLOT(onAbout()));
-    connect(ui.actionScan,          SIGNAL(triggered()),        SLOT(onScan()));
+    connect(ui.actionImport,        SIGNAL(triggered()),        SLOT(onScan()));
     connect(ui.actionOptions,       SIGNAL(triggered()),        SLOT(onOptions()));
     connect(ui.actionSortByAddress, SIGNAL(triggered(bool)),    SLOT(sort()));
     connect(ui.actionSortByTitle,   SIGNAL(triggered(bool)),    SLOT(sort()));
@@ -136,6 +136,7 @@ QAction*    MainWindow::getDeleteAction()       { return ui.actionDelete;       
 QAction*    MainWindow::getSortByTitleAction()  { return ui.actionSortByTitle;  }
 QAction*    MainWindow::getSortByTimeAction()   { return ui.actionSortByTime;   }
 QAction*    MainWindow::getSortingOrderAction() { return ui.actionOrder;        }
+QAction*    MainWindow::getExportAction()       { return ui.actionExport;       }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
     _library->clean();  // clean up unused tags and save the library

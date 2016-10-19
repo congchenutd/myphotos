@@ -197,6 +197,7 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
             menu.addAction(mainWindow->getRenameAction());
             menu.addAction(mainWindow->getRemoveAction());
             menu.addAction(mainWindow->getDeleteAction());
+            menu.addAction(mainWindow->getExportAction());
 
             menu.addSeparator();
             menu.addMenu(createEventMenu());

@@ -24,6 +24,7 @@ public:
     QAction* getSortByTitleAction();
     QAction* getSortByTimeAction();
     QAction* getSortingOrderAction();
+    QAction* getExportAction();
 
 protected:
     void closeEvent(QCloseEvent* event);

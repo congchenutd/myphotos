@@ -29,5 +29,7 @@
         <file>Images/Heart2.png</file>
         <file>Images/Checked.png</file>
         <file>Images/UnChecked.png</file>
+        <file>Images/Export.png</file>
+        <file>Images/Import.png</file>
     </qresource>
 </RCC>
