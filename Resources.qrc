@@ -31,5 +31,6 @@
         <file>Images/UnChecked.png</file>
         <file>Images/Export.png</file>
         <file>Images/Import.png</file>
+        <file>Images/Folder.png</file>
     </qresource>
 </RCC>

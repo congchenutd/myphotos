@@ -21,10 +21,8 @@ public:
     QAction* getRenameAction();
     QAction* getRemoveAction();
     QAction* getDeleteAction();
-    QAction* getSortByTitleAction();
-    QAction* getSortByTimeAction();
-    QAction* getSortingOrderAction();
     QAction* getExportAction();
+    QAction* getOpenFolderAction();
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -53,6 +51,7 @@ private slots:
     void onShowVideos   (bool show);
     void onShowFavorites(bool show);
     void onExport();
+    void onOpenFolder();
 
 private:
     Ui::MainWindow ui;

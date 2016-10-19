@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QScrollBar>
 #include <QFileDialog>
+#include <QDesktopServices>
 
 MainWindow* MainWindow::_instance = 0;
 
@@ -106,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui.actionShowVideos,    SIGNAL(triggered(bool)), SLOT(onShowVideos(bool)));
     connect(ui.actionShowFavorites, SIGNAL(triggered(bool)), SLOT(onShowFavorites(bool)));
     connect(ui.actionExport,        SIGNAL(triggered(bool)), SLOT(onExport()));
+    connect(ui.actionOpenFolder,    SIGNAL(triggered(bool)), SLOT(onOpenFolder()));
 
     // load photos to photo view
     ui.photoView->load(_library->getAllPhotos().values());
@@ -133,10 +135,8 @@ MainWindow* MainWindow::getInstance()           { return _instance;             
 QAction*    MainWindow::getRenameAction()       { return ui.actionRename;       }
 QAction*    MainWindow::getRemoveAction()       { return ui.actionRemove;       }
 QAction*    MainWindow::getDeleteAction()       { return ui.actionDelete;       }
-QAction*    MainWindow::getSortByTitleAction()  { return ui.actionSortByTitle;  }
-QAction*    MainWindow::getSortByTimeAction()   { return ui.actionSortByTime;   }
-QAction*    MainWindow::getSortingOrderAction() { return ui.actionOrder;        }
 QAction*    MainWindow::getExportAction()       { return ui.actionExport;       }
+QAction*    MainWindow::getOpenFolderAction()   { return ui.actionOpenFolder;   }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
     _library->clean();  // clean up unused tags and save the library
@@ -212,6 +212,7 @@ void MainWindow::onPhotoSelected(const QList<PhotoItem*>& selected)
     ui.actionDelete ->setEnabled(hasSelection);
     ui.actionRename ->setEnabled(hasSelection);
     ui.actionExport ->setEnabled(hasSelection);
+    ui.actionOpenFolder->setEnabled(hasSelection);
 
     ui.pageInfo->setCurrentPhoto(hasSelection ? selected.front()->getPhoto() : 0);
 
@@ -435,6 +436,13 @@ void MainWindow::onExport()
     ui.statusBar->showMessage(tr("%1 file(s) exported to %2")
                               .arg(count)
                               .arg(dir));
+}
+
+void MainWindow::onOpenFolder()
+{
+    PhotoItem* item = ui.photoView->getSelectedItems().front(); // not null if the action is enabled
+    QString dirPath = QFileInfo(item->getPhoto()->getFilePath()).path();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dirPath));
 }
 
 void MainWindow::onAbout()

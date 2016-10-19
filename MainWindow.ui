@@ -68,6 +68,7 @@
     <addaction name="separator"/>
     <addaction name="actionImport"/>
     <addaction name="actionExport"/>
+    <addaction name="actionOpenFolder"/>
     <addaction name="separator"/>
     <addaction name="actionOptions"/>
     <addaction name="actionQuit"/>
@@ -422,6 +423,15 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+X</string>
+   </property>
+  </action>
+  <action name="actionOpenFolder">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/Images/Folder.png</normaloff>:/Images/Folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open folder</string>
    </property>
   </action>
  </widget>

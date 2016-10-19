@@ -188,9 +188,6 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
 
         QMenu menu(this);
         MainWindow* mainWindow = MainWindow::getInstance();
-        menu.addAction(mainWindow->getSortByTitleAction());
-        menu.addAction(mainWindow->getSortByTimeAction());
-        menu.addAction(mainWindow->getSortingOrderAction());
         if (!_selected.isEmpty())
         {
             menu.addSeparator();
@@ -198,6 +195,7 @@ void PhotoView::mousePressEvent(QMouseEvent* event)
             menu.addAction(mainWindow->getRemoveAction());
             menu.addAction(mainWindow->getDeleteAction());
             menu.addAction(mainWindow->getExportAction());
+            menu.addAction(mainWindow->getOpenFolderAction());
 
             menu.addSeparator();
             menu.addMenu(createEventMenu());
